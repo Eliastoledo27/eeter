@@ -1,0 +1,16 @@
+# Enable Rewrite Engine
+RewriteEngine On
+
+# Force HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Delegate to Node.js application
+# Hostinger Node.js setup usually handles this automatically if server.js is correct,
+# but this ensures standard routing behavior.
+DirectoryIndex server.js
+
+# Allow access to static files in public folder
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ server.js [L,QSA]
