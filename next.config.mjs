@@ -8,12 +8,14 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'tolzrvsykzmvndvomllt.supabase.co',
-      },
-      {
-        protocol: 'https',
         hostname: 'ui-avatars.com',
       },
+      ...(process.env.NEXT_PUBLIC_SUPABASE_URL
+        ? [{
+            protocol: 'https',
+            hostname: new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname,
+          }]
+        : []),
     ],
   },
   eslint: {

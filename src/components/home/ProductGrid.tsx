@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo, useState, type MouseEvent } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Eye, Heart, ShoppingBag, ShoppingCart, ShieldCheck, Truck } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -125,14 +124,10 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
               <div className="group cursor-pointer flex flex-col h-full overflow-hidden rounded-[2.5rem] border border-white bg-white/40 backdrop-blur-2xl transition-all duration-500 hover:border-amber-500/30 hover:shadow-[0_40px_100px_rgba(0,0,0,0.1)] active:scale-[0.98] group">
                 <div className="relative aspect-[4/5] overflow-hidden bg-[#F5F4F1]">
                   {product.images && product.images[0] ? (
-                    <Image
+                    <img
                       src={product.images[0]}
                       alt={product.name}
-                      fill
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      placeholder="blur"
-                      blurDataURL={BLUR}
-                      className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                      className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-[1.03]"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-[#C4C4C4]">
@@ -249,12 +244,10 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
             <div className="flex flex-col md:flex-row h-[90vh] md:h-auto md:max-h-[85vh]">
               <div className="w-full md:w-1/2 bg-[#F5F5F4] relative h-64 md:h-auto">
                 {selectedProduct.images && selectedProduct.images[0] ? (
-                  <Image
+                  <img
                     src={selectedProduct.images[0]}
                     alt={selectedProduct.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover w-full h-full"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground/30">

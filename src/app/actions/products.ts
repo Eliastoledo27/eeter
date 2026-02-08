@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/utils/supabase/server';
+import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
@@ -175,7 +176,20 @@ export async function getProducts(
     category?: string,
     status: 'active' | 'inactive' | 'all' = 'active'
 ) {
-    const supabase = createClient();
+    let supabase = createClient();
+
+    if (process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL) {
+        supabase = createSupabaseAdmin(
+            process.env.NEXT_PUBLIC_SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY,
+            {
+                auth: {
+                    autoRefreshToken: false,
+                    persistSession: false,
+                },
+            }
+        );
+    }
 
     let dbQuery = supabase
         .from('productos')
