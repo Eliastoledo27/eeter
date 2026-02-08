@@ -176,6 +176,12 @@ export async function getProducts(
     category?: string,
     status: 'active' | 'inactive' | 'all' = 'active'
 ) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseAnon) {
+        return [];
+    }
+
     let supabase = createClient();
 
     if (process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL) {
@@ -191,47 +197,52 @@ export async function getProducts(
         );
     }
 
-    let dbQuery = supabase
-        .from('productos')
-        .select('id, name, description, category, price, images, stock_by_size, status, created_at')
-        .order('created_at', { ascending: false });
+    try {
+        let dbQuery = supabase
+            .from('productos')
+            .select('id, name, description, category, price, images, stock_by_size, status, created_at')
+            .order('created_at', { ascending: false });
 
-    if (status === 'active') {
-        dbQuery = dbQuery.eq('status', 'activo');
-    }
+        if (status === 'active') {
+            dbQuery = dbQuery.eq('status', 'activo');
+        }
 
-    if (status === 'inactive') {
-        dbQuery = dbQuery.eq('status', 'inactivo');
-    }
+        if (status === 'inactive') {
+            dbQuery = dbQuery.eq('status', 'inactivo');
+        }
 
-    if (query) {
-        dbQuery = dbQuery.ilike('name', `%${query}%`);
-    }
+        if (query) {
+            dbQuery = dbQuery.ilike('name', `%${query}%`);
+        }
 
-    if (category && category !== 'Todos') {
-        dbQuery = dbQuery.eq('category', category);
-    }
+        if (category && category !== 'Todos') {
+            dbQuery = dbQuery.eq('category', category);
+        }
 
-    const { data, error } = await dbQuery;
+        const { data, error } = await dbQuery;
 
-    if (error) {
-        console.error('Fetch products error:', error);
+        if (error) {
+            console.error('Fetch products error:', error);
+            return [];
+        }
+
+        const mappedData = data.map((p: SupabaseProduct) => ({
+            id: p.id,
+            name: p.name,
+            description: p.description,
+            category: p.category,
+            base_price: p.price,
+            images: p.images || [],
+            stock_by_size: p.stock_by_size || {},
+            is_active: p.status === 'activo',
+            created_at: p.created_at
+        }));
+
+        return mappedData as ProductType[];
+    } catch (e) {
+        console.error('Unexpected products fetch error:', e);
         return [];
     }
-
-    const mappedData = data.map((p: SupabaseProduct) => ({
-        id: p.id,
-        name: p.name,
-        description: p.description,
-        category: p.category,
-        base_price: p.price,
-        images: p.images || [],
-        stock_by_size: p.stock_by_size || {},
-        is_active: p.status === 'activo',
-        created_at: p.created_at
-    }));
-
-    return mappedData as ProductType[];
 }
 
 export async function createProduct(formData: FormData) {
