@@ -12,8 +12,6 @@ import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import { toast } from 'sonner';
 
-const BLUR = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-
 interface ProductGridProps {
   products: ProductType[];
 }
