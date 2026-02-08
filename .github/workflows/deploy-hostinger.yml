@@ -38,6 +38,10 @@ jobs:
           # Copy custom Hostinger config files
           cp .htaccess .next/standalone/
           cp .env.production .next/standalone/.env
+          # Include server entry to support Node execution if needed
+          cp server.js .next/standalone/
+          # Include package.json for Hostinger Node manager
+          cp package.json .next/standalone/
 
       - name: Deploy to Hostinger via FTP 🚀
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5

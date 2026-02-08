@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import LoginForm from './LoginForm'
 
+export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'Iniciar Sesión | Éter Store - Tu Negocio de Reventa',
   description: 'Accede a tu panel de control, gestiona tus pedidos y consulta el catálogo mayorista más exclusivo de Argentina. Empieza a vender hoy mismo.',
