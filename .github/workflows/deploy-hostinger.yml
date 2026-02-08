@@ -37,7 +37,8 @@ jobs:
           cp -r .next/static .next/standalone/.next/
           # Copy custom Hostinger config files
           cp .htaccess .next/standalone/
-          cp .env.production .next/standalone/.env
+          # If a .env.production file exists in the repo, copy it (optional)
+          if [ -f ".env.production" ]; then cp .env.production .next/standalone/.env; fi
           # Include server entry to support Node execution if needed
           cp server.js .next/standalone/
           # Include package.json for Hostinger Node manager
