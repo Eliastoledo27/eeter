@@ -1,0 +1,84 @@
+{
+    "common": {
+        "loading": "Cargando...",
+        "error": "Error",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "view_all": "Ver Todo",
+        "search": "Buscar...",
+        "dashboard": "Panel",
+        "back": "Volver",
+        "send": "Enviar"
+    },
+    "dashboard": {
+        "title": "Panel de Control",
+        "welcome": "Hola, {name}",
+        "last_login": "Último acceso: {date}",
+        "global_portfolio": "Cartera Global",
+        "live_updates": "ACTUALIZACIONES EN VIVO",
+        "total_assets": "ACTIVOS TOTALES",
+        "this_week": "ESTA SEMANA",
+        "regional_operations": "Operaciones Regionales",
+        "tactical_feed": "Feed Táctico de Productos",
+        "quick_execution": "Protocolo de Ejecución Rápida",
+        "add_product": "Agregar Producto",
+        "create_order": "Crear Pedido",
+        "stock_update": "Actualizar Stock",
+        "campaign": "Campaña",
+        "activity_timeline": "Línea de Tiempo de Actividad",
+        "performance_metrics": "Métricas de Rendimiento",
+        "usage_stats": "Estadísticas de Uso",
+        "widgets": {
+            "customize": "Personalizar Widgets",
+            "reset": "Restablecer Diseño"
+        },
+        "role": {
+            "admin": "Administrador",
+            "user": "Usuario",
+            "reseller": "Revendedor",
+            "support": "Soporte"
+        }
+    },
+    "nav": {
+        "home": "Inicio",
+        "catalog": "Catálogo",
+        "orders": "Pedidos",
+        "customers": "Clientes",
+        "settings": "Ajustes",
+        "logout": "Cerrar Sesión",
+        "panel": "Panel",
+        "products": "Productos",
+        "analytics": "Analíticas",
+        "messages": "Mensajes"
+    },
+    "widgets": {
+        "user_profile": "Perfil de Usuario",
+        "last_login": "Última Sesión",
+        "stats": "Estadísticas",
+        "timeline": "Actividad",
+        "performance": "Rendimiento"
+    },
+    "messages": {
+        "title": "Mensajes",
+        "subtitle": "{count} conversaciones",
+        "search_placeholder": "Buscar conversaciones...",
+        "new_conversation": "Nueva Conversación",
+        "all": "Todos",
+        "unread": "No leídos",
+        "no_conversations": "No hay conversaciones",
+        "no_conversations_sub": "Los mensajes aparecerán acá",
+        "select_conversation": "Seleccioná una conversación",
+        "select_conversation_sub": "Elegí un hilo de la lista para ver el historial completo y responder a tus clientes, o iniciá una nueva conversación.",
+        "start_conversation": "Empezar Conversación",
+        "type_message": "Escribí tu mensaje acá...",
+        "send": "Enviar Mensaje",
+        "sending": "Enviando...",
+        "new_message": "Nuevo Mensaje",
+        "to": "Para",
+        "search_user": "Buscar Usuario",
+        "no_users_found": "No se encontraron usuarios",
+        "initial_message": "Mensaje Inicial"
+    }
+}

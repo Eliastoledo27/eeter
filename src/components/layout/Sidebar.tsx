@@ -1,179 +1,101 @@
 'use client'
 
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { LogOut, ChevronRight, Sparkles, ChevronLeft } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useAuthStore } from '@/store/auth-store'
-import { useUIStore } from '@/store/ui-store'
-import { getModulesForRole, UserRole } from '@/config/roles'
+import { useAuth } from '@/hooks/useAuth'
+import { usePermissions } from '@/hooks/usePermissions'
+import { useTranslations } from 'next-intl'
+import { getModulesForRole } from '@/config/roles'
 
 export function Sidebar() {
-  const searchParams = useSearchParams()
-  const { signOut, profile } = useAuthStore()
-  const { isSidebarCollapsed, toggleSidebar } = useUIStore()
-  
-  const role = (profile?.role as UserRole) || 'user'
-  const navItems = getModulesForRole(role)
+  const pathname = usePathname()
+  const { user, logout } = useAuth()
+  const { role } = usePermissions()
+  const t = useTranslations('nav')
+  const tDashboard = useTranslations('dashboard')
+
+  // Get role-filtered nav modules
+  const modules = getModulesForRole(role)
+
+  // Map role to display label
+  const roleLabels: Record<string, string> = {
+    admin: tDashboard('role.admin'),
+    support: 'SOPORTE',
+    reseller: 'REVENDEDOR',
+    user: 'USUARIO',
+  }
+
+  // Role badge colors
+  const roleColors: Record<string, string> = {
+    admin: 'text-[#C88A04]',
+    support: 'text-blue-400',
+    reseller: 'text-emerald-400',
+    user: 'text-gray-400',
+  }
 
   return (
-    <aside 
-      className={cn(
-        "hidden md:flex flex-col h-screen fixed left-0 top-0 border-r border-[#E2E8F0] bg-white/80 backdrop-blur-2xl z-50 shadow-[0_20px_60px_rgba(15,23,42,0.12)] transition-all duration-300",
-        isSidebarCollapsed ? "w-20" : "w-72"
-      )}
-    >
-      <div className="absolute inset-0 bg-noise opacity-[0.06] pointer-events-none" />
-      
-      {/* Header Logo */}
-      <div className={cn(
-          "relative overflow-hidden transition-all duration-300 flex items-center",
-          isSidebarCollapsed ? "p-4 justify-center" : "p-8 pb-6"
-      )}>
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#3B82F6]/10 to-transparent opacity-60 pointer-events-none" />
-        
-        {!isSidebarCollapsed ? (
-             <div className="relative z-10 w-full">
-                <div className="flex justify-between items-start">
-                    <h1 className="text-3xl font-black tracking-tighter text-[#0F172A]">
-                    ETER <span className="text-[#1E40AF]">STORE</span>
-                    </h1>
-                    <button 
-                        onClick={toggleSidebar}
-                        className="text-[#94A3B8] hover:text-[#0F172A] transition-colors"
-                    >
-                        <ChevronLeft size={20} />
-                    </button>
-                </div>
-                {profile?.role && (
-                <div className="flex items-center gap-2 mt-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse motion-reduce:animate-none shadow-[0_0_10px_rgba(16,185,129,0.3)]" />
-                    <span className="text-[10px] uppercase font-bold text-[#64748B] tracking-[0.2em]">
-                    {profile.role} ACCESS
-                    </span>
-                </div>
-                )}
-            </div>
-        ) : (
-            <div className="flex flex-col items-center gap-4">
-                <h1 className="text-xl font-black text-[#1E40AF]">E</h1>
-                <button 
-                    onClick={toggleSidebar}
-                    className="text-[#94A3B8] hover:text-[#0F172A] transition-colors"
-                >
-                    <ChevronRight size={20} />
-                </button>
-            </div>
-        )}
+    <aside className="w-[180px] h-full fixed left-0 top-0 border-r border-white/5 flex flex-col justify-between bg-black/40 backdrop-blur-sm z-50">
+      {/* Logo Area */}
+      <div className="p-6 flex justify-center">
+        <Link href="/dashboard">
+          <div className="w-12 h-12 bg-transparent border border-primary flex items-center justify-center relative shadow-[0_0_15px_rgba(200,138,4,0.15)] rounded-lg group cursor-pointer hover:bg-primary/10 transition-colors">
+            <span className="text-3xl font-bold text-primary group-hover:text-shadow transition-all font-heading">É</span>
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+          </div>
+        </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-3 space-y-3 mt-4 overflow-y-auto custom-scrollbar relative z-10">
-        {navItems.map((item) => {
-          const isActive = item.id === 'dashboard' 
-            ? (!searchParams.get('view') || searchParams.get('view') === 'dashboard')
-            : searchParams.get('view') === item.id
-
+      {/* Navigation — filtered by role */}
+      <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto custom-scrollbar">
+        {modules.map((module) => {
+          const isActive = pathname === module.href ||
+            (module.href !== '/dashboard' && pathname.startsWith(module.href))
+          const Icon = module.icon
           return (
-            <Link key={item.id} href={item.href}>
-              <div className="relative group perspective-1000">
-                <motion.div
-                  className={cn(
-                    "relative flex items-center rounded-2xl transition-all duration-500 overflow-hidden",
-                    isSidebarCollapsed ? "justify-center p-3" : "gap-4 px-4 py-4",
-                    isActive 
-                      ? "bg-[#1E40AF]/10 border border-[#1E40AF]/20 shadow-[0_10px_30px_rgba(30,64,175,0.15)]" 
-                      : "hover:bg-[#F1F5F9] border border-transparent hover:border-[#E2E8F0]"
-                  )}
-                  whileHover={{ x: isSidebarCollapsed ? 0 : 5 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {/* Active Indicator Line */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="active-nav-indicator"
-                      className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#1E40AF] to-[#3B82F6] shadow-[0_0_12px_rgba(59,130,246,0.6)]"
-                    />
-                  )}
-
-                  {/* Icon Container */}
-                  <div className={cn(
-                    "relative z-10 rounded-xl transition-all duration-500 flex items-center justify-center",
-                    isSidebarCollapsed ? "p-2" : "p-2.5",
-                    isActive 
-                      ? "bg-[#1E40AF] text-white shadow-[0_10px_20px_rgba(30,64,175,0.35)] rotate-3" 
-                      : "bg-white text-[#64748B] group-hover:text-[#1E40AF] group-hover:bg-[#EFF6FF] group-hover:-rotate-3 border border-[#E2E8F0]"
-                  )}>
-                    <item.icon size={isSidebarCollapsed ? 24 : 20} strokeWidth={isActive ? 2.5 : 2} />
-                  </div>
-
-                  {/* Text Content */}
-                  {!isSidebarCollapsed && (
-                      <div className="flex-1 relative z-10">
-                        <span className={cn(
-                          "block text-sm transition-all duration-300",
-                          isActive 
-                            ? "font-bold text-[#0F172A] tracking-wide" 
-                            : "font-medium text-[#64748B] group-hover:text-[#0F172A]"
-                        )}>
-                          {item.label}
-                        </span>
-                        {isActive && (
-                          <span className="text-[10px] text-[#F59E0B] font-medium animate-pulse motion-reduce:animate-none">
-                            Activo ahora
-                          </span>
-                        )}
-                      </div>
-                  )}
-
-                  {/* Right Chevron / Sparkle */}
-                  {!isSidebarCollapsed && (
-                    <div className={cn(
-                        "text-[#94A3B8] transition-all duration-300 transform",
-                        isActive ? "text-[#F59E0B] translate-x-0 opacity-100" : "opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0"
-                    )}>
-                        {isActive ? <Sparkles size={16} /> : <ChevronRight size={16} />}
-                    </div>
-                  )}
-
-                  {/* Background Glow Effect on Hover */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#1E40AF]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                </motion.div>
-              </div>
+            <Link
+              key={module.id}
+              href={module.href}
+              className={cn(
+                "flex items-center gap-3 px-3 py-3 rounded-lg transition-all group relative",
+                isActive
+                  ? "bg-primary/10 border border-primary/30 text-primary"
+                  : "text-gray-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10"
+              )}
+            >
+              <Icon size={20} className="group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] font-semibold tracking-wider font-mono uppercase">{module.label}</span>
+              {module.id === 'messages' && (
+                <span className="absolute right-2 top-3 w-2 h-2 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
+              )}
             </Link>
           )
         })}
       </nav>
 
-      {/* Footer / Logout */}
-      <div className="p-4 mt-auto">
-        <button
-          onClick={() => signOut()}
-          className="group w-full relative overflow-hidden rounded-2xl p-[1px]"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-red-500/40 to-amber-500/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className={cn(
-              "relative bg-white group-hover:bg-white/90 rounded-2xl flex items-center transition-all border border-[#E2E8F0]",
-              isSidebarCollapsed ? "justify-center p-3" : "px-4 py-4 gap-3"
-          )}>
-            <div className="p-2 rounded-lg bg-white text-[#64748B] group-hover:text-red-500 group-hover:bg-red-500/10 transition-colors border border-[#E2E8F0]">
-               <LogOut size={18} />
+      {/* Profile / Logout */}
+      <div className="p-4 border-t border-white/5">
+        <div className="flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/10 group">
+
+          <Link href="/dashboard/profile" className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-700 to-black border border-primary/50 overflow-hidden relative flex-shrink-0">
+              <div className="w-full h-full flex items-center justify-center bg-zinc-800 text-[10px] text-white heading-font">
+                {user?.email?.charAt(0).toUpperCase()}
+              </div>
             </div>
-            {!isSidebarCollapsed && (
-                <div className="flex flex-col items-start">
-                <span className="text-sm font-bold text-[#0F172A] group-hover:text-[#0F172A] transition-colors">Cerrar Sesión</span>
-                <span className="text-[10px] text-[#94A3B8] group-hover:text-red-500/80">Hasta pronto</span>
-                </div>
-            )}
-          </div>
-        </button>
-        
-        {!isSidebarCollapsed && (
-            <p className="text-center text-[10px] text-[#94A3B8] mt-4 mb-2">
-            &copy; 2024 Eter Store Inc.
-            </p>
-        )}
+            <div className="flex flex-col min-w-0">
+              <span className={cn("text-[10px] font-bold tracking-wide truncate", roleColors[role] || 'text-gray-400')}>
+                {roleLabels[role] || 'USUARIO'}
+              </span>
+              <span className="text-[9px] text-primary font-mono">ONLINE</span>
+            </div>
+          </Link>
+
+          <button onClick={() => logout()} className="text-gray-500 hover:text-white transition-colors p-1" title={t('logout')}>
+            <LogOut size={14} />
+          </button>
+        </div>
       </div>
     </aside>
   )

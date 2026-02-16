@@ -60,68 +60,84 @@ export function ProductCard({ product }: { product: Product }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="group relative bg-white rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-accent/10 cursor-pointer"
+      onClick={() => {
+        // Al hacer click en la card (fuera de botones), vamos al detalle
+        window.location.href = `/catalog/${product.id}`;
+      }}
+      className="group relative bg-gradient-to-br from-[#111] to-[#050505] rounded-[2rem] overflow-hidden border border-white/5 hover:border-[#CA8A04]/30 transition-all duration-700 ease-out cursor-pointer shadow-2xl"
     >
+      {/* Noise Texture */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+      }} />
+
+      {/* Background Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] bg-[#CA8A04]/5 rounded-full blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
       {/* Image Container */}
-      <div className="aspect-[1/1] relative overflow-hidden bg-[#F5F5F4]">
+      <div className="aspect-[1/1] relative overflow-hidden bg-black/20">
         <Image
           src={product.images[0] || '/placeholder-shoe.png'}
           alt={product.name}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700 ease-out"
+          className="object-contain p-8 w-full h-full group-hover:scale-110 group-hover:-rotate-3 transition-all duration-1000 ease-out drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)]"
         />
 
-        {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* Hover Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
         {/* Quick Add Button */}
         <button
-          onClick={handleAddToCart}
-          className="absolute bottom-4 right-4 h-11 w-11 bg-primary text-white flex items-center justify-center rounded-full shadow-xl opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:bg-accent hover:scale-110 active:scale-95"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleAddToCart(e);
+          }}
+          className="absolute bottom-6 right-6 h-12 w-12 bg-white text-black flex items-center justify-center rounded-full shadow-[0_0_30px_rgba(255,255,255,0.2)] opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-700 hover:bg-[#CA8A04] hover:text-black active:scale-95 z-30"
           aria-label="Agregar al carrito"
         >
-          <ShoppingCart size={18} />
+          <ShoppingCart size={20} />
         </button>
 
-        {/* Stock Badge */}
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        {(product as any).is_active ? (
-          <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-emerald-500/10 backdrop-blur-md border border-emerald-500/20 text-[10px] font-bold text-emerald-600 uppercase tracking-widest">
-            En Stock
-          </div>
-        ) : (
-          <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-rose-500/10 backdrop-blur-md border border-rose-500/20 text-[10px] font-bold text-rose-600 uppercase tracking-widest">
-            Sin Stock
-          </div>
-        )}
+        {/* Status Badge */}
+        <div className="absolute top-6 left-6 z-20">
+          {product.status === 'active' ? (
+            <span className="px-3 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-[10px] font-bold text-emerald-400 uppercase tracking-widest backdrop-blur-md">
+              Disponible
+            </span>
+          ) : (
+            <span className="px-3 py-1.5 rounded-full border border-rose-500/20 bg-rose-500/10 text-[10px] font-bold text-rose-400 uppercase tracking-widest backdrop-blur-md">
+              Agotado
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Info */}
-      <div className="p-5 space-y-2">
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] font-bold text-accent uppercase tracking-[0.2em]">
+      <div className="p-8 relative z-20">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[10px] font-bold text-[#CA8A04] uppercase tracking-[0.3em] opacity-80">
             {product.category}
           </p>
-          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">
-            MDQ Orig.
+          <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">
+            EDICIÓN_LIMITED
           </span>
         </div>
 
-        <h3 className="font-heading text-lg font-medium text-foreground leading-tight group-hover:text-accent transition-colors line-clamp-1">
+        <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-[#CA8A04] transition-colors duration-500 line-clamp-1 mb-4 uppercase">
           {product.name}
         </h3>
 
-        <div className="flex flex-col gap-3 pt-2 border-t border-black/5">
+        <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
-            <span className="text-xl font-medium text-foreground font-heading">
-              ${product.basePrice.toLocaleString()}
+            <span className="text-3xl font-light text-white tracking-tighter">
+              ${product.basePrice.toLocaleString('es-AR')}
             </span>
           </div>
 
-          {availableSizes.length > 0 && availableSizes[0] !== 'Unique' && (
-            <div className="flex flex-wrap gap-1.5" onClick={(e) => e.preventDefault()}>
-              {availableSizes.slice(0, 5).map(size => (
+          <div className="flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
+            {availableSizes.length > 0 && availableSizes[0] !== 'Unique' ? (
+              availableSizes.slice(0, 5).map(size => (
                 <button
                   key={size}
                   onClick={(e) => {
@@ -130,20 +146,22 @@ export function ProductCard({ product }: { product: Product }) {
                     setSelectedSize(size);
                   }}
                   className={`
-                            h-6 min-w-[24px] px-1 rounded text-[10px] font-bold border transition-all
-                            ${selectedSize === size
-                      ? 'bg-primary border-primary text-white'
-                      : 'bg-white border-slate-200 text-slate-600 hover:border-primary hover:text-primary'}
-                        `}
+                        h-8 min-w-[32px] px-2 rounded-lg text-xs font-mono font-bold border transition-all duration-300
+                        ${selectedSize === size
+                      ? 'bg-[#CA8A04] border-[#CA8A04] text-black shadow-[0_0_15px_rgba(202,138,4,0.4)]'
+                      : 'bg-white/5 border-white/10 text-gray-400 hover:border-[#CA8A04] hover:text-[#CA8A04]'}
+                    `}
                 >
                   {size}
                 </button>
-              ))}
-              {availableSizes.length > 5 && (
-                <span className="text-[10px] text-slate-400 self-center">+{availableSizes.length - 5}</span>
-              )}
-            </div>
-          )}
+              ))
+            ) : (
+              <span className="h-8 flex items-center text-[10px] font-mono text-gray-600 uppercase tracking-tighter">Sin talles disponibles</span>
+            )}
+            {availableSizes.length > 5 && (
+              <span className="h-8 flex items-center text-[10px] font-mono text-gray-600 uppercase tracking-tighter">+{availableSizes.length - 5} MÁS</span>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>

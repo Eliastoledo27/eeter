@@ -1,0 +1,57 @@
+{
+    "common": {
+        "loading": "Chargement...",
+        "error": "Erreur",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "view_all": "Tout voir",
+        "search": "Rechercher...",
+        "dashboard": "Tableau de bord"
+    },
+    "dashboard": {
+        "title": "Panneau de configuration",
+        "welcome": "Bienvenue, {name}",
+        "last_login": "Dernière connexion : {date}",
+        "global_portfolio": "Portefeuille Global",
+        "live_updates": "MISES À JOUR EN DIRECT",
+        "total_assets": "TOTAL DES ACTIFS",
+        "this_week": "CETTE SEMAINE",
+        "regional_operations": "Opérations Régionales",
+        "tactical_feed": "Flux de Produits Tactique",
+        "quick_execution": "Protocole d'Exécution Rapide",
+        "add_product": "Ajouter un Produit",
+        "create_order": "Créer une Commande",
+        "stock_update": "Mise à jour du Stock",
+        "campaign": "Campagne",
+        "activity_timeline": "Chronologie de l'activité",
+        "performance_metrics": "Métriques de Performance",
+        "usage_stats": "Statistiques d'utilisation",
+        "widgets": {
+            "customize": "Personnaliser les Widgets",
+            "reset": "Réinitialiser la Disposition"
+        },
+        "role": {
+            "admin": "Administrateur",
+            "user": "Utilisateur",
+            "reseller": "Revendeur",
+            "support": "Support"
+        }
+    },
+    "nav": {
+        "home": "Accueil",
+        "catalog": "Catalogue",
+        "orders": "Commandes",
+        "customers": "Clients",
+        "settings": "Paramètres",
+        "logout": "Déconnexion"
+    },
+    "widgets": {
+        "user_profile": "Profil Utilisateur",
+        "last_login": "Dernière Connexion",
+        "stats": "Statistiques",
+        "timeline": "Activités",
+        "performance": "Performance"
+    }
+}

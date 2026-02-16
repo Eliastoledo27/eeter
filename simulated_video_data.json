@@ -1,0 +1,41 @@
+[
+    {
+        "name": "Remera Oversize Éter",
+        "description": "Remera oversize de algodón peinado premium.",
+        "category": "Remeras",
+        "base_price": 25000,
+        "stock_by_size": {
+            "S": 10,
+            "M": 15,
+            "L": 12,
+            "XL": 8
+        },
+        "image_url": "https://placehold.co/600x600?text=Remera+Eter"
+    },
+    {
+        "name": "Buzo Hoodie Street",
+        "description": "Buzo con capucha, friza invisible de alta calidad.",
+        "category": "Buzos",
+        "base_price": 45000,
+        "stock_by_size": {
+            "S": 5,
+            "M": 8,
+            "L": 10,
+            "XL": 6
+        },
+        "image_url": "https://placehold.co/600x600?text=Buzo+Street"
+    },
+    {
+        "name": "Pantalón Cargo Tech",
+        "description": "Pantalón cargo corte recto con múltiples bolsillos.",
+        "category": "Pantalones",
+        "base_price": 38000,
+        "stock_by_size": {
+            "38": 4,
+            "40": 6,
+            "42": 6,
+            "44": 2
+        },
+        "image_url": "https://placehold.co/600x600?text=Pantalon+Cargo"
+    }
+]

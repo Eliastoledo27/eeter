@@ -56,13 +56,63 @@ export interface TopProduct {
 export async function getDashboardStats(): Promise<DashboardStats> {
   const supabase = createClient();
 
-  // 1. Total Revenue & Orders (All time)
-  const { data: allOrders, error: ordersError } = await supabase
-    .from('pedidos')
-    .select('total_amount, created_at');
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
 
-  if (ordersError) {
-    console.error('Error fetching orders stats:', ordersError);
+    if (!user) {
+      return {
+        totalRevenue: 0,
+        totalOrders: 0,
+        totalProducts: 0,
+        activeCustomers: 0,
+        revenueGrowth: 0,
+        ordersGrowth: 0
+      };
+    }
+
+    const role = user.app_metadata?.role || 'user';
+
+    // Non-admins see their own stats
+    if (role !== 'admin' && role !== 'support') {
+      return getUserDashboardStats();
+    }
+
+    // 1. Total Revenue & Orders (Last 1000 orders for performance or aggregate)
+    // Ideally we should use a Postgres function for sum, but sticking to simple query with limit
+    const { data: allOrders, error: ordersError } = await supabase
+      .from('pedidos')
+      .select('total_amount, created_at')
+      .limit(2000); // Prevent fetching massive amounts of data
+
+    if (ordersError) {
+      console.error('Error fetching orders:', ordersError);
+      throw ordersError;
+    }
+
+    const orders = allOrders || [];
+    const totalRevenue = orders.reduce((sum, order) => sum + Number(order.total_amount || 0), 0);
+    const totalOrders = orders.length; // Approximate if over limit, but fast
+
+    // 2. Total Products
+    const { count: totalProducts } = await supabase
+      .from('productos')
+      .select('*', { count: 'exact', head: true });
+
+    // 3. Active Customers
+    const { count: activeCustomers } = await supabase
+      .from('clientes')
+      .select('*', { count: 'exact', head: true });
+
+    return {
+      totalRevenue,
+      totalOrders,
+      totalProducts: totalProducts || 0,
+      activeCustomers: activeCustomers || 0,
+      revenueGrowth: 0,
+      ordersGrowth: 0
+    };
+  } catch (error) {
+    console.error('getDashboardStats failed:', error);
     return {
       totalRevenue: 0,
       totalOrders: 0,
@@ -72,29 +122,6 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       ordersGrowth: 0
     };
   }
-
-  const orders = allOrders || [];
-  const totalRevenue = orders.reduce((sum, order) => sum + Number(order.total_amount || 0), 0);
-  const totalOrders = orders.length;
-
-  // 2. Total Products
-  const { count: totalProducts } = await supabase
-    .from('productos')
-    .select('*', { count: 'exact', head: true });
-
-  // 3. Active Customers
-  const { count: activeCustomers } = await supabase
-    .from('clientes')
-    .select('*', { count: 'exact', head: true });
-
-  return {
-    totalRevenue,
-    totalOrders,
-    totalProducts: totalProducts || 0,
-    activeCustomers: activeCustomers || 0,
-    revenueGrowth: 0,
-    ordersGrowth: 0
-  };
 }
 
 export async function getRanking() {
@@ -170,9 +197,44 @@ export async function getUserRecentOrders(limit = 5): Promise<Order[]> {
 
 export async function getUserDashboardStats(): Promise<DashboardStats> {
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user?.email) {
+    if (!user?.email) {
+      return {
+        totalRevenue: 0,
+        totalOrders: 0,
+        totalProducts: 0,
+        activeCustomers: 0,
+        revenueGrowth: 0,
+        ordersGrowth: 0
+      };
+    }
+
+    // 1. User's Orders
+    const { data: userOrders } = await supabase
+      .from('pedidos')
+      .select('total_amount, status')
+      .eq('customer_email', user.email)
+      .limit(100);
+
+    const totalSpent = userOrders?.reduce((sum, order) => sum + Number(order.total_amount || 0), 0) || 0;
+    const totalOrders = userOrders?.length || 0;
+
+    // 2. Active Orders (not completed/cancelled)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const activeOrdersCount = userOrders?.filter((o: any) => o.status !== 'completado' && o.status !== 'cancelado').length || 0;
+
+    return {
+      totalRevenue: totalSpent, // Reuse field for "Total Spent"
+      totalOrders: totalOrders,
+      totalProducts: 0, // Not relevant
+      activeCustomers: 0, // Not relevant
+      revenueGrowth: activeOrdersCount, // Reuse for "Active Orders" count
+      ordersGrowth: 0
+    };
+  } catch (error) {
+    console.error('getUserDashboardStats failed:', error);
     return {
       totalRevenue: 0,
       totalOrders: 0,
@@ -182,61 +244,43 @@ export async function getUserDashboardStats(): Promise<DashboardStats> {
       ordersGrowth: 0
     };
   }
-
-  // 1. User's Orders
-  const { data: userOrders } = await supabase
-    .from('pedidos')
-    .select('total_amount')
-    .eq('customer_email', user.email);
-
-  const totalSpent = userOrders?.reduce((sum, order) => sum + Number(order.total_amount || 0), 0) || 0;
-  const totalOrders = userOrders?.length || 0;
-
-  // 2. Active Orders (not completed/cancelled)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const activeOrdersCount = userOrders?.filter((o: any) => o.status !== 'completado' && o.status !== 'cancelado').length || 0;
-
-  // 3. Cart Items (Approximate, from local storage usually, but maybe we have a server cart?)
-  // For now we'll use activeOrders as a proxy for "active activity" or just 0.
-
-  return {
-    totalRevenue: totalSpent, // Reuse field for "Total Spent"
-    totalOrders: totalOrders,
-    totalProducts: 0, // Not relevant
-    activeCustomers: 0, // Not relevant
-    revenueGrowth: activeOrdersCount, // Reuse for "Active Orders" count
-    ordersGrowth: 0
-  };
 }
+
 
 export async function getRevenueData(): Promise<RevenueData[]> {
   const supabase = createClient();
 
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  try {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const { data: orders, error } = await supabase
-    .from('pedidos')
-    .select('created_at, total_amount')
-    .gte('created_at', thirtyDaysAgo.toISOString())
-    .order('created_at', { ascending: true });
+    const { data: orders, error } = await supabase
+      .from('pedidos')
+      .select('created_at, total_amount')
+      .gte('created_at', thirtyDaysAgo.toISOString())
+      .order('created_at', { ascending: true })
+      .limit(1000);
 
-  if (error || !orders) {
+    if (error || !orders) {
+      return [];
+    }
+
+    const revenueMap = new Map<string, number>();
+
+    orders.forEach(order => {
+      const date = new Date(order.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+      const amount = Number(order.total_amount || 0);
+      revenueMap.set(date, (revenueMap.get(date) || 0) + amount);
+    });
+
+    return Array.from(revenueMap.entries()).map(([date, revenue]) => ({
+      date,
+      revenue
+    }));
+  } catch (error) {
+    console.error('getRevenueData failed', error);
     return [];
   }
-
-  const revenueMap = new Map<string, number>();
-
-  orders.forEach(order => {
-    const date = new Date(order.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
-    const amount = Number(order.total_amount || 0);
-    revenueMap.set(date, (revenueMap.get(date) || 0) + amount);
-  });
-
-  return Array.from(revenueMap.entries()).map(([date, revenue]) => ({
-    date,
-    revenue
-  }));
 }
 
 export async function getTopProducts(limit = 5): Promise<TopProduct[]> {
@@ -384,11 +428,31 @@ export async function getPerformanceMetrics(): Promise<PerformanceMetric[]> {
 
 export async function getRecentActivity(limit = 10): Promise<ActivityItem[]> {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  // Combine latest orders and new customers
-  // In a real scenario, you might have an 'events' table or union queries.
-  // Here we'll fetch both and sort in JS.
+  if (!user) return [];
 
+  const role = user.app_metadata?.role || 'user';
+  const activities: ActivityItem[] = [];
+
+  // Non-admins see only their own activity
+  if (role !== 'admin' && role !== 'support') {
+    const userOrders = await getUserRecentOrders(limit);
+    userOrders.forEach(o => {
+      activities.push({
+        id: `order-${o.id}`,
+        type: 'order',
+        title: 'Tu pedido',
+        description: `Realizaste una compra`,
+        timestamp: o.created_at,
+        value: `$${o.total_amount}`
+      });
+    });
+    return activities;
+  }
+
+  // Admin/Support logic: Global Activity
+  // Combine latest orders, new customers, and alerts
   const { data: orders } = await supabase
     .from('pedidos')
     .select('id, customer_name, total_amount, created_at')
@@ -397,11 +461,9 @@ export async function getRecentActivity(limit = 10): Promise<ActivityItem[]> {
 
   const { data: customers } = await supabase
     .from('clientes')
-    .select('id, nombre, created_at') // Changed 'name' to 'nombre' based on previous file read
+    .select('id, nombre, created_at')
     .order('created_at', { ascending: false })
     .limit(limit);
-
-  const activities: ActivityItem[] = [];
 
   orders?.forEach(o => {
     activities.push({

@@ -1,63 +1,84 @@
 'use client';
 
-import { Search, Filter } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useCatalog } from '@/hooks/useCatalog';
-import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { List, LayoutGrid } from 'lucide-react';
 
-export function CatalogFilters() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { categories } = useCatalog(); // Get dynamic categories
-  
-  const query = searchParams.get('q') || '';
-  const category = searchParams.get('category') || 'Todos';
+interface CatalogFiltersProps {
+  categories: string[];
+  selectedCategory: string | null;
+  onCategorySelect: (category: string | null) => void;
+  viewMode: 'grid' | 'list';
+  onViewModeChange: (mode: 'grid' | 'list') => void;
+  totalCount: number;
+}
 
-  const handleSearch = (term: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (term) {
-      params.set('q', term);
-    } else {
-      params.delete('q');
-    }
-    router.replace(`/?${params.toString()}`, { scroll: false });
-  };
-
-  const handleCategoryChange = (cat: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (cat && cat !== 'Todos') {
-      params.set('category', cat);
-    } else {
-      params.delete('category');
-    }
-    router.replace(`/?${params.toString()}`, { scroll: false });
-  };
-
+export function CatalogFilters({
+  categories,
+  selectedCategory,
+  onCategorySelect,
+  viewMode,
+  onViewModeChange,
+  totalCount,
+}: CatalogFiltersProps) {
   return (
-    <div className="flex flex-col md:flex-row gap-4 mb-8">
-      <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-        <Input 
-          value={query}
-          onChange={(e) => handleSearch(e.target.value)}
-          placeholder="Buscar productos..." 
-          className="pl-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 shadow-sm focus:border-primary focus:ring-primary"
-        />
-      </div>
-      
-      <div className="relative w-full md:w-[200px]">
-        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-        <select 
-          value={category}
-          onChange={(e) => handleCategoryChange(e.target.value)}
-          className="w-full h-10 pl-10 pr-4 rounded-md border border-gray-200 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none shadow-sm transition-all"
+    <div className="flex items-center justify-between gap-4 mb-4">
+      {/* Category Pills */}
+      <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1 flex-1">
+        <button
+          onClick={() => onCategorySelect(null)}
+          className={cn(
+            'shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 border',
+            !selectedCategory
+              ? 'bg-[#ffd900] text-black border-[#ffd900] shadow-[0_0_20px_rgba(255,217,0,0.2)]'
+              : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20'
+          )}
         >
-          {categories.map(c => (
-            <option key={c} value={c} className="bg-white text-gray-900">
-              {c}
-            </option>
-          ))}
-        </select>
+          Todos ({totalCount})
+        </button>
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() =>
+              onCategorySelect(selectedCategory === cat ? null : cat)
+            }
+            className={cn(
+              'shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 border',
+              selectedCategory === cat
+                ? 'bg-[#ffd900] text-black border-[#ffd900] shadow-[0_0_20px_rgba(255,217,0,0.2)]'
+                : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20'
+            )}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* View Mode Toggle */}
+      <div className="hidden sm:flex items-center gap-1 bg-white/5 rounded-xl border border-white/10 p-1">
+        <button
+          onClick={() => onViewModeChange('grid')}
+          className={cn(
+            'p-2 rounded-lg transition-all duration-200',
+            viewMode === 'grid'
+              ? 'bg-[#ffd900] text-black'
+              : 'text-gray-500 hover:text-white'
+          )}
+          title="Vista grilla"
+        >
+          <LayoutGrid size={16} />
+        </button>
+        <button
+          onClick={() => onViewModeChange('list')}
+          className={cn(
+            'p-2 rounded-lg transition-all duration-200',
+            viewMode === 'list'
+              ? 'bg-[#ffd900] text-black'
+              : 'text-gray-500 hover:text-white'
+          )}
+          title="Vista lista"
+        >
+          <List size={16} />
+        </button>
       </div>
     </div>
   );

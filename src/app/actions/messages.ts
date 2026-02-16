@@ -8,7 +8,7 @@ import type { Message } from '@/types';
 // Exporting types for other consumers if needed (though they should use @/types now)
 export type { Message };
 
-export async function getMessages() {
+export async function getMessages(page = 1, limit = 50) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -30,15 +30,19 @@ export async function getMessages() {
     .order('created_at', { ascending: false });
 
   // If NOT admin, only show messages where user is receiver OR sender
-  // Since RLS policies are hard to debug without CLI, we enforce logic here too.
   if (!isAdmin) {
     query = query.or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`);
   }
 
+  // Apply pagination
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+  query = query.range(from, to);
+
   const { data, error } = await query;
 
   if (error) {
-    // console.error('Error fetching messages:', error);
+    console.error('Error fetching messages:', error);
     return [];
   }
 
@@ -98,7 +102,7 @@ export async function sendMessage(formData: FormData) {
       .select('id')
       .eq('email', email)
       .single();
-    
+
     if (existingUser) {
       senderId = existingUser.id;
     }

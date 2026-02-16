@@ -1,7 +1,6 @@
-'use client';
-
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { getMessages, sendAdminMessage } from '@/app/actions/messages';
+import { getMessages, sendAdminMessage, getConversation } from '@/app/actions/messages';
+import { groupMessages } from '@/utils/message-utils';
 import type { Message } from '@/types';
 import { getAllProfiles } from '@/app/actions/profiles';
 import type { Profile } from '@/types/profiles';
@@ -17,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { createClient } from '@/utils/supabase/client';
+import { useTranslations } from 'next-intl';
 
 interface MessagesInboxProps {
     isAdmin: boolean;
@@ -25,9 +25,14 @@ interface MessagesInboxProps {
 }
 
 export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: MessagesInboxProps) => {
+    const t = useTranslations('messages');
+    const tCommon = useTranslations('common');
+    const tDashboard = useTranslations('dashboard');
+
     const [messages, setMessages] = useState<Message[]>([]);
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isThreadLoading, setIsThreadLoading] = useState(false);
     const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState<'all' | 'unread' | 'archived'>('all');
@@ -46,12 +51,19 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
         // Only show loading spinner on first load
         if (!hasLoadedRef.current) setIsLoading(true);
         try {
-            const data = await getMessages();
-            setMessages(data || []);
+            const data = await getMessages(1, 100);
+            if (data) {
+                setMessages(prev => {
+                    // Update recent messages and keep older loaded messages
+                    const newIds = new Set(data.map(m => m.id));
+                    const oldMessages = prev.filter(m => !newIds.has(m.id));
+                    return [...data, ...oldMessages];
+                });
+            }
             hasLoadedRef.current = true;
         } catch (err) {
             console.error("Error fetching messages:", err);
-            toast.error("Error al cargar mensajes");
+            toast.error(tCommon('error'));
         } finally {
             setIsLoading(false);
         }
@@ -90,7 +102,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                     if (payload.eventType === 'INSERT') {
                         const newMsg = payload.new as Message;
                         if (!newMsg.is_admin_reply) {
-                            toast.info(`Nuevo mensaje de ${newMsg.name || 'Usuario'}`);
+                            toast.info(`${t('new_message')} ${t('to')} ${newMsg.name || tDashboard('role.user')}`);
                         }
                     }
                 } else {
@@ -99,7 +111,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                     if (newMsg.sender_id === currentUserId || newMsg.receiver_id === currentUserId) {
                         fetchMessagesRef.current(); // Immediate for single user
                         if (payload.eventType === 'INSERT' && newMsg.receiver_id === currentUserId) {
-                            toast.info('Nuevo mensaje recibido');
+                            toast.info(t('new_message'));
                         }
                     }
                 }
@@ -140,108 +152,42 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
         return isNaN(d.getTime()) ? new Date() : d;
     };
 
+    // Fetch full conversation when thread is selected
+    useEffect(() => {
+        const loadConversation = async () => {
+            if (!selectedThreadId) return;
+
+            setIsThreadLoading(true);
+            const fullConversation = await getConversation(selectedThreadId);
+
+            if (fullConversation && fullConversation.length > 0) {
+                setMessages(prev => {
+                    // Merge new messages with existing ones, avoiding duplicates
+                    const existingIds = new Set(prev.map(m => m.id));
+                    const newMessages = fullConversation.filter(m => !existingIds.has(m.id));
+
+                    if (newMessages.length === 0) return prev;
+
+                    return [...prev, ...newMessages];
+                });
+            }
+            setIsThreadLoading(false);
+        };
+
+        loadConversation();
+    }, [selectedThreadId]);
+
     // Group messages by thread
     const threads = useMemo(() => {
-        // if (!isAdmin) {
-        //     return [];
-        // }
+        return groupMessages({
+            messages,
+            profiles,
+            tNewMessage: t('new_message'),
+            tRoleUser: tDashboard('role.user')
+        });
+    }, [messages, profiles, t, tDashboard]);
 
-        const threadMap = new Map<string, {
-            userId: string,
-            name: string,
-            email: string,
-            lastMessage: Message,
-            unreadCount: number,
-            messages: Message[]
-        }>();
 
-        try {
-            messages.forEach(msg => {
-                let threadKey = '';
-                let threadName = '';
-                let threadEmail = '';
-
-                if (msg.is_admin_reply) {
-                    threadKey = msg.receiver_id || 'unknown';
-                } else {
-                    threadKey = msg.sender_id || 'anonymous';
-                    threadName = msg.name || 'Anónimo';
-                    threadEmail = msg.email || '';
-                }
-
-                if (threadKey === 'anonymous' || !threadKey) {
-                    threadKey = msg.email || `anon-${Math.random()}`;
-                }
-
-                if (!threadMap.has(threadKey)) {
-                    // Try to find profile details if threadKey is a valid UUID (likely a user ID)
-                    const userProfile = profiles.find(p => p.id === threadKey);
-
-                    threadMap.set(threadKey, {
-                        userId: threadKey,
-                        name: userProfile?.full_name || threadName || msg.name || 'Usuario',
-                        email: userProfile?.email || threadEmail || msg.email || '',
-                        lastMessage: msg,
-                        unreadCount: 0,
-                        messages: []
-                    });
-                }
-
-                const thread = threadMap.get(threadKey)!;
-                thread.messages.push(msg);
-
-                const msgDate = safeDate(msg.created_at);
-                const lastMsgDate = safeDate(thread.lastMessage.created_at);
-
-                if (msgDate > lastMsgDate) {
-                    thread.lastMessage = msg;
-                    // Update name only if it's from user and has valid name, AND no profile found
-                    const userProfile = profiles.find(p => p.id === threadKey);
-                    if (!userProfile && !msg.is_admin_reply && msg.name) {
-                        thread.name = msg.name;
-                        thread.email = msg.email || thread.email;
-                    }
-                }
-
-                if (msg.status === 'unread' && !msg.is_admin_reply) {
-                    thread.unreadCount++;
-                }
-            });
-
-            profiles.forEach(profile => {
-                if (!profile.id || threadMap.has(profile.id)) return;
-                const fallbackMessage: Message = {
-                    id: `empty-${profile.id}`,
-                    sender_id: profile.id,
-                    receiver_id: undefined,
-                    name: profile.full_name || profile.email || 'Usuario',
-                    email: profile.email || '',
-                    subject: 'Nuevo mensaje',
-                    message: '',
-                    status: 'read',
-                    created_at: profile.created_at || new Date().toISOString(),
-                    is_admin_reply: true,
-                };
-
-                threadMap.set(profile.id, {
-                    userId: profile.id,
-                    name: profile.full_name || profile.email || 'Usuario',
-                    email: profile.email || '',
-                    lastMessage: fallbackMessage,
-                    unreadCount: 0,
-                    messages: []
-                });
-            });
-        } catch (e) {
-            console.error("Error processing threads:", e);
-            return [];
-        }
-
-        return Array.from(threadMap.values()).sort((a, b) =>
-            safeDate(b.lastMessage.created_at).getTime() - safeDate(a.lastMessage.created_at).getTime()
-        );
-
-    }, [messages, profiles]);
 
     // Filter threads safely
     const filteredThreads = useMemo(() => {
@@ -290,7 +236,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
         setIsSending(false);
 
         if (result.success) {
-            toast.success('Mensaje enviado');
+            toast.success(t('sending'));
             setIsNewMsgOpen(false);
             setNewMsgText('');
             setSelectedUser(null);
@@ -298,7 +244,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
             // Automatically select the thread
             setSelectedThreadId(selectedUser.id);
         } else {
-            toast.error(result.error || 'Error al enviar mensaje');
+            toast.error(result.error || tCommon('error'));
         }
     };
 
@@ -323,8 +269,8 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                                 <Inbox size={20} className="text-white" strokeWidth={2.5} />
                             </div>
                             <div>
-                                <h2 className="font-black text-xl text-slate-900 tracking-tight">Mensajes</h2>
-                                <p className="text-xs text-slate-500 font-medium">{filteredThreads.length} conversaciones</p>
+                                <h2 className="font-black text-xl text-slate-900 tracking-tight">{t('title')}</h2>
+                                <p className="text-xs text-slate-500 font-medium">{t('subtitle', { count: filteredThreads.length })}</p>
                             </div>
                         </div>
                         <div className="flex gap-2">
@@ -333,7 +279,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => setIsNewMsgOpen(true)}
                                 className="p-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md shadow-blue-600/20 transition-all"
-                                title="Nueva Conversación"
+                                title={t('new_conversation')}
                             >
                                 <Plus size={20} strokeWidth={2.5} />
                             </motion.button>
@@ -352,7 +298,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} strokeWidth={2} />
                         <input
                             type="text"
-                            placeholder="Buscar conversaciones..."
+                            placeholder={t('search_placeholder')}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="w-full bg-white/80 border border-slate-200 rounded-xl py-3 pl-12 pr-4 text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 outline-none transition-all shadow-sm focus:shadow-md placeholder:text-slate-400"
@@ -371,7 +317,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                             )}
                         >
                             <Mail size={14} />
-                            Todos
+                            {t('all')}
                             <span className={cn(
                                 "px-1.5 py-0.5 rounded-full text-[10px] font-extrabold",
                                 filter === 'all' ? "bg-slate-100 text-slate-700" : "bg-slate-200/50 text-slate-500"
@@ -389,7 +335,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                             )}
                         >
                             <Circle size={14} className={filter === 'unread' ? 'fill-white' : ''} />
-                            No leídos
+                            {t('unread')}
                             {threads.filter(t => t.unreadCount > 0).length > 0 && (
                                 <span className={cn(
                                     "px-1.5 py-0.5 rounded-full text-[10px] font-extrabold",
@@ -409,7 +355,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center animate-pulse">
                                 <Inbox size={32} className="text-white" />
                             </div>
-                            <p className="text-sm font-medium text-slate-500">Cargando mensajes...</p>
+                            <p className="text-sm font-medium text-slate-500">{tCommon('loading')}</p>
                         </div>
                     ) : filteredThreads.length === 0 ? (
                         <div className="p-12 flex flex-col items-center text-center space-y-4">
@@ -417,8 +363,8 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                                 <Inbox size={40} className="text-slate-300" />
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-slate-700 mb-1">No hay conversaciones</p>
-                                <p className="text-xs text-slate-500">Los mensajes aparecerán aquí</p>
+                                <p className="text-sm font-bold text-slate-700 mb-1">{t('no_conversations')}</p>
+                                <p className="text-xs text-slate-500">{t('no_conversations_sub')}</p>
                             </div>
                         </div>
                     ) : (
@@ -503,7 +449,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                                                             )}
                                                             {thread.lastMessage.message || 'Sin mensajes aún'}
                                                         </>
-                                                    ) : 'Inicia una conversación'}
+                                                    ) : t('start_conversation')}
                                                 </p>
 
                                                 <div className="flex items-center gap-2">
@@ -561,16 +507,16 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                                 <div className="absolute inset-0 bg-gradient-to-t from-blue-600/50 to-transparent" />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-black text-slate-900 mb-2">Selecciona una conversación</h3>
+                                <h3 className="text-2xl font-black text-slate-900 mb-2">{t('select_conversation')}</h3>
                                 <p className="text-sm text-slate-500 max-w-md font-medium leading-relaxed mb-6">
-                                    Elige un hilo de la lista para ver el historial completo y responder a tus clientes, o inicia una nueva conversación.
+                                    {t('select_conversation_sub')}
                                 </p>
                                 <Button
                                     onClick={() => setIsNewMsgOpen(true)}
                                     className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 py-6 shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 transition-all transform hover:-translate-y-1"
                                 >
                                     <Plus className="mr-2" size={20} />
-                                    Nueva Conversación
+                                    {t('new_conversation')}
                                 </Button>
                             </div>
                         </motion.div>
@@ -583,17 +529,17 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
             <Dialog open={isNewMsgOpen} onOpenChange={setIsNewMsgOpen}>
                 <DialogContent className="max-w-md">
                     <DialogHeader>
-                        <DialogTitle>Nueva Conversación</DialogTitle>
+                        <DialogTitle>{t('new_conversation')}</DialogTitle>
                     </DialogHeader>
 
                     <div className="space-y-4 pt-2">
                         {!selectedUser ? (
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase">Buscar Usuario</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase">{t('search_user')}</label>
                                 <div className="relative">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                     <Input
-                                        placeholder="Nombre o email..."
+                                        placeholder={t('search_placeholder')}
                                         value={newMsgSearch}
                                         onChange={(e) => setNewMsgSearch(e.target.value)}
                                         className="pl-9"
@@ -603,7 +549,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                                 <div className="border border-slate-100 rounded-lg max-h-[200px] overflow-y-auto mt-2 divide-y divide-slate-50">
                                     {usersForSelection.length === 0 ? (
                                         <div className="p-4 text-center text-xs text-slate-400">
-                                            No se encontraron usuarios
+                                            {t('no_users_found')}
                                         </div>
                                     ) : (
                                         usersForSelection.map(user => (
@@ -636,7 +582,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                                         </div>
                                         <div>
                                             <p className="text-sm font-bold text-slate-900">
-                                                Para: {selectedUser.full_name || selectedUser.email}
+                                                {t('to')}: {selectedUser.full_name || selectedUser.email}
                                             </p>
                                             <p className="text-xs text-blue-600/80">{selectedUser.email}</p>
                                         </div>
@@ -647,14 +593,14 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                                         onClick={() => setSelectedUser(null)}
                                         className="text-slate-400 hover:text-slate-600"
                                     >
-                                        Cambiar
+                                        {tCommon('edit')}
                                     </Button>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase">Mensaje Inicial</label>
+                                    <label className="text-xs font-bold text-slate-500 uppercase">{t('initial_message')}</label>
                                     <Textarea
-                                        placeholder="Escribe tu mensaje aquí..."
+                                        placeholder={t('type_message')}
                                         value={newMsgText}
                                         onChange={(e) => setNewMsgText(e.target.value)}
                                         className="min-h-[100px] resize-none"
@@ -663,7 +609,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                                 </div>
 
                                 <div className="flex justify-end gap-2 pt-2">
-                                    <Button variant="ghost" onClick={() => setIsNewMsgOpen(false)}>Cancelar</Button>
+                                    <Button variant="ghost" onClick={() => setIsNewMsgOpen(false)}>{tCommon('cancel')}</Button>
                                     <Button
                                         onClick={handleSendNewMessage}
                                         disabled={!newMsgText.trim() || isSending}
@@ -680,7 +626,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
                                         ) : (
                                             <Send size={16} className="mr-2" />
                                         )}
-                                        Enviar Mensaje
+                                        {t('send')}
                                     </Button>
                                 </div>
                             </div>

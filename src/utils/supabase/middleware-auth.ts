@@ -1,207 +1,199 @@
+import { createClient } from '@/utils/supabase/server'
+import type { User } from '@supabase/supabase-js'
+import { hasPermission, type UserRole } from '@/config/roles'
+
+// ─── Role Cache ────────────────────────────────────────────────────
+// Caches role lookups per request to avoid repeated DB queries
+const roleCache = new Map<string, { role: string; timestamp: number }>()
+const ROLE_CACHE_TTL = 60_000 // 60 seconds
+
+function getCachedRole(userId: string): string | null {
+    const entry = roleCache.get(userId)
+    if (entry && Date.now() - entry.timestamp < ROLE_CACHE_TTL) {
+        return entry.role
+    }
+    roleCache.delete(userId)
+    return null
+}
+
+function setCachedRole(userId: string, role: string): void {
+    roleCache.set(userId, { role, timestamp: Date.now() })
+}
+
 /**
- * Middleware Auth Helper
- * 
- * Funciones centralizadas para validación de permisos y roles de usuario.
- * Utiliza cache en memoria para optimizar consultas repetitivas.
+ * Invalidate the cached role for a user (e.g., after admin changes their role).
  */
+export function invalidateUserRoleCache(userId: string): void {
+    roleCache.delete(userId)
+}
 
-import { createClient } from './server';
-import type { SupabaseClient, User } from '@supabase/supabase-js';
+// ─── Permission Check Result ──────────────────────────────────────
+export interface PermissionCheckResult {
+    user: User | null
+    role: UserRole
+    isAdmin: boolean
+    isStaff: boolean
+    canManageProfiles: boolean
+    error: string | null
+}
 
-// Cache simple en memoria para roles (se limpia cada 5 minutos)
-const roleCache = new Map<string, { role: string; timestamp: number }>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
-
+// ─── Core Permission Check ────────────────────────────────────────
 /**
- * Limpia entradas expiradas del cache
+ * Core function to check user authentication and resolve role.
+ * Uses JWT app_metadata first, falls back to DB query with cache.
  */
-function cleanExpiredCache() {
-    const now = Date.now();
-    for (const [key, value] of roleCache.entries()) {
-        if (now - value.timestamp > CACHE_TTL) {
-            roleCache.delete(key);
+export async function checkUserPermissions(): Promise<PermissionCheckResult> {
+    const defaultResult: PermissionCheckResult = {
+        user: null,
+        role: 'user',
+        isAdmin: false,
+        isStaff: false,
+        canManageProfiles: false,
+        error: null,
+    }
+
+    try {
+        const supabase = await createClient()
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+        if (authError || !user) {
+            return { ...defaultResult, error: authError?.message || 'No autenticado' }
         }
-    }
-}
 
-/**
- * Obtiene el rol del usuario con cache
- */
-async function getUserRole(userId: string, supabase: SupabaseClient): Promise<string | null> {
-    // Limpiar cache expirado
-    cleanExpiredCache();
+        // Priority 1: JWT app_metadata (set by sync_role_to_jwt trigger)
+        let role: UserRole = 'user'
+        const jwtRole = user.app_metadata?.role as string | undefined
 
-    // Verificar cache
-    const cached = roleCache.get(userId);
-    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-        return cached.role;
-    }
+        if (jwtRole && ['admin', 'support', 'reseller', 'user'].includes(jwtRole)) {
+            role = jwtRole as UserRole
+        } else {
+            // Priority 2: Check cache
+            const cached = getCachedRole(user.id)
+            if (cached) {
+                role = cached as UserRole
+            } else {
+                // Priority 3: Fallback to DB query
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', user.id)
+                    .single()
 
-    // Consultar base de datos (primero user_roles, luego profiles como fallback)
-    const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .single();
+                if (!profileError && profile?.role) {
+                    role = profile.role as UserRole
+                    setCachedRole(user.id, role)
+                }
+            }
+        }
 
-    if (roleData?.role) {
-        roleCache.set(userId, { role: roleData.role, timestamp: Date.now() });
-        return roleData.role;
-    }
+        // Priority 4: Hardcoded admin email override
+        if (user.email?.toLowerCase() === 'feitopepe510@gmail.com') {
+            role = 'admin'
+        }
 
-    // Fallback: consultar profiles si user_roles no tiene el dato
-    const { data: profileData } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .single();
+        const isAdmin = role === 'admin'
+        const isStaff = role === 'admin' || role === 'support'
 
-    if (profileData?.role) {
-        const role = profileData.role;
-        roleCache.set(userId, { role, timestamp: Date.now() });
-        return role;
-    }
-
-    return null;
-}
-
-/**
- * Invalida el cache para un usuario específico
- */
-export function invalidateUserRoleCache(userId: string) {
-    roleCache.delete(userId);
-}
-
-/**
- * Verifica los permisos del usuario actual
- */
-export async function checkUserPermissions(): Promise<{
-    user: User | null;
-    role: string | null;
-    isAdmin: boolean;
-    isSupport: boolean;
-    isReseller: boolean;
-    canManageProfiles: boolean;
-    error: string | null;
-}> {
-    const supabase = createClient();
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
         return {
-            user: null,
-            role: null,
-            isAdmin: false,
-            isSupport: false,
-            isReseller: false,
-            canManageProfiles: false,
-            error: 'No autorizado'
-        };
+            user,
+            role,
+            isAdmin,
+            isStaff,
+            canManageProfiles: isStaff,
+            error: null,
+        }
+    } catch (err) {
+        console.error('Permission check error:', err)
+        return { ...defaultResult, error: 'Error al verificar permisos' }
     }
-
-    const role = await getUserRole(user.id, supabase);
-
-    return {
-        user,
-        role,
-        isAdmin: role === 'admin',
-        isSupport: role === 'support',
-        isReseller: role === 'reseller',
-        canManageProfiles: role === 'admin' || role === 'support',
-        error: null
-    };
 }
 
-/**
- * Verifica si el usuario actual es admin
- */
-export async function isAdmin(): Promise<boolean> {
-    const { isAdmin } = await checkUserPermissions();
-    return isAdmin;
-}
+// ─── Guard Functions ──────────────────────────────────────────────
 
 /**
- * Verifica si el usuario actual es admin o support
+ * Require authentication. Throws if not authenticated.
  */
-export async function canManageProfiles(): Promise<boolean> {
-    const { canManageProfiles } = await checkUserPermissions();
-    return canManageProfiles;
-}
-
-/**
- * Verifica si el usuario actual es reseller
- */
-export async function isReseller(): Promise<boolean> {
-    const { isReseller } = await checkUserPermissions();
-    return isReseller;
-}
-
-/**
- * Obtiene el usuario actual con su rol
- */
-export async function getCurrentUser(): Promise<{
-    user: User | null;
-    role: string | null;
-    error: string | null;
-}> {
-    const { user, role, error } = await checkUserPermissions();
-    return { user, role, error };
-}
-
-/**
- * Middleware guard para verificar que el usuario está autenticado
- * Lanza error si no está autenticado
- */
-export async function requireAuth(): Promise<{ user: User; role: string | null }> {
-    const { user, role, error } = await checkUserPermissions();
+export async function requireAuth(): Promise<{ user: User; role: UserRole }> {
+    const { user, role, error } = await checkUserPermissions()
 
     if (error || !user) {
-        throw new Error('No autorizado');
+        throw new Error('No autorizado')
     }
 
-    return { user, role };
+    return { user, role }
 }
 
 /**
- * Middleware guard para verificar que el usuario es admin
- * Lanza error si no tiene permisos
+ * Require admin role. Throws if not admin.
  */
-export async function requireAdmin(): Promise<{ user: User; role: string }> {
-    const { user, isAdmin, error } = await checkUserPermissions();
+export async function requireAdmin(): Promise<{ user: User; role: 'admin' }> {
+    const { user, isAdmin, error } = await checkUserPermissions()
 
     if (error || !user || !isAdmin) {
-        throw new Error('Permisos insuficientes - Se requiere rol de administrador');
+        throw new Error('Permisos insuficientes - Se requiere rol de administrador')
     }
 
-    return { user, role: 'admin' };
+    return { user, role: 'admin' }
 }
 
 /**
- * Middleware guard para verificar que el usuario puede gestionar perfiles
- * Lanza error si no tiene permisos
+ * Require a specific role. Throws if user doesn't have one of the allowed roles.
  */
-export async function requireCanManageProfiles(): Promise<{ user: User; role: string }> {
-    const { user, role, canManageProfiles, error } = await checkUserPermissions();
+export async function requireRole(...allowedRoles: UserRole[]): Promise<{ user: User; role: UserRole }> {
+    const { user, role, error } = await checkUserPermissions()
+
+    if (error || !user) {
+        throw new Error('No autorizado')
+    }
+
+    if (!allowedRoles.includes(role)) {
+        throw new Error(`Permisos insuficientes - Se requiere rol: ${allowedRoles.join(', ')}`)
+    }
+
+    return { user, role }
+}
+
+/**
+ * Require a specific permission. Throws if user doesn't have the permission.
+ */
+export async function requirePermission(permission: string): Promise<{ user: User; role: UserRole }> {
+    const { user, role, error } = await checkUserPermissions()
+
+    if (error || !user) {
+        throw new Error('No autorizado')
+    }
+
+    if (!hasPermission(role, permission)) {
+        throw new Error(`Permisos insuficientes - Se requiere permiso: ${permission}`)
+    }
+
+    return { user, role }
+}
+
+/**
+ * Require profile management capability. Throws if user can't manage profiles.
+ */
+export async function requireCanManageProfiles(): Promise<{ user: User; role: UserRole }> {
+    const { user, role, canManageProfiles, error } = await checkUserPermissions()
 
     if (error || !user || !canManageProfiles) {
-        throw new Error('Permisos insuficientes - Se requiere rol de administrador o soporte');
+        throw new Error('Permisos insuficientes - Se requiere rol de administrador o soporte')
     }
 
-    return { user, role: role! };
+    return { user, role }
 }
 
 /**
- * Crea un cliente de Supabase con validación de variables de entorno
+ * Creates a validated Supabase client (validates env vars).
  */
-export function createValidatedClient() {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+export async function createValidatedClient() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (!url || !key) {
-        console.error('❌ Supabase environment variables not configured');
-        throw new Error('Configuración de Supabase faltante');
+        console.error('❌ Supabase environment variables not configured')
+        throw new Error('Configuración de Supabase faltante')
     }
 
-    return createClient();
+    return createClient()
 }

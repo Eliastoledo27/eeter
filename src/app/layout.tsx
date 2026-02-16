@@ -1,54 +1,64 @@
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Montserrat } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { AuthProvider } from "@/hooks/useAuth";
-import { AuthModal } from "@/components/auth/AuthModal";
+import { AuthInitializer } from '@/components/auth/AuthInitializer';
+import { AuthModal } from '@/components/auth/AuthModal';
+import { CartSidebar } from '@/components/cart/CartSidebar';
 
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  variable: "--font-cormorant",
-  weight: ["300", "400", "500", "600", "700"],
-});
 
-const montserrat = Montserrat({
+const manrope = Manrope({
   subsets: ["latin"],
-  variable: "--font-montserrat",
-  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-manrope",
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
   title: {
     template: '%s | Éter Store',
-    default: 'Éter Store | Tu Negocio de Dropshipping y Reventa',
+    default: 'Éter Store | La Plataforma #1 de Resellers de Sneakers',
   },
-  description: "La plataforma líder para revendedores en Argentina. Zapatillas premium, indumentaria y accesorios con logística incluida. Sin inversión inicial.",
-  keywords: ["dropshipping", "reventa", "zapatillas", "mayorista", "emprendimiento", "dinero extra"],
-  metadataBase: new URL('https://eter-store.com'), // Replace with actual domain in prod
+  description: "Accede al catálogo de sneakers más exclusivo, gestiona tu stock digital y escala tu negocio de dropshipping con Éter Store.",
+  keywords: ["sneakers", "dropshipping", "reseller", "zapatillas", "logística", "emprendimiento", "calzado de lujo"],
+  metadataBase: new URL('https://eter-store.com'),
   openGraph: {
-    type: 'website',
-    locale: 'es_AR',
+    title: 'Éter Store | Tu Imperio de Sneakers',
+    description: 'Vende sneakers exclusivos sin invertir en stock. Nosotros nos encargamos de la logística.',
+    url: 'https://eter-store.com',
     siteName: 'Éter Store',
-    title: 'Éter Store | Tu Negocio de Dropshipping',
-    description: 'Empieza a vender hoy mismo sin stock ni inversión.',
-  }
+    locale: 'es_AR',
+    type: 'website',
+  },
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+  },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="es">
+    <html lang={locale} className="dark">
       <body
-        className={`${cormorant.variable} ${montserrat.variable} font-body antialiased`}
+        className={`${manrope.variable} font-sans antialiased bg-[#0A0A0A] text-white`}
       >
-        <AuthProvider>
-          {children}
-          <AuthModal />
-        </AuthProvider>
-        <Toaster position="top-center" theme="light" richColors />
+        <NextIntlClientProvider messages={messages}>
+          <AuthInitializer>
+            {children}
+            <AuthModal />
+            <CartSidebar />
+          </AuthInitializer>
+          <Toaster position="top-center" theme="dark" richColors />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

@@ -1,0 +1,372 @@
+/**
+ * ÉTER STORE Design System
+ * Design Tokens & CSS Variables
+ * Version 1.0.0
+ */
+
+:root {
+    /* ============================================
+     COLOR PALETTE
+     ============================================ */
+
+    /* Primary Gold */
+    --color-primary: #C88A04;
+    --color-primary-light: #ECA413;
+    --color-primary-dark: #A67203;
+    --color-primary-rgb: 200, 138, 4;
+
+    /* Backgrounds */
+    --color-bg-darkest: #0A0A0A;
+    --color-bg-dark: #131313;
+    --color-bg-medium: #1A1A1A;
+    --color-bg-light: #1F1F1F;
+    --color-bg-card: #2A2A2A;
+    --color-bg-hover: #333333;
+
+    /* Text Colors */
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #F5F5F5;
+    --color-text-muted: #A0A0A0;
+    --color-text-disabled: #666666;
+
+    /* Semantic Colors */
+    --color-success: #10B981;
+    --color-success-light: #34D399;
+    --color-success-dark: #059669;
+    --color-success-bg: rgba(16, 185, 129, 0.1);
+
+    --color-warning: #F59E0B;
+    --color-warning-light: #FBBF24;
+    --color-warning-dark: #D97706;
+    --color-warning-bg: rgba(245, 158, 11, 0.1);
+
+    --color-error: #EF4444;
+    --color-error-light: #F87171;
+    --color-error-dark: #DC2626;
+    --color-error-bg: rgba(239, 68, 68, 0.1);
+
+    --color-info: #3B82F6;
+    --color-info-light: #60A5FA;
+    --color-info-dark: #2563EB;
+    --color-info-bg: rgba(59, 130, 246, 0.1);
+
+    /* Border Colors */
+    --color-border-subtle: rgba(200, 138, 4, 0.1);
+    --color-border-normal: rgba(200, 138, 4, 0.2);
+    --color-border-strong: rgba(200, 138, 4, 0.4);
+
+    /* ============================================
+     TYPOGRAPHY
+     ============================================ */
+
+    /* Font Families */
+    --font-heading: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'Fira Code', 'Courier New', monospace;
+
+    /* Font Sizes */
+    --font-size-xs: 0.75rem;
+    /* 12px */
+    --font-size-sm: 0.875rem;
+    /* 14px */
+    --font-size-base: 1rem;
+    /* 16px */
+    --font-size-lg: 1.125rem;
+    /* 18px */
+    --font-size-xl: 1.25rem;
+    /* 20px */
+    --font-size-2xl: 1.5rem;
+    /* 24px */
+    --font-size-3xl: 1.75rem;
+    /* 28px */
+    --font-size-4xl: 2.25rem;
+    /* 36px */
+    --font-size-5xl: 3rem;
+    /* 48px */
+    --font-size-6xl: 3.75rem;
+    /* 60px */
+
+    /* Font Weights */
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+
+    /* Line Heights */
+    --line-height-tight: 1.2;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    /* Letter Spacing */
+    --letter-spacing-tight: -0.02em;
+    --letter-spacing-normal: 0;
+    --letter-spacing-wide: 0.02em;
+
+    /* ============================================
+     SPACING
+     ============================================ */
+
+    --spacing-0: 0;
+    --spacing-xs: 0.25rem;
+    /* 4px */
+    --spacing-sm: 0.5rem;
+    /* 8px */
+    --spacing-md: 0.75rem;
+    /* 12px */
+    --spacing-base: 1rem;
+    /* 16px */
+    --spacing-lg: 1.5rem;
+    /* 24px */
+    --spacing-xl: 2rem;
+    /* 32px */
+    --spacing-2xl: 3rem;
+    /* 48px */
+    --spacing-3xl: 4rem;
+    /* 64px */
+    --spacing-4xl: 6rem;
+    /* 96px */
+    --spacing-5xl: 8rem;
+    /* 128px */
+
+    /* ============================================
+     BORDER RADIUS
+     ============================================ */
+
+    --radius-none: 0;
+    --radius-sm: 0.25rem;
+    /* 4px */
+    --radius-md: 0.5rem;
+    /* 8px */
+    --radius-lg: 0.75rem;
+    /* 12px */
+    --radius-xl: 1rem;
+    /* 16px */
+    --radius-2xl: 1.5rem;
+    /* 24px */
+    --radius-3xl: 2rem;
+    /* 32px */
+    --radius-full: 9999px;
+
+    /* ============================================
+     SHADOWS
+     ============================================ */
+
+    /* Elevation Shadows */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.6);
+    --shadow-2xl: 0 24px 48px rgba(0, 0, 0, 0.7);
+
+    /* Glow Effects */
+    --glow-primary-sm: 0 0 10px rgba(var(--color-primary-rgb), 0.3);
+    --glow-primary: 0 0 20px rgba(var(--color-primary-rgb), 0.4);
+    --glow-primary-lg: 0 0 30px rgba(var(--color-primary-rgb), 0.5);
+    --glow-primary-xl: 0 0 40px rgba(var(--color-primary-rgb), 0.6);
+
+    /* Inner Shadows */
+    --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    /* ============================================
+     TRANSITIONS & ANIMATIONS
+     ============================================ */
+
+    /* Durations */
+    --duration-instant: 50ms;
+    --duration-fast: 150ms;
+    --duration-base: 300ms;
+    --duration-slow: 500ms;
+    --duration-slower: 800ms;
+
+    /* Easing Functions */
+    --ease-linear: linear;
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Combined Transitions */
+    --transition-fast: var(--duration-fast) var(--ease-out);
+    --transition-base: var(--duration-base) var(--ease-in-out);
+    --transition-slow: var(--duration-slow) var(--ease-in-out);
+
+    /* ============================================
+     Z-INDEX LAYERS
+     ============================================ */
+
+    --z-base: 0;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-fixed: 300;
+    --z-modal-backdrop: 400;
+    --z-modal: 500;
+    --z-popover: 600;
+    --z-tooltip: 700;
+    --z-notification: 800;
+    --z-max: 999;
+
+    /* ============================================
+     LAYOUT
+     ============================================ */
+
+    /* Container Max Widths */
+    --container-sm: 640px;
+    --container-md: 768px;
+    --container-lg: 1024px;
+    --container-xl: 1280px;
+    --container-2xl: 1440px;
+
+    /* Grid Gutters */
+    --gutter-mobile: 0.75rem;
+    /* 12px */
+    --gutter-tablet: 1rem;
+    /* 16px */
+    --gutter-desktop: 1.5rem;
+    /* 24px */
+
+    /* Navbar Height */
+    --navbar-height: 80px;
+    --navbar-height-mobile: 64px;
+
+    /* ============================================
+     BREAKPOINTS (for JS)
+     ============================================ */
+
+    --breakpoint-sm: 640px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
+    --breakpoint-2xl: 1536px;
+
+    /* ============================================
+     GRADIENTS
+     ============================================ */
+
+    /* Primary Gradients */
+    --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+    --gradient-primary-vertical: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+    --gradient-primary-radial: radial-gradient(circle, var(--color-primary-light) 0%, var(--color-primary) 100%);
+
+    /* Background Gradients */
+    --gradient-dark: linear-gradient(180deg, var(--color-bg-dark) 0%, var(--color-bg-darkest) 100%);
+    --gradient-dark-radial: radial-gradient(circle at top, var(--color-bg-medium) 0%, var(--color-bg-darkest) 100%);
+
+    /* Shimmer Gradient (for loading) */
+    --gradient-shimmer: linear-gradient(90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.05) 40%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 60%,
+            rgba(255, 255, 255, 0) 100%);
+
+    /* Glassmorphism */
+    --glass-bg: rgba(26, 26, 26, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: 20px;
+
+    /* ============================================
+     COMPONENT SPECIFIC
+     ============================================ */
+
+    /* Buttons */
+    --btn-height-sm: 36px;
+    --btn-height-md: 44px;
+    --btn-height-lg: 52px;
+    --btn-padding-x-sm: 16px;
+    --btn-padding-x-md: 24px;
+    --btn-padding-x-lg: 32px;
+
+    /* Input Fields */
+    --input-height-sm: 36px;
+    --input-height-md: 44px;
+    --input-height-lg: 52px;
+    --input-padding-x: 16px;
+
+    /* Cards */
+    --card-padding-sm: 16px;
+    --card-padding-md: 24px;
+    --card-padding-lg: 32px;
+}
+
+/* ============================================
+   RESPONSIVE OVERRIDES
+   ============================================ */
+
+@media (max-width: 767px) {
+    :root {
+        /* Reduce spacing on mobile */
+        --spacing-xl: 1.5rem;
+        --spacing-2xl: 2rem;
+        --spacing-3xl: 3rem;
+        --spacing-4xl: 4rem;
+        --spacing-5xl: 6rem;
+
+        /* Smaller font sizes on mobile */
+        --font-size-4xl: 2rem;
+        --font-size-5xl: 2.5rem;
+        --font-size-6xl: 3rem;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Apply glassmorphism effect */
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+}
+
+/* Golden gradient text */
+.text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Glow effect */
+.glow-primary {
+    box-shadow: var(--glow-primary);
+}
+
+.glow-primary-hover:hover {
+    box-shadow: var(--glow-primary-lg);
+    transition: box-shadow var(--transition-base);
+}
+
+/* Smooth transitions */
+.transition-all {
+    transition: all var(--transition-base);
+}
+
+.transition-fast {
+    transition: all var(--transition-fast);
+}
+
+.transition-slow {
+    transition: all var(--transition-slow);
+}
+
+/* ============================================
+   DARK MODE (if implementing)
+   ============================================ */
+
+/* Currently using dark theme as default
+   Light mode overrides can be added here if needed */
+
+/*
+[data-theme="light"] {
+  --color-bg-darkest: #FFFFFF;
+  --color-bg-dark: #F9FAFB;
+  --color-bg-medium: #F3F4F6;
+  --color-text-primary: #111827;
+  --color-text-secondary: #374151;
+  --color-text-muted: #6B7280;
+}
+*/

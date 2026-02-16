@@ -62,9 +62,9 @@ export function PurchaseForm({ resellers, products, onSuccess }: PurchaseFormPro
     };
 
     return (
-        <form action={action} className="space-y-6 bg-white/40 backdrop-blur-3xl p-8 rounded-[2rem] border border-white/60 shadow-2xl">
+        <form action={action} className="space-y-6 bg-black/40 backdrop-blur-3xl p-8 rounded-[2rem] border border-white/10 shadow-2xl">
             <div className="space-y-2">
-                <label className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] ml-2">Revendedor</label>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-2 font-mono">Revendedor</label>
                 <div className="relative">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40">
                         <User size={18} />
@@ -72,7 +72,7 @@ export function PurchaseForm({ resellers, products, onSuccess }: PurchaseFormPro
                     <select
                         name="reseller_id"
                         required
-                        className="w-full h-14 pl-12 pr-4 bg-white/60 border border-white/80 rounded-2xl text-sm font-bold appearance-none focus:ring-4 focus:ring-accent/5 focus:border-accent/30 transition-all outline-none"
+                        className="w-full h-14 pl-12 pr-4 bg-white/5 border border-white/10 rounded-2xl text-sm font-bold appearance-none focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none text-white"
                     >
                         <option value="">Seleccionar Revendedor...</option>
                         {resellers.map(r => (
@@ -84,7 +84,7 @@ export function PurchaseForm({ resellers, products, onSuccess }: PurchaseFormPro
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] ml-2">Producto</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-2 font-mono">Producto</label>
                     <div className="relative">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40">
                             <Package size={18} />
@@ -94,7 +94,7 @@ export function PurchaseForm({ resellers, products, onSuccess }: PurchaseFormPro
                             required
                             value={selectedProduct}
                             onChange={(e) => handleProductChange(e.target.value)}
-                            className="w-full h-14 pl-12 pr-4 bg-white/60 border border-white/80 rounded-2xl text-sm font-bold appearance-none focus:ring-4 focus:ring-accent/5 focus:border-accent/30 transition-all outline-none"
+                            className="w-full h-14 pl-12 pr-4 bg-white/5 border border-white/10 rounded-2xl text-sm font-bold appearance-none focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none text-white"
                         >
                             <option value="">Seleccionar Producto...</option>
                             {products.map(p => (
@@ -105,7 +105,7 @@ export function PurchaseForm({ resellers, products, onSuccess }: PurchaseFormPro
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] ml-2">Talle (Opcional)</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-2 font-mono">Talle (Opcional)</label>
                     <div className="relative">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40">
                             <Hash size={18} />
@@ -113,7 +113,7 @@ export function PurchaseForm({ resellers, products, onSuccess }: PurchaseFormPro
                         <input
                             name="size"
                             placeholder="Ej: 42, XL, etc"
-                            className="w-full h-14 pl-12 pr-4 bg-white/60 border border-white/80 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-accent/5 focus:border-accent/30 transition-all outline-none"
+                            className="w-full h-14 pl-12 pr-4 bg-white/5 border border-white/10 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none text-white"
                         />
                     </div>
                 </div>
@@ -121,7 +121,7 @@ export function PurchaseForm({ resellers, products, onSuccess }: PurchaseFormPro
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] ml-2">Cantidad</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-2 font-mono">Cantidad</label>
                     <div className="relative">
                         <input
                             name="quantity"
@@ -129,13 +129,13 @@ export function PurchaseForm({ resellers, products, onSuccess }: PurchaseFormPro
                             min="1"
                             defaultValue="1"
                             required
-                            className="w-full h-14 px-6 bg-white/60 border border-white/80 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-accent/5 focus:border-accent/30 transition-all outline-none"
+                            className="w-full h-14 px-6 bg-white/5 border border-white/10 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none text-white"
                         />
                     </div>
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] ml-2">Precio de Venta</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-2 font-mono">Precio de Venta</label>
                     <div className="relative">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40">
                             <DollarSign size={18} />
@@ -146,7 +146,7 @@ export function PurchaseForm({ resellers, products, onSuccess }: PurchaseFormPro
                             required
                             value={price}
                             onChange={(e) => setPrice(e.target.value)}
-                            className="w-full h-14 pl-12 pr-4 bg-white/60 border border-white/80 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-accent/5 focus:border-accent/30 transition-all outline-none text-accent"
+                            className="w-full h-14 pl-12 pr-4 bg-white/5 border border-white/10 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none text-primary"
                         />
                     </div>
                 </div>

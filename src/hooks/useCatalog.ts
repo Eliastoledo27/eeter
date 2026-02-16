@@ -93,7 +93,7 @@ export function useCatalog() {
     }
   };
 
-  const filterProducts = (filters: CatalogFilter) => {
+  const filterProducts = useCallback((filters: CatalogFilter) => {
     if (!isMounted) return [];
 
     return products.filter(p => {
@@ -101,7 +101,7 @@ export function useCatalog() {
       const matchesCategory = filters.category === 'Todos' || !filters.category || p.category === filters.category;
       return matchesQuery && matchesCategory;
     });
-  };
+  }, [products, isMounted]);
 
   const categories = useMemo(() => {
     if (!isMounted) return ['Todos'];

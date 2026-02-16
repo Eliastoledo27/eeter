@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default async function CataloguePage() {
   const supabase = createClient()
-  
+
   const { data: { user }, error: userError } = await supabase.auth.getUser()
   if (userError || !user) {
     redirect('/login')
@@ -28,20 +28,20 @@ export default async function CataloguePage() {
 
   // Simplified query
   const { data: productsData, error: productsFetchError } = await supabase
-    .from('products')
+    .from('productos')
     .select('*')
-    .eq('is_active', true)
+    .eq('status', 'activo')
     .order('name')
 
   if (productsFetchError) {
     console.error('Error fetching products:', productsFetchError)
-    throw new Error('Error al cargar el catálogo.')
+    // Don't throw, just allow empty array to be passed
   }
 
   return (
-    <DashboardCatalog 
-      user={profile} 
-      products={productsData || []} 
+    <DashboardCatalog
+      user={profile}
+      products={productsData || []}
     />
   )
 }

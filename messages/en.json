@@ -1,0 +1,57 @@
+{
+    "common": {
+        "loading": "Loading...",
+        "error": "Error",
+        "save": "Save",
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "delete": "Delete",
+        "view_all": "View All",
+        "search": "Search...",
+        "dashboard": "Dashboard"
+    },
+    "dashboard": {
+        "title": "Control Panel",
+        "welcome": "Welcome, {name}",
+        "last_login": "Last login: {date}",
+        "global_portfolio": "Global Portfolio",
+        "live_updates": "LIVE UPDATES",
+        "total_assets": "TOTAL ASSETS",
+        "this_week": "THIS WEEK",
+        "regional_operations": "Regional Operations",
+        "tactical_feed": "Tactical Product Feed",
+        "quick_execution": "Quick Execution Protocol",
+        "add_product": "Add Product",
+        "create_order": "Create Order",
+        "stock_update": "Stock Update",
+        "campaign": "Campaign",
+        "activity_timeline": "Activity Timeline",
+        "performance_metrics": "Performance Metrics",
+        "usage_stats": "Usage Stats",
+        "widgets": {
+            "customize": "Customize Widgets",
+            "reset": "Reset Layout"
+        },
+        "role": {
+            "admin": "Administrator",
+            "user": "User",
+            "reseller": "Reseller",
+            "support": "Support"
+        }
+    },
+    "nav": {
+        "home": "Home",
+        "catalog": "Catalog",
+        "orders": "Orders",
+        "customers": "Customers",
+        "settings": "Settings",
+        "logout": "Logout"
+    },
+    "widgets": {
+        "user_profile": "User Profile",
+        "last_login": "Last Login",
+        "stats": "Statistics",
+        "timeline": "Timeline",
+        "performance": "Performance"
+    }
+}

@@ -1,5 +1,10 @@
-import { Home, ShoppingBag, BookOpen, Trophy, Users, Package, MessageSquare, BarChart2, ClipboardList, type LucideIcon } from 'lucide-react'
+import {
+  Home, ShoppingBag, BookOpen, Trophy, Users, Package,
+  MessageSquare, BarChart2, ClipboardList, Settings,
+  type LucideIcon,
+} from 'lucide-react'
 
+// ─── Types ───────────────────────────────────────────────────────────
 export type UserRole = 'admin' | 'support' | 'reseller' | 'user'
 
 export interface NavItem {
@@ -7,44 +12,133 @@ export interface NavItem {
   label: string
   icon: LucideIcon
   href: string
+  requiredPermission: string
 }
 
+// ─── Permissions Matrix ──────────────────────────────────────────────
+// Each role maps to a set of string-based permissions.
+// Permissions follow VERB_RESOURCE format for granularity.
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
-  admin: ['view_dashboard', 'view_analytics', 'view_catalog', 'view_academy', 'view_ranking', 'manage_users', 'manage_products', 'view_crm', 'manage_messages', 'manage_purchases', 'manage_orders'],
-  support: ['view_dashboard', 'view_catalog', 'view_academy', 'manage_users', 'view_crm', 'manage_orders'],
-  reseller: ['view_dashboard', 'view_catalog', 'view_academy', 'view_ranking', 'view_crm', 'view_messages', 'view_orders'],
-  user: ['view_dashboard', 'view_catalog', 'view_academy', 'view_messages', 'view_orders'] // Basic access
+  admin: [
+    'view_dashboard', 'view_analytics', 'view_catalog', 'view_academy',
+    'view_ranking', 'manage_users', 'manage_products', 'view_crm',
+    'manage_messages', 'manage_purchases', 'manage_orders', 'manage_settings',
+    'view_messages', 'view_orders', 'view_profiles',
+    'view_inventory', 'manage_inventory', 'view_notifications',
+  ],
+  support: [
+    'view_dashboard', 'view_catalog', 'view_academy', 'manage_users',
+    'view_crm', 'manage_orders', 'view_messages', 'view_orders',
+    'view_profiles', 'view_inventory', 'view_notifications',
+  ],
+  reseller: [
+    'view_dashboard', 'view_catalog', 'view_academy', 'view_ranking',
+    'view_crm', 'view_messages', 'view_orders', 'view_notifications',
+  ],
+  user: [
+    'view_dashboard', 'view_catalog', 'view_academy', 'view_messages',
+    'view_orders', 'view_notifications',
+  ],
 }
 
+// ─── Route-to-Permission Mapping ─────────────────────────────────────
+// Maps route prefixes to the permission needed to access them.
+// More specific routes should appear first.
+export const ROUTE_PERMISSIONS: Record<string, string> = {
+  '/dashboard/analytics': 'view_analytics',
+  '/dashboard/catalogue': 'view_catalog',
+  '/dashboard/profiles': 'view_profiles',
+  '/dashboard/purchases': 'manage_purchases',
+  '/dashboard/settings': 'manage_settings',
+  '/dashboard/messages': 'view_messages',
+  '/dashboard/orders': 'view_orders',
+  '/dashboard/inventory': 'view_inventory',
+  '/dashboard/ranking': 'view_ranking',
+  '/dashboard': 'view_dashboard',
+  '/academy': 'view_academy',
+}
+
+// ─── Route-to-Allowed-Roles Mapping ──────────────────────────────────
+// Direct role-to-routes for middleware enforcement.
+export const ROUTE_ROLES: Record<string, UserRole[]> = {
+  '/dashboard/analytics': ['admin'],
+  '/dashboard/catalogue': ['admin', 'support', 'reseller', 'user'],
+  '/dashboard/profiles': ['admin', 'support'],
+  '/dashboard/purchases': ['admin', 'support', 'reseller', 'user'],
+  '/dashboard/settings': ['admin'],
+  '/dashboard/messages': ['admin', 'support', 'reseller', 'user'],
+  '/dashboard/orders': ['admin', 'support', 'reseller', 'user'],
+  '/dashboard/inventory': ['admin', 'support'],
+  '/dashboard/ranking': ['admin', 'reseller'],
+  '/dashboard': ['admin', 'support', 'reseller', 'user'],
+  '/academy': ['admin', 'support', 'reseller', 'user'],
+}
+
+// ─── Navigation Modules ──────────────────────────────────────────────
 export const DASHBOARD_MODULES: NavItem[] = [
-  { id: 'dashboard', label: 'Panel Principal', icon: Home, href: '/dashboard' },
-  { id: 'analytics', label: 'Análisis', icon: BarChart2, href: '/dashboard?view=analytics' },
-  { id: 'catalog', label: 'Mi Catálogo', icon: ShoppingBag, href: '/dashboard?view=catalog' },
-  { id: 'orders', label: 'Pedidos', icon: ClipboardList, href: '/dashboard?view=orders' },
-  { id: 'academy', label: 'Academia VIP', icon: BookOpen, href: '/dashboard?view=academy' },
-  { id: 'ranking', label: 'Ranking Global', icon: Trophy, href: '/dashboard?view=ranking' },
-  { id: 'users', label: 'Usuarios', icon: Users, href: '/dashboard?view=users' },
-  { id: 'products', label: 'Inventario', icon: Package, href: '/dashboard/catalogue' }, // Corrected href from previous dashboard route
-  { id: 'purchases', label: 'Compras', icon: ShoppingBag, href: '/dashboard/purchases' },
-  { id: 'messages', label: 'Mensajes', icon: MessageSquare, href: '/dashboard?view=messages' },
+  { id: 'dashboard', label: 'Panel Principal', icon: Home, href: '/dashboard', requiredPermission: 'view_dashboard' },
+  { id: 'analytics', label: 'Análisis', icon: BarChart2, href: '/dashboard/analytics', requiredPermission: 'view_analytics' },
+  { id: 'catalog', label: 'Catálogo', icon: ShoppingBag, href: '/dashboard/catalogue', requiredPermission: 'view_catalog' },
+  { id: 'orders', label: 'Pedidos', icon: ClipboardList, href: '/dashboard/orders', requiredPermission: 'view_orders' },
+  { id: 'academy', label: 'Academia VIP', icon: BookOpen, href: '/academy', requiredPermission: 'view_academy' },
+  { id: 'ranking', label: 'Ranking', icon: Trophy, href: '/dashboard/ranking', requiredPermission: 'view_ranking' },
+  { id: 'users', label: 'Usuarios', icon: Users, href: '/dashboard/profiles', requiredPermission: 'manage_users' },
+  { id: 'inventory', label: 'Inventario', icon: Package, href: '/dashboard/inventory', requiredPermission: 'view_inventory' },
+  { id: 'messages', label: 'Mensajes', icon: MessageSquare, href: '/dashboard/messages', requiredPermission: 'view_messages' },
+  { id: 'settings', label: 'Configuración', icon: Settings, href: '/dashboard/settings', requiredPermission: 'manage_settings' },
 ]
 
-export const getModulesForRole = (role: UserRole): NavItem[] => {
-  const permissions = ROLE_PERMISSIONS[role] || []
+// ─── Utility Functions ───────────────────────────────────────────────
 
-  return DASHBOARD_MODULES.filter(module => {
-    switch (module.id) {
-      case 'dashboard': return permissions.includes('view_dashboard')
-      case 'analytics': return permissions.includes('view_analytics')
-      case 'orders': return permissions.includes('manage_orders') || permissions.includes('view_orders')
-      case 'catalog': return permissions.includes('view_catalog')
-      case 'academy': return permissions.includes('view_academy')
-      case 'ranking': return permissions.includes('view_ranking')
-      case 'users': return permissions.includes('manage_users')
-      case 'products': return permissions.includes('manage_products')
-      case 'purchases': return permissions.includes('manage_purchases')
-      case 'messages': return permissions.includes('manage_messages') || permissions.includes('view_messages')
-      default: return false
+/**
+ * Check if a role has a specific permission.
+ */
+export function hasPermission(role: UserRole, permission: string): boolean {
+  const permissions = ROLE_PERMISSIONS[role]
+  return permissions ? permissions.includes(permission) : false
+}
+
+/**
+ * Get all nav modules accessible by a given role.
+ */
+export function getModulesForRole(role: UserRole): NavItem[] {
+  return DASHBOARD_MODULES.filter(module =>
+    hasPermission(role, module.requiredPermission)
+  )
+}
+
+/**
+ * Check if a role can access a given route pathname.
+ * Returns true if no specific restriction is configured.
+ */
+export function canAccessRoute(role: UserRole, pathname: string): boolean {
+  // Check from most specific to least specific
+  const sortedRoutes = Object.keys(ROUTE_ROLES).sort((a, b) => b.length - a.length)
+
+  for (const route of sortedRoutes) {
+    if (pathname.startsWith(route)) {
+      return ROUTE_ROLES[route].includes(role)
     }
-  })
+  }
+
+  // No restriction found → allow
+  return true
+}
+
+/**
+ * Get the default redirect path for a given role after login.
+ */
+export function getDefaultRedirect(role: UserRole): string {
+  switch (role) {
+    case 'admin':
+      return '/dashboard'
+    case 'support':
+      return '/dashboard'
+    case 'reseller':
+      return '/dashboard'
+    case 'user':
+      return '/dashboard'
+    default:
+      return '/dashboard'
+  }
 }

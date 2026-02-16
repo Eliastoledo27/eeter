@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,65 +10,37 @@
   }
 
   :root {
-    /* Premium Luxury - Stone & Gold */
-    --background: 44 9% 98%;
-    /* #FAFAF9 */
-    --foreground: 24 10% 4%;
-    /* #0C0A09 */
-    --card: 0 0% 100%;
-    --card-foreground: 24 10% 4%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 24 10% 4%;
-    --primary: 24 10% 10%;
-    /* #1C1917 */
-    --primary-foreground: 60 9.1% 97.8%;
-    --secondary: 24 6% 25%;
-    /* #44403C */
-    --secondary-foreground: 60 9.1% 97.8%;
-    --muted: 60 4.8% 95.9%;
-    --muted-foreground: 25 5.3% 44.7%;
-    --accent: 45 93% 40%;
-    /* #CA8A04 */
-    --accent-foreground: 60 9.1% 97.8%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 60 9.1% 97.8%;
-    --border: 20 5.9% 90%;
-    --input: 20 5.9% 90%;
-    --ring: 24 10% 10%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    /* Deep Luxury Dark Mode */
-    --background: 24 10% 4%;
-    /* #0C0A09 */
-    --foreground: 60 9.1% 97.8%;
-    --card: 24 10% 8%;
-    --card-foreground: 60 9.1% 97.8%;
-    --popover: 24 10% 8%;
-    --popover-foreground: 60 9.1% 97.8%;
+    /* ÉTER Dark-First Design System — Stitch 2026 */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 100%;
     --primary: 45 93% 40%;
-    /* Gold as primary for dark mode */
-    --primary-foreground: 24 10% 4%;
-    --secondary: 24 6% 14%;
-    --secondary-foreground: 60 9.1% 97.8%;
-    --muted: 24 6% 14%;
-    --muted-foreground: 24 5% 64%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 63%;
     --accent: 45 93% 40%;
-    --accent-foreground: 24 10% 4%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 60 9.1% 97.8%;
-    --border: 24 6% 14%;
-    --input: 24 6% 14%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 15%;
+    --input: 0 0% 10%;
     --ring: 45 93% 40%;
+    --radius: 0.5rem;
+    --gold: #ffd900;
+    --gold-dim: #c88a04;
   }
 }
 
 @layer utilities {
 
-  /* Liquid Glass - Cosmic Edition */
+  /* Liquid Glass - ÉTER Dark Edition */
   .glass {
-    @apply backdrop-blur-xl bg-white/70 border border-white/20 shadow-lg supports-[backdrop-filter]:bg-white/40;
+    @apply backdrop-blur-xl bg-white/5 border border-white/10 shadow-lg;
   }
 
   .glass-dark {
@@ -76,16 +48,52 @@
   }
 
   .glass-panel {
-    @apply backdrop-blur-2xl bg-white/5 border border-white/10 shadow-2xl;
+    background: rgba(23, 23, 23, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .gold-text-shadow {
+    text-shadow: 0px 0px 20px rgba(255, 217, 0, 0.3);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .glass-gold {
+    @apply backdrop-blur-xl bg-[#ffd900]/5 border border-[#ffd900]/20 shadow-lg;
+  }
+
+  .glass-card {
+    @apply backdrop-blur-xl bg-white/[0.03] border border-white/[0.08] rounded-2xl;
   }
 
   /* Cosmic Gradients */
   .bg-cosmic {
-    @apply bg-gradient-to-br from-neutral-900 via-stone-900 to-amber-950;
+    @apply bg-gradient-to-br from-[#0a0a0a] via-[#111] to-[#0a0a0a];
   }
 
   .text-gradient-gold {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#ffd900] via-amber-400 to-[#c88a04];
+  }
+
+  .text-gold {
+    color: var(--gold);
+  }
+
+  .bg-gold {
+    background-color: var(--gold);
+  }
+
+  .border-gold {
+    border-color: var(--gold);
   }
 
   .glass-hover {
@@ -96,10 +104,35 @@
     text-wrap: balance;
   }
 
-  /* Animated Gradient */
+  .btn-gold {
+    @apply bg-[#ffd900] text-black font-bold rounded-full px-8 py-3.5 transition-all duration-300 hover:bg-[#ffe033] active:scale-95;
+  }
+
+  .btn-gold:hover {
+    box-shadow: 0 0 30px rgba(255, 217, 0, 0.3);
+  }
+
+  .btn-glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/20 text-white font-bold rounded-full px-8 py-3.5 transition-all duration-300 hover:bg-white/10 hover:border-white/30 active:scale-95;
+  }
+
+  /* Revolutionary Animations */
   .animate-gradient {
     background-size: 200% 200%;
     animation: gradientShift 3s ease infinite;
+  }
+
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradientShiftX 3s ease infinite;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite;
   }
 
   @keyframes gradientShift {
@@ -114,6 +147,42 @@
     }
   }
 
+  @keyframes gradientShiftX {
+
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes glow {
+
+    0%,
+    100% {
+      box-shadow: 0 0 20px rgba(234, 179, 8, 0.3);
+    }
+
+    50% {
+      box-shadow: 0 0 40px rgba(234, 179, 8, 0.6);
+    }
+  }
+
   /* Noise Texture */
   .bg-noise {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
@@ -125,6 +194,11 @@
 
   .text-glow {
     text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+  }
+
+  /* Radial Gradient */
+  .bg-gradient-radial {
+    background: radial-gradient(circle at center, var(--tw-gradient-stops));
   }
 
   /* Custom Scrollbar - Premium Edition */
@@ -208,6 +282,71 @@
 
   .animate-morph {
     animation: morph 8s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s ease-in-out infinite;
+    background-size: 200% 100%;
+    background-image: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 100%);
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.5s ease-out forwards;
+  }
+
+  /* Skeleton shimmer for loading cards */
+  .skeleton-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .skeleton-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.04) 40%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0.04) 60%,
+        transparent 100%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s ease-in-out infinite;
+  }
+
+  @keyframes skeletonShimmer {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
+    }
   }
 }
 

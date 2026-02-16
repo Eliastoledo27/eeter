@@ -20,7 +20,7 @@ interface PurchaseListProps {
 export function PurchaseList({ purchases, onViewTicket }: PurchaseListProps) {
     if (purchases.length === 0) {
         return (
-            <div className="bg-white/40 backdrop-blur-3xl rounded-[2.5rem] p-20 text-center border border-white/60 shadow-xl">
+            <div className="bg-black/40 backdrop-blur-3xl rounded-[2.5rem] p-20 text-center border border-white/10 shadow-xl">
                 <ShoppingCart className="mx-auto h-16 w-16 text-muted-foreground/20 mb-6" />
                 <h3 className="text-xl font-bold text-foreground mb-2">Sin registros de compras</h3>
                 <p className="text-muted-foreground max-w-xs mx-auto text-sm">Aún no se han registrado compras manuales para revendedores.</p>
@@ -29,8 +29,8 @@ export function PurchaseList({ purchases, onViewTicket }: PurchaseListProps) {
     }
 
     return (
-        <div className="bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-white/60 shadow-xl overflow-hidden">
-            <div className="p-8 border-b border-black/[0.03] bg-white/40">
+        <div className="bg-black/40 backdrop-blur-3xl rounded-[2.5rem] border border-white/10 shadow-xl overflow-hidden">
+            <div className="p-8 border-b border-white/5 bg-black/40">
                 <h3 className="text-lg font-bold text-foreground">Historial de Operaciones</h3>
                 <p className="text-xs text-muted-foreground font-medium">Registro cronológico de ventas a revendedores</p>
             </div>
@@ -38,7 +38,7 @@ export function PurchaseList({ purchases, onViewTicket }: PurchaseListProps) {
             <div className="overflow-x-auto">
                 <table className="w-full">
                     <thead>
-                        <tr className="bg-black/[0.02] border-b border-black/[0.03]">
+                        <tr className="bg-white/5 border-b border-white/5">
                             <th className="px-8 py-5 text-left text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em]">Referencia</th>
                             <th className="px-8 py-5 text-left text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em]">Revendedor</th>
                             <th className="px-8 py-5 text-left text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em]">Producto</th>
@@ -47,11 +47,11 @@ export function PurchaseList({ purchases, onViewTicket }: PurchaseListProps) {
                             <th className="px-8 py-5 text-right text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em]">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-black/[0.03]">
+                    <tbody className="divide-y divide-white/5">
                         {purchases.map((purchase) => (
                             <tr key={purchase.id} className="hover:bg-accent/5 transition-colors group">
                                 <td className="px-8 py-6">
-                                    <span className="text-xs font-black tracking-widest text-foreground bg-white/60 px-3 py-1.5 rounded-lg border border-black/5 shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
+                                    <span className="text-xs font-black tracking-widest text-white bg-white/5 px-3 py-1.5 rounded-lg border border-white/10 shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
                                         {purchase.reference_code}
                                     </span>
                                 </td>
@@ -87,7 +87,7 @@ export function PurchaseList({ purchases, onViewTicket }: PurchaseListProps) {
                                                 <MoreHorizontal size={18} />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="bg-white/80 backdrop-blur-2xl border-white/60 rounded-2xl shadow-2xl p-2 min-w-[160px]">
+                                        <DropdownMenuContent align="end" className="bg-black/90 backdrop-blur-2xl border-white/10 rounded-2xl shadow-2xl p-2 min-w-[160px]">
                                             <DropdownMenuItem
                                                 onClick={() => onViewTicket(purchase.id)}
                                                 className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-foreground hover:bg-primary hover:text-white rounded-xl cursor-not-allowed transition-all"

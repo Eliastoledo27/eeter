@@ -6,6 +6,7 @@ export interface User {
   name: string;
   role: Role;
   avatar_url?: string;
+  last_sign_in_at?: string;
 }
 
 // Re-export Domain Entity as the main Product type

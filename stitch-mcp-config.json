@@ -1,0 +1,20 @@
+{
+    "mcpServers": {
+        "stitch": {
+            "serverUrl": "https://stitch.googleapis.com/mcp",
+            "headers": {
+                "X-Goog-Api-Key": "AQ.Ab8RN6K82uKSw0vwxth3XBu4kTgFlmE6BubW2UieVVGBod76eA"
+            }
+        },
+        "supabase": {
+            "command": "C:\\Program Files\\nodejs\\npx.cmd",
+            "args": [
+                "-y",
+                "@supabase/mcp-server"
+            ],
+            "env": {
+                "SUPABASE_ACCESS_TOKEN": "sbp_baeec420f36b8e74e7b43fc81c9e8c8fc129fad8"
+            }
+        }
+    }
+}

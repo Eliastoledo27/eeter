@@ -1,92 +1,54 @@
 'use client';
 
-import Link from 'next/link';
-import { Search, Menu } from 'lucide-react';
-import { useAuthStore } from '@/store/auth-store';
-import { useUIStore } from '@/store/ui-store';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { NotificationsPopover } from '@/components/notifications/NotificationsPopover';
+import { Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { NotificationBell } from './NotificationBell';
+import { usePermissions } from '@/hooks/usePermissions';
 
 export function TopBar() {
-  const { profile, signOut } = useAuthStore();
-  const { toggleMobileMenu } = useUIStore();
+  const [time, setTime] = useState('');
+  const { can } = usePermissions();
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTime(new Date().toLocaleTimeString('en-US', { hour12: false }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[#E2E8F0] bg-white/80 px-6 backdrop-blur-xl">
-      <div className="flex items-center gap-4">
-        {/* Mobile Brand Icon - "É" */}
-        <div className="md:hidden flex items-center justify-center -mr-2">
-            <div className="relative flex items-center justify-center h-8 w-8 rounded-lg bg-white border border-[#E2E8F0] shadow-[0_8px_20px_rgba(15,23,42,0.12)] overflow-hidden group hover:border-[#3B82F6]/40 transition-all">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/10 to-transparent opacity-60" />
-                <span className="relative text-lg font-black text-[#1E40AF] pt-0.5">É</span>
-            </div>
-        </div>
+    <header className="h-16 border-b border-white/10 flex items-center justify-between px-4 md:px-8 bg-black/20 backdrop-blur-md z-40 bg-hud-black/80 fixed top-0 w-full md:w-[calc(100%-180px)] left-0 md:left-[180px]">
+      <div className="flex items-center gap-2">
+        <div className="h-2 w-2 bg-primary rounded-sm animate-pulse"></div>
+        <span className="font-mono text-xs tracking-[0.2em] text-gray-400 hidden sm:inline">SYSTEM // ETER_CORE</span>
+      </div>
 
-        {/* Mobile Menu Trigger - Hidden on desktop since Sidebar is permanent */}
-        <Button variant="ghost" size="icon" className="md:hidden text-[#64748B]" onClick={toggleMobileMenu}>
-          <Menu className="h-5 w-5" />
-        </Button>
-
-        {/* Search Bar */}
-        <div className="relative hidden md:block w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
-          <input
-            type="text"
-            placeholder="Buscar productos, pedidos..."
-            className="w-full h-9 pl-9 pr-4 rounded-full border border-[#E2E8F0] bg-white/80 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/40 focus:border-[#3B82F6]/40 transition-all"
-          />
+      <div className="absolute left-1/2 transform -translate-x-1/2 hidden md:block">
+        <div className="bg-black/50 border border-primary/20 rounded px-4 py-1 shadow-[0_0_15px_rgba(200,138,4,0.15)] inset-0">
+          <span className="font-mono text-xl text-white font-light tracking-widest text-shadow-glow">
+            {time || '00:00:00'}
+          </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <NotificationsPopover />
+      <div className="flex items-center gap-3 md:gap-6">
+        <LanguageSwitcher />
 
-        <div className="h-6 w-px bg-[#E2E8F0] hidden md:block" />
+        {/* Search — desktop only */}
+        <div className="relative group hidden lg:block">
+          <input
+            className="bg-black/40 text-xs w-64 pl-4 pr-10 py-2 rounded border border-primary/30 focus:border-primary focus:ring-0 text-white placeholder-gray-600 font-mono tracking-wide transition-all outline-none"
+            placeholder="SEARCH DATABASE..."
+            type="text"
+          />
+          <Search className="absolute right-3 top-2 text-primary/50" size={14} />
+        </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-9 w-9 rounded-full ring-2 ring-[#E2E8F0] hover:ring-[#3B82F6]/30 p-0 overflow-hidden">
-              <Avatar className="h-9 w-9">
-                <AvatarImage src={profile?.avatar_url || ''} alt={profile?.full_name || ''} />
-                <AvatarFallback className="bg-[#1E40AF]/10 text-[#1E40AF] font-bold">
-                  {profile?.full_name?.charAt(0) || 'U'}
-                </AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56 bg-white border-[#E2E8F0] text-[#0F172A]" align="end" forceMount>
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none text-[#0F172A]">{profile?.full_name}</p>
-                <p className="text-xs leading-none text-[#64748B]">{profile?.email}</p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-[#E2E8F0]" />
-            <DropdownMenuItem asChild>
-              <Link href="/dashboard/profile" className="w-full cursor-pointer focus:bg-[#F1F5F9] focus:text-[#0F172A]">
-                Perfil
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/dashboard/settings" className="w-full cursor-pointer focus:bg-[#F1F5F9] focus:text-[#0F172A]">
-                Configuración
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-[#E2E8F0]" />
-            <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-500/10 cursor-pointer" onClick={() => signOut()}>
-              Cerrar Sesión
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Notification Bell — conditionally rendered */}
+        {can('view_notifications') && (
+          <NotificationBell />
+        )}
       </div>
     </header>
   );

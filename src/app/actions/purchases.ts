@@ -25,8 +25,12 @@ export interface PurchaseRecord {
 
 export async function getPurchases() {
     const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    const { data, error } = await supabase
+    if (!user) return [];
+
+    const role = user.app_metadata?.role || 'user';
+    let query = supabase
         .from('pedidos')
         .select(`
       id,
@@ -37,24 +41,34 @@ export async function getPurchases() {
     `)
         .order('created_at', { ascending: false });
 
+    // Non-admins see only their own orders
+    if (role !== 'admin' && role !== 'support') {
+        query = query.eq('customer_id', user.id);
+    }
+
+    const { data, error } = await query;
+
     if (error) {
         console.error('Error fetching purchases:', error);
         return [];
     }
 
-    return data.map(order => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return data.map((order: any) => {
         const items = Array.isArray(order.items)
             ? order.items
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            : (order.items as any)?.products || [];
+            : (order.items)?.products || [];
+
+        // Handle case where items might be empty or malformed
+        const firstItem = items[0] || {};
 
         return {
             id: order.id,
             reference_code: `ETER-${order.id.slice(0, 4)}-${new Date(order.created_at).getFullYear()}`.toUpperCase(),
             reseller_name: order.customer_name,
-            product_name: items[0]?.name || 'Producto',
-            quantity: items[0]?.quantity || 1,
-            price: items[0]?.price || 0,
+            product_name: firstItem.name || 'Producto',
+            quantity: firstItem.quantity || 1,
+            price: firstItem.price || 0,
             total: order.total_amount,
             created_at: order.created_at
         };
@@ -153,6 +167,17 @@ export async function registerPurchase(formData: FormData) {
 
 export async function getResellers() {
     const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return [];
+
+    const role = user.app_metadata?.role || 'user';
+
+    // Only admins/support can see reseller list
+    if (role !== 'admin' && role !== 'support') {
+        return [];
+    }
+
     const { data, error } = await supabase
         .from('profiles')
         .select('id, full_name, email')

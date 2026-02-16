@@ -1,20 +1,19 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://eter-store.com'
-
   return [
     {
-      url: baseUrl,
+      url: 'https://eter-store.com',
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1,
     },
     {
-      url: `${baseUrl}/login`,
+      url: 'https://eter-store.com/catalog',
       lastModified: new Date(),
-      changeFrequency: 'monthly',
+      changeFrequency: 'daily',
       priority: 0.8,
     },
+    // Add dynamic routes here later (e.g. products)
   ]
 }

@@ -1,299 +1,394 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Cell, PieChart, Pie, Legend
-} from 'recharts';
-import {
-  DollarSign, ShoppingBag, TrendingUp, Users,
-  ArrowUpRight, ArrowDownRight, Download
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { getDetailedAnalytics, AnalyticsData } from '@/app/actions/analytics';
+import { getPerformanceMetrics, PerformanceMetric } from '@/app/actions/dashboard';
+import { useAuthStore } from '@/store/auth-store';
+import { RevenueChart } from './RevenueChart';
+import { OrdersStatusChart } from './OrdersStatusChart';
+import { SalesByCategoryChart } from './SalesByCategoryChart';
+import { TopProductsTable } from './TopProductsTable';
+import {
+    TrendingUp, DollarSign, ShoppingCart, BarChart3,
+    Download, Calendar, Loader2, RefreshCw, Target
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
-import { subDays } from 'date-fns';
-export function AnalyticsDashboard() {
-  const [data, setData] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState<{ start?: string; end?: string }>({
-    start: subDays(new Date(), 30).toISOString(),
-    end: new Date().toISOString()
-  });
-  const [periodLabel, setPeriodLabel] = useState('Últimos 30 días');
+type DatePreset = '7d' | '30d' | '90d' | 'all';
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const result = await getDetailedAnalytics(dateRange);
-      setData(result);
-    } catch (error) {
-      console.error('Error loading analytics:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [dateRange]);
+export const AnalyticsDashboard = () => {
+    const { profile, checkSession } = useAuthStore();
+    const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+    const [metrics, setMetrics] = useState<PerformanceMetric[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [datePreset, setDatePreset] = useState<DatePreset>('30d');
+    const [isExporting, setIsExporting] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData, dateRange]);
+    useEffect(() => {
+        checkSession();
+    }, [checkSession]);
 
-  const handlePeriodChange = (days: number, label: string) => {
-    const end = new Date();
-    const start = subDays(end, days);
-    setDateRange({ start: start.toISOString(), end: end.toISOString() });
-    setPeriodLabel(label);
-  };
+    const getDateRange = useCallback((preset: DatePreset) => {
+        const now = new Date();
+        switch (preset) {
+            case '7d':
+                return { start: new Date(now.getTime() - 7 * 86400000).toISOString() };
+            case '30d':
+                return { start: new Date(now.getTime() - 30 * 86400000).toISOString() };
+            case '90d':
+                return { start: new Date(now.getTime() - 90 * 86400000).toISOString() };
+            default:
+                return {};
+        }
+    }, []);
 
-  if (loading && !data) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+    const fetchData = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const range = getDateRange(datePreset);
+            const [analyticsData, metricsData] = await Promise.all([
+                getDetailedAnalytics(range),
+                getPerformanceMetrics()
+            ]);
+            setAnalytics(analyticsData);
+            setMetrics(metricsData);
+        } catch (err) {
+            console.error('Error fetching analytics:', err);
+            toast.error('Error al cargar los datos de analytics');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [datePreset, getDateRange]);
 
-  const stats = [
-    {
-      label: 'Ingresos Totales',
-      value: data?.summary.totalRevenue.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0 }),
-      icon: DollarSign,
-      color: 'blue',
-      trend: '+12.5%' // Mocked trend
-    },
-    {
-      label: 'Pedidos Totales',
-      value: data?.summary.totalOrders,
-      icon: ShoppingBag,
-      color: 'emerald',
-      trend: '+5.2%'
-    },
-    {
-      label: 'Ticket Promedio',
-      value: data?.summary.averageOrderValue.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0 }),
-      icon: TrendingUp,
-      color: 'amber',
-      trend: '+2.1%'
-    },
-    {
-      label: 'Conversión',
-      value: `${data?.summary.conversionRate}%`,
-      icon: Users,
-      color: 'purple',
-      trend: '-0.5%'
-    }
-  ];
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
-  return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-10">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">
-            Análisis <span className="text-blue-600">Avanzado</span>
-          </h1>
-          <p className="text-slate-600">
-            Visualiza el rendimiento de tu negocio en tiempo real.
-          </p>
-        </div>
+    const handleExportCSV = async () => {
+        if (!analytics) return;
+        setIsExporting(true);
+        try {
+            const Papa = (await import('papaparse')).default;
 
-        <div className="flex flex-wrap gap-2">
-          <div className="bg-white border border-slate-200 rounded-lg p-1 flex items-center">
-            {[
-              { label: '7D', days: 7, text: 'Últimos 7 días' },
-              { label: '30D', days: 30, text: 'Últimos 30 días' },
-              { label: '90D', days: 90, text: 'Últimos 3 meses' },
-              { label: 'YTD', days: 365, text: 'Este año' } // Simplified YTD
-            ].map((period) => (
-              <button
-                key={period.label}
-                onClick={() => handlePeriodChange(period.days, period.text)}
-                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${periodLabel === period.text
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:bg-slate-50'
-                  }`}
-              >
-                {period.label}
-              </button>
-            ))}
-          </div>
-          <Button variant="outline" className="gap-2">
-            <Download size={16} /> Exportar
-          </Button>
-        </div>
-      </div>
+            const rows = analytics.revenueOverTime.map(r => ({
+                Fecha: r.date,
+                Ingresos: r.revenue,
+                Pedidos: r.orders
+            }));
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all"
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div className={`p-3 rounded-xl bg-${stat.color}-50 text-${stat.color}-600`}>
-                <stat.icon size={24} />
-              </div>
-              <div className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${stat.trend.startsWith('+') ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
-                }`}>
-                {stat.trend.startsWith('+') ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                {stat.trend}
-              </div>
-            </div>
-            <p className="text-sm font-medium text-slate-500 mb-1">{stat.label}</p>
-            <h3 className="text-2xl font-black text-slate-900">{stat.value}</h3>
-          </motion.div>
-        ))}
-      </div>
+            const csv = Papa.unparse(rows);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `analytics_${datePreset}_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            toast.success('Reporte exportado exitosamente');
+        } catch {
+            toast.error('Error al exportar');
+        } finally {
+            setIsExporting(false);
+        }
+    };
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    const handleExportPDF = async () => {
+        if (!analytics) return;
+        setIsExporting(true);
+        try {
+            const { jsPDF } = await import('jspdf');
+            const { default: autoTable } = await import('jspdf-autotable');
 
-        {/* Revenue Chart (Main) */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-bold text-slate-900 text-lg">Evolución de Ingresos</h3>
-            <div className="text-sm text-slate-500 font-medium bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">
-              {periodLabel}
-            </div>
-          </div>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data?.revenueOverTime}>
-                <defs>
-                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                <XAxis
-                  dataKey="date"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: '#64748B', fontSize: 12 }}
-                  dy={10}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: '#64748B', fontSize: 12 }}
-                  tickFormatter={(value) => `$${value / 1000}k`}
-                />
-                <Tooltip
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  formatter={(value: any) => [value?.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }), 'Ingresos']}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#3B82F6"
-                  strokeWidth={3}
-                  fillOpacity={1}
-                  fill="url(#colorRevenue)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+            const doc = new jsPDF();
+            doc.setFontSize(18);
+            doc.text('Reporte de Analytics - Éter', 14, 22);
+            doc.setFontSize(10);
+            doc.text(`Generado: ${new Date().toLocaleDateString('es-ES')} | Período: ${datePreset}`, 14, 30);
 
-        {/* Category Distribution */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 className="font-bold text-slate-900 text-lg mb-6">Ventas por Categoría</h3>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={data?.salesByCategory}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
+            // Summary
+            doc.setFontSize(12);
+            doc.text('Resumen', 14, 42);
+            autoTable(doc, {
+                startY: 46,
+                head: [['Métrica', 'Valor']],
+                body: [
+                    ['Ingresos Totales', `$${analytics.summary.totalRevenue.toLocaleString()}`],
+                    ['Total de Pedidos', analytics.summary.totalOrders.toString()],
+                    ['Valor Promedio', `$${analytics.summary.averageOrderValue.toLocaleString()}`],
+                ],
+                theme: 'striped',
+            });
+
+            // Top Products
+            doc.text('Top Productos', 14, (doc as any).lastAutoTable.finalY + 12);
+            autoTable(doc, {
+                startY: (doc as any).lastAutoTable.finalY + 16,
+                head: [['Producto', 'Ventas', 'Ingresos']],
+                body: analytics.topProducts.map(p => [
+                    p.name,
+                    p.sales.toString(),
+                    `$${p.revenue.toLocaleString()}`
+                ]),
+                theme: 'striped',
+            });
+
+            doc.save(`analytics_${datePreset}_${new Date().toISOString().slice(0, 10)}.pdf`);
+            toast.success('PDF exportado exitosamente');
+        } catch {
+            toast.error('Error al exportar PDF');
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
+    const formatCurrency = (value: number) => {
+        if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+        if (value >= 1000) return `$${(value / 1000).toFixed(1)}K`;
+        return `$${value.toLocaleString()}`;
+    };
+
+    const kpiCards = analytics ? [
+        {
+            label: 'Ingresos Totales',
+            value: formatCurrency(analytics.summary.totalRevenue),
+            icon: DollarSign,
+            color: 'from-emerald-500 to-emerald-600',
+            bg: 'bg-emerald-500/10',
+            textColor: 'text-emerald-400'
+        },
+        {
+            label: 'Total Pedidos',
+            value: analytics.summary.totalOrders.toLocaleString(),
+            icon: ShoppingCart,
+            color: 'from-blue-500 to-blue-600',
+            bg: 'bg-blue-500/10',
+            textColor: 'text-blue-400'
+        },
+        {
+            label: 'Valor Promedio',
+            value: formatCurrency(analytics.summary.averageOrderValue),
+            icon: TrendingUp,
+            color: 'from-purple-500 to-purple-600',
+            bg: 'bg-purple-500/10',
+            textColor: 'text-purple-400'
+        },
+        {
+            label: 'Tasa Conversión',
+            value: `${analytics.summary.conversionRate}%`,
+            icon: Target,
+            color: 'from-amber-500 to-amber-600',
+            bg: 'bg-amber-500/10',
+            textColor: 'text-amber-400'
+        }
+    ] : [];
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
                 >
-                  {data?.salesByCategory.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  formatter={(value: any) => [`${value} uds`, 'Ventas']}
-                  contentStyle={{ borderRadius: '12px' }}
-                />
-                <Legend verticalAlign="bottom" height={36} iconType="circle" />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+                    <Loader2 size={48} className="text-primary" />
+                </motion.div>
+                <p className="text-gray-400 font-mono text-sm tracking-wider">CARGANDO ANALYTICS...</p>
+            </div>
+        );
+    }
 
-        {/* Order Status */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 className="font-bold text-slate-900 text-lg mb-6">Estado de Pedidos</h3>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data?.ordersByStatus} layout="vertical" margin={{ left: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
-                <XAxis type="number" hide />
-                <YAxis
-                  dataKey="name"
-                  type="category"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: '#475569', fontSize: 12, fontWeight: 500 }}
-                  width={80}
-                />
-                <Tooltip
-                  cursor={{ fill: '#F1F5F9' }}
-                  contentStyle={{ borderRadius: '8px' }}
-                />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
-                  {data?.ordersByStatus.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+    return (
+        <div className="space-y-8 relative">
+            {/* Header */}
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                <div>
+                    <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-2">
+                        Analytics
+                    </h1>
+                    <p className="text-gray-400 text-sm font-medium max-w-md">
+                        Métricas en tiempo real de tu negocio con datos directos de Supabase.
+                    </p>
+                    <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-gray-400">
+                        Rol: {profile?.role || 'cargando'}
+                    </div>
+                </div>
 
-        {/* Top Products Table */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 className="font-bold text-slate-900 text-lg mb-4">Productos Más Vendidos</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="text-xs text-slate-500 uppercase bg-slate-50">
-                <tr>
-                  <th className="px-4 py-3 rounded-l-lg">Producto</th>
-                  <th className="px-4 py-3 text-right">Ventas</th>
-                  <th className="px-4 py-3 text-right rounded-r-lg">Ingresos</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data?.topProducts.map((product, index) => (
-                  <tr key={index} className="border-b border-slate-100 hover:bg-slate-50/50">
-                    <td className="px-4 py-3 font-medium text-slate-900">
-                      {product.name}
-                    </td>
-                    <td className="px-4 py-3 text-right font-bold text-blue-600">
-                      {product.sales}
-                    </td>
-                    <td className="px-4 py-3 text-right font-medium text-slate-600">
-                      {product.revenue.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0 })}
-                    </td>
-                  </tr>
+                <div className="flex flex-wrap items-center gap-3">
+                    {/* Date Presets */}
+                    <div className="flex gap-1 p-1 bg-black/40 border border-white/10 rounded-xl backdrop-blur-sm">
+                        {([
+                            { key: '7d', label: '7 días' },
+                            { key: '30d', label: '30 días' },
+                            { key: '90d', label: '90 días' },
+                            { key: 'all', label: 'Todo' },
+                        ] as { key: DatePreset; label: string }[]).map(({ key, label }) => (
+                            <button
+                                key={key}
+                                onClick={() => setDatePreset(key)}
+                                className={cn(
+                                    'px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300',
+                                    datePreset === key
+                                        ? 'bg-primary/20 text-primary border border-primary/30 shadow-lg shadow-primary/10'
+                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                )}
+                            >
+                                <Calendar size={12} className="inline mr-1.5" />
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-2">
+                        <button
+                            onClick={fetchData}
+                            className="p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-gray-400 hover:text-white transition-all"
+                            title="Refrescar"
+                        >
+                            <RefreshCw size={16} />
+                        </button>
+                        <button
+                            onClick={handleExportCSV}
+                            disabled={isExporting}
+                            className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition-all disabled:opacity-50"
+                        >
+                            <Download size={14} />
+                            CSV
+                        </button>
+                        <button
+                            onClick={handleExportPDF}
+                            disabled={isExporting}
+                            className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-xl text-xs font-bold text-primary transition-all disabled:opacity-50"
+                        >
+                            <Download size={14} />
+                            PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {kpiCards.map((kpi, idx) => (
+                    <motion.div
+                        key={kpi.label}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-5 group hover:border-primary/30 transition-all duration-300"
+                    >
+                        <div className="flex items-start justify-between mb-4">
+                            <div className={cn('p-3 rounded-xl', kpi.bg)}>
+                                <kpi.icon size={20} className={kpi.textColor} />
+                            </div>
+                        </div>
+                        <h3 className="text-3xl font-black text-white mb-1">{kpi.value}</h3>
+                        <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider">{kpi.label}</p>
+                    </motion.div>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+            </div>
 
-      </div>
-    </div>
-  );
-}
+            {/* Performance Metrics Row */}
+            {metrics.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {metrics.map((metric, idx) => {
+                        const progress = Math.min((metric.value / metric.target) * 100, 100);
+                        return (
+                            <motion.div
+                                key={metric.label}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 + idx * 0.1 }}
+                                className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-5"
+                            >
+                                <div className="flex items-center justify-between mb-3">
+                                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">{metric.label}</p>
+                                    <span className={cn(
+                                        'text-[10px] font-bold px-2 py-0.5 rounded-full',
+                                        metric.trend === 'up'
+                                            ? 'bg-emerald-500/20 text-emerald-400'
+                                            : 'bg-red-500/20 text-red-400'
+                                    )}>
+                                        {metric.trend === 'up' ? '↑' : '↓'} {metric.trendValue.toFixed(1)}%
+                                    </span>
+                                </div>
+                                <p className="text-2xl font-black text-white mb-3">
+                                    {typeof metric.value === 'number' && metric.value > 1000
+                                        ? formatCurrency(metric.value)
+                                        : metric.value}
+                                </p>
+                                <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${progress}%` }}
+                                        transition={{ duration: 1, delay: 0.5 + idx * 0.1 }}
+                                        className="h-full bg-gradient-to-r from-primary/80 to-primary rounded-full"
+                                    />
+                                </div>
+                                <p className="text-[10px] text-gray-500 mt-1.5 font-medium">
+                                    Objetivo: {typeof metric.target === 'number' && metric.target > 1000
+                                        ? formatCurrency(metric.target)
+                                        : metric.target}
+                                </p>
+                            </motion.div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* Charts Grid */}
+            {analytics && (
+                <div className="grid grid-cols-12 gap-6">
+                    {/* Revenue Chart - Large */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.6 }}
+                        className="col-span-12 lg:col-span-8 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6"
+                    >
+                        <h3 className="text-lg font-black text-white mb-1">Ingresos por Período</h3>
+                        <p className="text-xs text-gray-400 font-medium mb-6">Evolución de ingresos y pedidos</p>
+                        <RevenueChart data={analytics.revenueOverTime} />
+                    </motion.div>
+
+                    {/* Orders Status - Small */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.7 }}
+                        className="col-span-12 lg:col-span-4 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6"
+                    >
+                        <h3 className="text-lg font-black text-white mb-1">Estado de Pedidos</h3>
+                        <p className="text-xs text-gray-400 font-medium mb-6">Distribución actual</p>
+                        <OrdersStatusChart data={analytics.ordersByStatus} />
+                    </motion.div>
+
+                    {/* Sales by Category */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.8 }}
+                        className="col-span-12 lg:col-span-5 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6"
+                    >
+                        <h3 className="text-lg font-black text-white mb-1">Ventas por Categoría</h3>
+                        <p className="text-xs text-gray-400 font-medium mb-6">Desglose de productos vendidos</p>
+                        <SalesByCategoryChart data={analytics.salesByCategory} />
+                    </motion.div>
+
+                    {/* Top Products */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.9 }}
+                        className="col-span-12 lg:col-span-7 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6"
+                    >
+                        <h3 className="text-lg font-black text-white mb-1">Top Productos</h3>
+                        <p className="text-xs text-gray-400 font-medium mb-6">Productos más vendidos</p>
+                        <TopProductsTable data={analytics.topProducts} />
+                    </motion.div>
+                </div>
+            )}
+        </div>
+    );
+};

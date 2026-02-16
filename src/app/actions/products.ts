@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { checkUserPermissions } from '@/utils/supabase/middleware-auth';
 
 export interface ProductType {
     id: string;
@@ -39,12 +40,13 @@ const bulkProductSchema = z.object({
 });
 
 export async function bulkImportProducts(products: Record<string, unknown>[]) {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { user, isAdmin, isStaff } = await checkUserPermissions();
 
-    if (!user) {
+    if (!user || (!isAdmin && !isStaff)) {
         return { success: false, error: 'Unauthorized', successCount: 0, errors: [] };
     }
+
+    const supabase = createClient();
 
     const results = {
         successCount: 0,
@@ -105,12 +107,13 @@ export async function bulkImportProducts(products: Record<string, unknown>[]) {
 }
 
 export async function bulkUpdateProducts(updates: { id: string, data: Partial<ProductType> }[]) {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { user, isAdmin, isStaff } = await checkUserPermissions();
 
-    if (!user) {
+    if (!user || (!isAdmin && !isStaff)) {
         return { error: 'Unauthorized' };
     }
+
+    const supabase = createClient();
 
     let successCount = 0;
     const errors = [];
@@ -149,12 +152,13 @@ export async function bulkUpdateProducts(updates: { id: string, data: Partial<Pr
 }
 
 export async function bulkDeleteProducts(ids: string[]) {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { user, isAdmin, isStaff } = await checkUserPermissions();
 
-    if (!user) {
+    if (!user || (!isAdmin && !isStaff)) {
         return { error: 'Unauthorized' };
     }
+
+    const supabase = createClient();
 
     const { error } = await supabase
         .from('productos')
@@ -246,12 +250,13 @@ export async function getProducts(
 }
 
 export async function createProduct(formData: FormData) {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { user, isAdmin, isStaff } = await checkUserPermissions();
 
-    if (!user) {
+    if (!user || (!isAdmin && !isStaff)) {
         return { error: 'Unauthorized' };
     }
+
+    const supabase = createClient();
 
     const name = formData.get('name') as string;
     const description = formData.get('description') as string;
@@ -321,12 +326,13 @@ export async function createProduct(formData: FormData) {
 }
 
 export async function updateProduct(id: string, formData: FormData) {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { user, isAdmin, isStaff } = await checkUserPermissions();
 
-    if (!user) {
+    if (!user || (!isAdmin && !isStaff)) {
         return { error: 'Unauthorized' };
     }
+
+    const supabase = createClient();
 
     const name = formData.get('name') as string;
     const description = formData.get('description') as string;
@@ -395,12 +401,13 @@ export async function updateProduct(id: string, formData: FormData) {
 }
 
 export async function deleteProduct(id: string) {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { user, isAdmin, isStaff } = await checkUserPermissions();
 
-    if (!user) {
+    if (!user || (!isAdmin && !isStaff)) {
         return { error: 'Unauthorized' };
     }
+
+    const supabase = createClient();
 
     const { error } = await supabase
         .from('productos')
