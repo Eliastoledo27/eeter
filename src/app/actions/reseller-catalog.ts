@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { getProducts } from './products';
+import { revalidatePath } from 'next/cache';
 
 /**
  * Get reseller data by their unique slug
@@ -25,7 +26,7 @@ export async function getResellerBySlug(slug: string) {
 /**
  * Get products with prices adjusted for a specific reseller
  */
-export async function getResellerProducts(resellerId: string, defaultMarkup: number = 10000) {
+export async function getResellerProducts(resellerId: string, defaultMarkup: number) {
     const supabase = createClient();
 
     // 1. Get all base products
@@ -96,6 +97,20 @@ export async function updateResellerMarkup(markup: number) {
 
     if (error) return { success: false, error: error.message };
 
+    // Fetch slug to revalidate public catalog
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('reseller_slug')
+        .eq('id', user.id)
+        .single();
+
+    if (profile?.reseller_slug) {
+        revalidatePath(`/c/${profile.reseller_slug}`);
+        revalidatePath(`/c/${profile.reseller_slug}/[productId]`, 'page');
+    }
+
+    revalidatePath('/dashboard/myshop');
+
     return { success: true };
 }
 
@@ -133,6 +148,20 @@ export async function updateProductOverride(productId: string, customPrice: numb
         });
 
     if (error) return { success: false, error: error.message };
+
+    // Fetch slug to revalidate public catalog
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('reseller_slug')
+        .eq('id', user.id)
+        .single();
+
+    if (profile?.reseller_slug) {
+        revalidatePath(`/c/${profile.reseller_slug}`);
+        revalidatePath(`/c/${profile.reseller_slug}/${productId}`);
+    }
+
+    revalidatePath('/dashboard/myshop');
 
     return { success: true };
 }

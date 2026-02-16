@@ -23,7 +23,7 @@ export default async function ResellerProductDetailPage({
     }
 
     // 2. Fetch adjusted products for this reseller
-    const products = await getResellerProducts(reseller.id, (reseller as any).reseller_markup || 10000);
+    const products = await getResellerProducts(reseller.id, reseller.reseller_markup ?? 10000);
     const product = products.find(p => p.id === params.productId);
 
     if (!product) {

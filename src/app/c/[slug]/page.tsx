@@ -15,7 +15,7 @@ export default async function ResellerPublicCatalog({ params }: { params: { slug
     }
 
     // Pass the reseller's custom pricing to the grid
-    const products = await getResellerProducts(reseller.id, (reseller as any).reseller_markup || 10000);
+    const products = await getResellerProducts(reseller.id, reseller.reseller_markup ?? 10000);
 
     return (
         <main className="min-h-screen bg-[#050505] text-white">
