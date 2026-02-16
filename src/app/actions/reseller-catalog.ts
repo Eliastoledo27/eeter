@@ -44,12 +44,23 @@ export async function getResellerProducts(resellerId: string, defaultMarkup: num
         const basePrice = product.base_price;
         const overridePrice = overridesMap.get(product.id);
 
-        // Final price logic:
-        // If has override: use override
-        // Else: base_price + defaultMarkup
-        // CRITICAL: Final price can NEVER be lower than basePrice (handled by UI/Validation, but safe here too)
-        let finalPrice = overridePrice || (basePrice + defaultMarkup);
+        /**
+         * Final price logic:
+         * 1. If the reseller has a manual override for THIS specific product -> use it.
+         * 2. Otherwise -> use the base_price + the reseller's global markup.
+         * 3. In any case, it can NEVER be less than the base price.
+         */
+        let finalPrice: number;
 
+        if (overridePrice && overridePrice > 0) {
+            // Manual override takes precedence
+            finalPrice = overridePrice;
+        } else {
+            // Use global markup
+            finalPrice = basePrice + defaultMarkup;
+        }
+
+        // Safety check: Never below base cost
         if (finalPrice < basePrice) {
             finalPrice = basePrice;
         }
@@ -57,7 +68,6 @@ export async function getResellerProducts(resellerId: string, defaultMarkup: num
         return {
             ...product,
             resellerPrice: finalPrice,
-            // We'll use this price in the UI
             displayPrice: finalPrice
         };
     });
