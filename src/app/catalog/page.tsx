@@ -1,12 +1,12 @@
 'use client';
 
 import { Navbar } from '@/components/layout/Navbar';
+import { Footer } from '@/components/layout/Footer';
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { Filter, Search, Loader2 } from 'lucide-react';
 import { useCatalog } from '@/hooks/useCatalog';
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
 import { FilterSidebar } from '@/components/catalog/FilterSidebar';
 
 export default function CatalogPage() {
@@ -65,11 +65,11 @@ export default function CatalogPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#050505] font-sans text-white selection:bg-[#CA8A04] selection:text-black overflow-x-hidden">
+        <div className="min-h-screen bg-[#050505] font-sans text-white selection:bg-[#C88A04] selection:text-black overflow-x-hidden">
             {/* Background Ambience & Grid */}
             <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-[#CA8A04]/10 rounded-full blur-[150px] animate-pulse-slow" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#CA8A04]/5 rounded-full blur-[120px]" />
+                <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-[#C88A04]/10 rounded-full blur-[150px] animate-pulse-slow" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#C88A04]/5 rounded-full blur-[120px]" />
 
                 {/* Visual Grid */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(200,138,4,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,138,4,0.03)_1px,transparent_1px)] bg-[size:100px_100px] opacity-40" />
@@ -90,11 +90,11 @@ export default function CatalogPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
                     >
-                        <span className="text-[#CA8A04] font-mono text-sm tracking-[0.4em] uppercase mb-4 block text-center lg:text-left">
+                        <span className="text-[#C88A04] font-mono text-sm tracking-[0.4em] uppercase mb-4 block text-center lg:text-left">
                             Colección 2026
                         </span>
                         <h1 className="text-6xl md:text-9xl font-black tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/20 uppercase text-center lg:text-left">
-                            Catálogo <span className="text-[#CA8A04]">Éter</span>
+                            Catálogo <span className="text-[#C88A04]">Éter</span>
                         </h1>
                     </motion.div>
                 </div>
@@ -105,7 +105,7 @@ export default function CatalogPage() {
                         <button
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                             className={`flex items-center gap-3 h-12 px-8 rounded-full border transition-all duration-500 uppercase text-[10px] font-bold tracking-widest ${isSidebarOpen
-                                ? 'bg-[#CA8A04] text-black border-[#CA8A04] shadow-[0_0_20px_rgba(202,138,4,0.3)]'
+                                ? 'bg-[#C88A04] text-black border-[#C88A04] shadow-[0_0_20px_rgba(200,138,4,0.3)]'
                                 : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/30 hover:text-white'
                                 }`}
                         >
@@ -118,13 +118,13 @@ export default function CatalogPage() {
                     </div>
 
                     <div className="relative group w-full md:w-96">
-                        <Search size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-700 group-focus-within:text-[#CA8A04] transition-colors" />
+                        <Search size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-700 group-focus-within:text-[#C88A04] transition-colors" />
                         <input
                             type="text"
                             placeholder="BUSCAR EN EL ARCHIVO..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-white/[0.02] border border-white/5 rounded-full py-3.5 pl-14 pr-6 text-[10px] font-bold tracking-[0.2em] focus:outline-none focus:border-[#CA8A04]/30 transition-all uppercase placeholder:text-gray-800"
+                            className="w-full bg-white/[0.02] border border-white/5 rounded-full py-3.5 pl-14 pr-6 text-[10px] font-bold tracking-[0.2em] focus:outline-none focus:border-[#C88A04]/30 transition-all uppercase placeholder:text-gray-800"
                         />
                     </div>
                 </div>
@@ -168,8 +168,8 @@ export default function CatalogPage() {
                         {loading ? (
                             <div className="min-h-[500px] flex flex-col items-center justify-center gap-6">
                                 <div className="relative">
-                                    <div className="w-16 h-16 border-2 border-[#CA8A04]/20 rounded-full animate-ping absolute inset-0" />
-                                    <Loader2 className="animate-spin text-[#CA8A04]" size={64} />
+                                    <div className="w-16 h-16 border-2 border-[#C88A04]/20 rounded-full animate-ping absolute inset-0" />
+                                    <Loader2 className="animate-spin text-[#C88A04]" size={64} />
                                 </div>
                                 <p className="text-gray-500 font-mono text-sm tracking-[0.3em] uppercase animate-pulse">Sincronizando Archivo...</p>
                             </div>
@@ -203,7 +203,7 @@ export default function CatalogPage() {
                                 <p className="text-gray-500 mb-12 max-w-sm mx-auto">Tu búsqueda no arrojó resultados en el catálogo actual. Intentá con otros términos o categorías.</p>
                                 <button
                                     onClick={resetFilters}
-                                    className="px-10 py-4 border border-[#CA8A04] text-[#CA8A04] rounded-full hover:bg-[#CA8A04] hover:text-black transition-all font-bold uppercase tracking-widest text-xs"
+                                    className="px-10 py-4 border border-[#C88A04] text-[#C88A04] rounded-full hover:bg-[#C88A04] hover:text-black transition-all font-bold uppercase tracking-widest text-xs"
                                 >
                                     Reiniciar Búsqueda
                                 </button>
@@ -212,6 +212,8 @@ export default function CatalogPage() {
                     </motion.div>
                 </div>
             </div>
+
+            <Footer />
         </div>
-    )
+    );
 }

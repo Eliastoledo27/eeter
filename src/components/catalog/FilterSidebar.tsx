@@ -55,8 +55,8 @@ export function FilterSidebar({
                     onClick={() => toggleSection('categories')}
                     className="flex items-center justify-between w-full group"
                 >
-                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-700 group-hover:text-[#CA8A04] transition-colors">Categorías</span>
-                    <ChevronDown size={14} className={`text-gray-800 transition-transform duration-500 ${expandedSections.includes('categories') ? '' : '-rotate-90'}`} />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 group-hover:text-[#C88A04] transition-colors">Categorías</span>
+                    <ChevronDown size={14} className={`text-gray-500 transition-transform duration-500 ${expandedSections.includes('categories') ? '' : '-rotate-90'}`} />
                 </button>
 
                 <AnimatePresence>
@@ -72,8 +72,8 @@ export function FilterSidebar({
                                     key={category}
                                     onClick={() => onCategoryChange(category)}
                                     className={`w-full text-left px-4 py-2.5 rounded-xl text-[10px] font-bold transition-all duration-300 ${activeCategory === category
-                                            ? 'text-[#CA8A04] bg-[#CA8A04]/5'
-                                            : 'text-gray-600 hover:text-white hover:bg-white/5'
+                                        ? 'text-[#C88A04] bg-[#C88A04]/10'
+                                        : 'text-gray-500 hover:text-white hover:bg-white/5'
                                         }`}
                                 >
                                     {category.toUpperCase()}
@@ -90,8 +90,8 @@ export function FilterSidebar({
                     onClick={() => toggleSection('price')}
                     className="flex items-center justify-between w-full group"
                 >
-                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-700 group-hover:text-[#CA8A04] transition-colors">Rango de Precio</span>
-                    <ChevronDown size={14} className={`text-gray-800 transition-transform duration-500 ${expandedSections.includes('price') ? '' : '-rotate-90'}`} />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 group-hover:text-[#C88A04] transition-colors">Rango de Precio</span>
+                    <ChevronDown size={14} className={`text-gray-500 transition-transform duration-500 ${expandedSections.includes('price') ? '' : '-rotate-90'}`} />
                 </button>
 
                 <AnimatePresence>
@@ -105,25 +105,25 @@ export function FilterSidebar({
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-2">
                                     <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] text-gray-700">$</span>
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] text-gray-600">$</span>
                                         <input
                                             type="number"
                                             placeholder="MIN"
                                             value={priceRange[0] || ''}
                                             onChange={(e) => onPriceChange([Number(e.target.value), priceRange[1]])}
-                                            className="w-full bg-white/[0.02] border border-white/5 rounded-xl py-2 pl-7 pr-3 text-[10px] font-mono focus:outline-none focus:border-[#CA8A04]/30 transition-colors uppercase placeholder:text-gray-800"
+                                            className="w-full bg-white/[0.02] border border-white/5 rounded-xl py-2.5 pl-7 pr-3 text-[10px] font-mono focus:outline-none focus:border-[#C88A04]/30 transition-colors uppercase placeholder:text-gray-800"
                                         />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] text-gray-700">$</span>
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] text-gray-600">$</span>
                                         <input
                                             type="number"
                                             placeholder="MAX"
                                             value={priceRange[1] || ''}
                                             onChange={(e) => onPriceChange([priceRange[0], Number(e.target.value)])}
-                                            className="w-full bg-white/[0.02] border border-white/5 rounded-xl py-2 pl-7 pr-3 text-[10px] font-mono focus:outline-none focus:border-[#CA8A04]/30 transition-colors uppercase placeholder:text-gray-800"
+                                            className="w-full bg-white/[0.02] border border-white/5 rounded-xl py-2.5 pl-7 pr-3 text-[10px] font-mono focus:outline-none focus:border-[#C88A04]/30 transition-colors uppercase placeholder:text-gray-800"
                                         />
                                     </div>
                                 </div>
@@ -139,8 +139,8 @@ export function FilterSidebar({
                     onClick={() => toggleSection('sizes')}
                     className="flex items-center justify-between w-full group"
                 >
-                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-700 group-hover:text-[#CA8A04] transition-colors">Talles</span>
-                    <ChevronDown size={14} className={`text-gray-800 transition-transform duration-500 ${expandedSections.includes('sizes') ? '' : '-rotate-90'}`} />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 group-hover:text-[#C88A04] transition-colors">Talles</span>
+                    <ChevronDown size={14} className={`text-gray-500 transition-transform duration-500 ${expandedSections.includes('sizes') ? '' : '-rotate-90'}`} />
                 </button>
 
                 <AnimatePresence>
@@ -151,14 +151,14 @@ export function FilterSidebar({
                             exit={{ opacity: 0, height: 0 }}
                             className="pt-2 overflow-hidden"
                         >
-                            <div className="grid grid-cols-4 gap-1.5">
+                            <div className="grid grid-cols-4 gap-2">
                                 {sizes.map((size) => (
                                     <button
                                         key={size}
                                         onClick={() => toggleSize(size)}
-                                        className={`h-9 rounded-lg text-[9px] font-mono font-bold transition-all duration-300 border ${selectedSizes.includes(size)
-                                                ? 'bg-[#CA8A04] text-black border-[#CA8A04]'
-                                                : 'bg-white/[0.02] border-white/5 text-gray-700 hover:border-white/20 hover:text-white'
+                                        className={`h-10 rounded-xl text-[9px] font-mono font-bold transition-all duration-300 border ${selectedSizes.includes(size)
+                                            ? 'bg-[#C88A04] text-black border-[#C88A04] shadow-[0_0_15px_rgba(200,138,4,0.3)]'
+                                            : 'bg-white/[0.02] border-white/5 text-gray-500 hover:border-white/20 hover:text-white'
                                             }`}
                                     >
                                         {size}
@@ -176,8 +176,8 @@ export function FilterSidebar({
                     onClick={() => toggleSection('sort')}
                     className="flex items-center justify-between w-full group"
                 >
-                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-700 group-hover:text-[#CA8A04] transition-colors">Ordenar</span>
-                    <ChevronDown size={14} className={`text-gray-800 transition-transform duration-500 ${expandedSections.includes('sort') ? '' : '-rotate-90'}`} />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 group-hover:text-[#C88A04] transition-colors">Ordenar</span>
+                    <ChevronDown size={14} className={`text-gray-500 transition-transform duration-500 ${expandedSections.includes('sort') ? '' : '-rotate-90'}`} />
                 </button>
 
                 <AnimatePresence>
@@ -197,8 +197,8 @@ export function FilterSidebar({
                                     key={option.value}
                                     onClick={() => onSortChange(option.value)}
                                     className={`w-full text-left px-4 py-2.5 rounded-xl text-[9px] font-bold transition-all duration-300 ${sortBy === option.value
-                                            ? 'text-white bg-white/5'
-                                            : 'text-gray-600 hover:text-white hover:bg-white/5'
+                                        ? 'text-white bg-white/10'
+                                        : 'text-gray-500 hover:text-white hover:bg-white/5'
                                         }`}
                                 >
                                     {option.label.toUpperCase()}
@@ -210,13 +210,13 @@ export function FilterSidebar({
             </div>
 
             {/* Reset Button (Sutil) */}
-            <div className="pt-6 border-t border-white/5">
+            <div className="pt-8 border-t border-white/5">
                 <button
                     onClick={onReset}
-                    className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-gray-700 hover:text-[#CA8A04] transition-colors group"
+                    className="flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 hover:text-[#C88A04] transition-colors group"
                 >
-                    <RotateCcw size={12} className="group-hover:rotate-[-45deg] transition-transform" />
-                    Resetear Archivo
+                    <RotateCcw size={14} className="group-hover:rotate-[-180deg] transition-transform duration-700" />
+                    Reiniciar Filtros
                 </button>
             </div>
         </aside>

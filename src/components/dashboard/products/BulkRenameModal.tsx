@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { ProductType, bulkUpdateProducts } from '@/app/actions/products';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Save, X, Info } from 'lucide-react';
+import { Loader2, Save, X, Info, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { analyzeImageWithName } from '@/lib/ai-utils';
+import { useSettingsStore } from '@/store/settings-store';
 
 interface BulkRenameModalProps {
     isOpen: boolean;
@@ -16,13 +18,51 @@ interface BulkRenameModalProps {
 }
 
 export function BulkRenameModal({ isOpen, onClose, selectedProducts, onSuccess }: BulkRenameModalProps) {
+    const { geminiApiKey } = useSettingsStore();
     const [names, setNames] = useState<Record<string, string>>(
         selectedProducts.reduce((acc, p) => ({ ...acc, [p.id]: p.name }), {})
     );
     const [isSaving, setIsSaving] = useState(false);
+    const [analyzingIds, setAnalyzingIds] = useState<Set<string>>(new Set());
 
     const handleNameChange = (id: string, newName: string) => {
         setNames(prev => ({ ...prev, [id]: newName }));
+    };
+
+    const handleAIAnalyze = async (id: string, imageUrl: string) => {
+        if (!imageUrl) return;
+        setAnalyzingIds(prev => {
+            const next = new Set(prev);
+            next.add(id);
+            return next;
+        });
+        try {
+            const newName = await analyzeImageWithName(imageUrl, geminiApiKey);
+            if (newName) {
+                setNames(prev => ({ ...prev, [id]: newName }));
+            }
+        } finally {
+            setAnalyzingIds(prev => {
+                const next = new Set(prev);
+                next.delete(id);
+                return next;
+            });
+        }
+    };
+
+    const handleAnalyzeAll = async () => {
+        if (!geminiApiKey) {
+            toast.error('Configura tu API Key de Gemini primero.');
+            return;
+        }
+
+        toast.info('Iniciando análisis masivo con IA...');
+        for (const product of selectedProducts) {
+            if (product.images?.[0]) {
+                await handleAIAnalyze(product.id, product.images[0]);
+            }
+        }
+        toast.success('Análisis masivo completado ✨');
     };
 
     const handleSave = async () => {
@@ -72,17 +112,29 @@ export function BulkRenameModal({ isOpen, onClose, selectedProducts, onSuccess }
             >
                 {/* Header */}
                 <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-                    <div>
-                        <h2 className="text-3xl font-black text-white tracking-tighter uppercase leading-none mb-2">
-                            RENOMBRAR <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C88A04] to-[#ECA413]">MASIVAMENTE</span>
-                        </h2>
-                        <p className="text-gray-500 text-[10px] font-black tracking-[0.2em] uppercase">
-                            Edición de {selectedProducts.length} registros exclusivos
-                        </p>
+                    <div className="flex-1">
+                        <div className="flex items-center justify-between gap-4">
+                            <div>
+                                <h2 className="text-3xl font-black text-white tracking-tighter uppercase leading-none mb-2">
+                                    RENOMBRAR <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C88A04] to-[#ECA413]">MASIVAMENTE</span>
+                                </h2>
+                                <p className="text-gray-500 text-[10px] font-black tracking-[0.2em] uppercase">
+                                    Edición de {selectedProducts.length} registros exclusivos
+                                </p>
+                            </div>
+                            <Button
+                                onClick={handleAnalyzeAll}
+                                disabled={analyzingIds.size > 0}
+                                className="bg-[#C88A04]/10 hover:bg-[#C88A04]/20 text-[#C88A04] border border-[#C88A04]/20 rounded-2xl font-black text-[9px] tracking-[0.2em] uppercase h-12 px-6"
+                            >
+                                <Sparkles size={14} className="mr-2" />
+                                {analyzingIds.size > 0 ? 'ANALIZANDO...' : 'RENOMBRAR TODO CON IA'}
+                            </Button>
+                        </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-all text-gray-500 hover:text-white border border-white/5"
+                        className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-all text-gray-500 hover:text-white border border-white/5 ml-4"
                     >
                         <X size={20} />
                     </button>
@@ -111,9 +163,23 @@ export function BulkRenameModal({ isOpen, onClose, selectedProducts, onSuccess }
                                 />
                             </div>
                             <div className="flex-1 space-y-2">
-                                <label className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em] pl-1">
-                                    Nomenclatura Actual
-                                </label>
+                                <div className="flex justify-between items-center pr-2">
+                                    <label className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em] pl-1">
+                                        Nomenclatura Actual
+                                    </label>
+                                    <button
+                                        onClick={() => handleAIAnalyze(product.id, product.images[0])}
+                                        disabled={analyzingIds.has(product.id)}
+                                        className="text-[#C88A04] hover:text-[#ECA413] transition-colors p-1"
+                                        title="Sugerir nombre con IA"
+                                    >
+                                        {analyzingIds.has(product.id) ? (
+                                            <Loader2 size={12} className="animate-spin" />
+                                        ) : (
+                                            <Sparkles size={12} />
+                                        )}
+                                    </button>
+                                </div>
                                 <Input
                                     value={names[product.id] || ''}
                                     onChange={(e) => handleNameChange(product.id, e.target.value)}

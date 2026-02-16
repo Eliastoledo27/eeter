@@ -52,7 +52,7 @@ type StockLevel = 'available' | 'low' | 'out';
 
 function getStockLevel(product: ProductType): StockLevel {
   const total = getTotalStock(product.stock_by_size || {});
-  if (!product.is_active || total <= 0) return 'out';
+  if (total <= 0) return 'out';
   if (total <= 3) return 'low';
   return 'available';
 }
@@ -154,8 +154,8 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
 
   return (
     <>
-      {/* ── Product Grid — 4 cols desktop · 2 tablet · 1 mobile ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6 pb-20">
+      {/* ── Product Grid — 4 cols desktop · 2 tablet · 2 mobile ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6 pb-20">
         {products?.map((product, index) => {
           const stockLevel = getStockLevel(product);
           const badge = stockBadgeConfig[stockLevel];
@@ -246,7 +246,7 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
                 {/* ── Card Info — generous spacing ── */}
                 <div className="p-4 flex flex-col flex-1 gap-2">
                   {/* Category */}
-                  <span className="text-[10px] font-semibold text-[#ffd900]/70 uppercase tracking-[0.15em]">
+                  <span className="text-[9px] sm:text-[10px] font-semibold text-[#ffd900]/70 uppercase tracking-[0.15em]">
                     {product.category || 'General'}
                   </span>
 
@@ -259,7 +259,7 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
                   <div className="mt-auto pt-3">
                     <span
                       suppressHydrationWarning
-                      className="text-[18px] font-bold text-white font-display"
+                      className="text-[16px] sm:text-[18px] font-bold text-white font-display"
                     >
                       ${Number(product.base_price).toLocaleString('es-AR')}
                     </span>
@@ -294,7 +294,7 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
       <Dialog open={!!selectedProduct} onOpenChange={(open) => !open && setSelectedProduct(null)}>
         <DialogContent className="max-w-5xl p-0 overflow-hidden bg-[#0a0a0a]/95 backdrop-blur-3xl border border-white/10 shadow-[0_40px_120px_rgba(0,0,0,0.5)] rounded-[2rem] gap-0 text-white">
           {selectedProduct && (
-            <div className="flex flex-col md:flex-row h-[90vh] md:h-auto md:max-h-[85vh]">
+            <div className="flex flex-col md:flex-row h-full md:h-auto md:max-h-[85vh]">
               <div className="w-full md:w-1/2 bg-[#1a1a1a] relative h-64 md:h-auto">
                 {selectedProduct.images && selectedProduct.images[0] ? (
                   <Image
@@ -311,7 +311,7 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
                 )}
               </div>
 
-              <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col overflow-y-auto bg-black/20">
+              <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col flex-1 overflow-y-auto bg-black/20">
                 <DialogHeader className="mb-6">
                   <p className="text-[#ffd900] font-semibold text-xs uppercase tracking-widest mb-2">
                     {selectedProduct.category}
@@ -320,7 +320,7 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
                     {selectedProduct.name}
                   </DialogTitle>
                   <div className="flex items-baseline gap-3">
-                    <span className="text-3xl font-bold text-[#ffd900] font-display">
+                    <span className="text-2xl md:text-3xl font-bold text-[#ffd900] font-display">
                       ${selectedProduct.base_price.toLocaleString()}
                     </span>
                   </div>

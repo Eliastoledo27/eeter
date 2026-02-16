@@ -141,7 +141,7 @@ const HeroSection = ({ products }: { products: Product[] }) => {
     }, [primaryHeroImage]);
 
     return (
-        <section className="relative h-screen min-h-[900px] w-full overflow-hidden flex flex-col justify-center items-center bg-[#050505]">
+        <section className="relative h-screen min-h-[600px] md:min-h-[900px] w-full overflow-hidden flex flex-col justify-center items-center bg-[#050505]">
             {/* Dynamic Background */}
             <div className="absolute inset-0 z-0">
                 <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay" style={{
@@ -177,7 +177,7 @@ const HeroSection = ({ products }: { products: Product[] }) => {
                     </motion.div>
 
                     <motion.h1
-                        className="text-[12vw] leading-[0.8] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40 mb-8 select-none"
+                        className="text-[18vw] md:text-[12vw] leading-[0.8] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40 mb-8 select-none"
                     >
                         ÉTER
                     </motion.h1>
@@ -188,7 +188,7 @@ const HeroSection = ({ products }: { products: Product[] }) => {
                         transition={{ delay: 0.8, duration: 1, ease: [0.19, 1, 0.22, 1] }}
                         style={{ y: useTransform(scrollY, [0, 600], [0, 50]) }}
                     >
-                        <p className="max-w-xl mx-auto text-lg md:text-xl text-gray-400 font-light leading-relaxed mb-12">
+                        <p className="max-w-xl mx-auto text-base md:text-xl text-gray-400 font-light leading-relaxed mb-8 md:mb-12">
                             Vende <span className="text-white font-medium">calzado premium brasilero</span> desde tu casa y genera <span className="text-[#C88A04] font-medium">ingresos reales</span>.
                             Nosotros manejamos la logística. Vos enfocate en vender.
                         </p>
@@ -214,17 +214,36 @@ const HeroSection = ({ products }: { products: Product[] }) => {
 
             {/* Scroll Indicator */}
             <motion.div
-                className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
+                className="absolute bottom-10 left-0 right-0 flex flex-col items-center gap-3 z-20"
                 initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.2, duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
+                animate={{
+                    opacity: 1,
+                    y: [0, 8, 0]
+                }}
+                transition={{
+                    opacity: { delay: 1.5, duration: 1.2 },
+                    y: {
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                    }
+                }}
             >
-                <span className="text-[10px] uppercase tracking-[0.3em] text-white/40">Desliza para Explorar</span>
-                <motion.div
-                    className="w-[1px] h-12 bg-gradient-to-b from-[#C88A04] to-transparent"
-                    animate={{ height: [0, 48, 0], y: [0, 0, 48] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: [0.65, 0, 0.35, 1] }}
-                />
+                <span className="text-[9px] uppercase tracking-[0.4em] text-white/40 font-black">Desliza para Explorar</span>
+                <div className="w-[1px] h-12 bg-white/5 relative overflow-hidden">
+                    <motion.div
+                        className="absolute top-0 left-0 w-full bg-gradient-to-b from-transparent via-[#C88A04] to-transparent h-full"
+                        animate={{
+                            y: ['-100%', '100%'],
+                            opacity: [0, 1, 0]
+                        }}
+                        transition={{
+                            duration: 2.5,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                    />
+                </div>
             </motion.div>
         </section>
     );
@@ -243,7 +262,7 @@ const PhilosophyCard = ({ title, desc, image, index }: { title: string, desc: st
                 transition: { delay: index * 0.15, duration: 1, ease: [0.19, 1, 0.22, 1] }
             }
         }}
-        className="group relative h-[450px] flex flex-col justify-end p-10 rounded-[2.5rem] border border-white/5 bg-[#111] overflow-hidden hover:border-[#C88A04]/30 transition-all duration-700 ease-out"
+        className="group relative h-[380px] md:h-[450px] flex flex-col justify-end p-6 md:p-10 rounded-[2.5rem] border border-white/5 bg-[#111] overflow-hidden hover:border-[#C88A04]/30 transition-all duration-700 ease-out"
     >
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
@@ -286,7 +305,7 @@ const PhilosophySection = () => {
                     className="mb-20"
                 >
                     <span className="text-[#C88A04] font-bold tracking-widest text-sm uppercase mb-4 block">Nuestros Pilares</span>
-                    <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter">
+                    <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter">
                         TU ÉXITO ES <br /> NUESTRO ÉXITO.
                     </h2>
                 </motion.div>
@@ -323,7 +342,7 @@ const FeaturedProduct = ({ product }: { product: Product }) => {
     const imageSrc = product.images?.[0] || 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?q=90&w=2400&auto=format&fit=crop&ixlib=rb-4.0.3';
 
     return (
-        <div className="md:col-span-8 relative group h-[600px] rounded-[2.5rem] overflow-hidden border border-white/10 bg-gradient-to-br from-[#0F0F0F] to-[#0A0A0A] hover:border-[#C88A04]/30 transition-all duration-1000">
+        <div className="md:col-span-8 relative group h-[450px] md:h-[600px] rounded-[2.5rem] overflow-hidden border border-white/10 bg-gradient-to-br from-[#0F0F0F] to-[#0A0A0A] hover:border-[#C88A04]/30 transition-all duration-1000">
             {/* Noise Texture */}
             <div className="absolute inset-0 opacity-20" style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
@@ -364,13 +383,13 @@ const FeaturedProduct = ({ product }: { product: Product }) => {
                         <span className="inline-block px-4 py-1.5 bg-gradient-to-r from-[#C88A04] to-[#ECA413] text-black text-xs font-bold uppercase rounded-full mb-4 shadow-lg shadow-[#C88A04]/30">
                             Modelo Insignia
                         </span>
-                        <h3 className="text-6xl font-black tracking-tighter mb-2 drop-shadow-2xl">{product.name}</h3>
-                        <p className="text-xl text-gray-400 font-light tracking-widest">{product.category}</p>
+                        <h3 className="text-4xl md:text-6xl font-black tracking-tighter mb-2 drop-shadow-2xl">{product.name}</h3>
+                        <p className="text-lg md:text-xl text-gray-400 font-light tracking-widest">{product.category}</p>
                     </div>
                 </div>
 
                 <div className="flex items-end justify-between pointer-events-auto">
-                    <div className="text-5xl font-light text-white">${product.basePrice.toLocaleString('es-AR')}</div>
+                    <div className="text-3xl md:text-5xl font-light text-white">${product.basePrice.toLocaleString('es-AR')}</div>
                     <Link href={`/catalog`}>
                         <MagneticButton className="h-16 w-16 md:w-auto md:px-8 bg-white text-black hover:bg-[#C88A04] hover:text-white rounded-full flex items-center justify-center gap-3 transition-all duration-500 ease-out">
                             <span className="hidden md:block font-bold">VER PRODUCTO</span>
@@ -393,7 +412,7 @@ const SecondaryProduct = ({ product, index }: { product: Product, index: number 
             whileInView={{ opacity: 1, y: 0 }}
             viewport={viewportOptions}
             transition={{ delay: 0.1 * index, duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-            className="md:col-span-4 relative group h-[600px] md:h-auto rounded-[2.5rem] overflow-hidden border border-white/10 bg-gradient-to-br from-[#0F0F0F] to-[#0A0A0A] p-8 flex flex-col justify-between hover:border-[#C88A04]/50 hover:shadow-[0_0_40px_rgba(200,138,4,0.15)] transition-all duration-700 ease-out"
+            className="md:col-span-4 relative group h-[450px] md:h-[600px] rounded-[2.5rem] overflow-hidden border border-white/10 bg-gradient-to-br from-[#0F0F0F] to-[#0A0A0A] p-6 md:p-8 flex flex-col justify-between hover:border-[#C88A04]/50 hover:shadow-[0_0_40px_rgba(200,138,4,0.15)] transition-all duration-700 ease-out"
         >
             {/* Background Glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-gradient-radial from-[#C88A04]/10 to-transparent rounded-full blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -453,7 +472,7 @@ const ProductShowcase = ({ products, loading }: { products: Product[], loading: 
             <div className="container mx-auto px-6">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
                     <motion.div variants={fadeInUpVariants} initial="hidden" whileInView="visible" viewport={viewportOptions}>
-                        <h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-2">
+                        <h2 className="text-5xl md:text-8xl font-black text-white tracking-tighter mb-2">
                             DROPS <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C88A04] to-[#ECA413]">LIMITADOS</span>
                         </h2>
                     </motion.div>
@@ -526,7 +545,7 @@ const TechSection = () => {
                         <motion.h2 variants={fadeInUpVariants} initial="hidden" whileInView="visible" viewport={viewportOptions} className="text-[#C88A04] font-mono text-sm tracking-widest mb-6">
                             {'/' + '/ CÓMO_FUNCIONA'}
                         </motion.h2>
-                        <motion.h3 variants={fadeInUpVariants} initial="hidden" whileInView="visible" viewport={viewportOptions} className="text-5xl md:text-6xl font-black mb-12 text-white leading-none">
+                        <motion.h3 variants={fadeInUpVariants} initial="hidden" whileInView="visible" viewport={viewportOptions} className="text-4xl md:text-6xl font-black mb-12 text-white leading-none">
                             VENDER NUNCA FUE <br /> TAN SIMPLE.
                         </motion.h3>
 
@@ -605,9 +624,9 @@ const TheJournal = () => {
         <section id="journal" className="py-32 bg-[#0C0C0C]">
             <div className="container mx-auto px-6">
                 <div className="flex justify-between items-end mb-20">
-                    <h2 className="text-9xl font-black text-white/5 absolute left-0 right-0 text-center select-none pointer-events-none">DIARIO</h2>
-                    <h2 className="text-4xl font-bold relative z-10">EL DIARIO</h2>
-                    <Button variant="ghost" className="text-white hover:text-[#C88A04]">LEER TODOS LOS ARTÍCULOS</Button>
+                    <h2 className="text-6xl md:text-9xl font-black text-white/5 absolute left-0 right-0 text-center select-none pointer-events-none">DIARIO</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold relative z-10">EL DIARIO</h2>
+                    <Button variant="ghost" className="text-white hover:text-[#C88A04] hidden md:flex">LEER TODOS LOS ARTÍCULOS</Button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

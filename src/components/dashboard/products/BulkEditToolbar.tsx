@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { bulkUpdateProducts, bulkDeleteProducts, ProductType } from '@/app/actions/products';
-import { Loader2, Save, Check, Trash2, Download, Type } from 'lucide-react';
+import { Loader2, Save, Check, Trash2, Download, Type, Ruler } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface BulkEditToolbarProps {
@@ -14,9 +14,10 @@ interface BulkEditToolbarProps {
     onClearSelection: () => void;
     onSuccess: () => void;
     onRename: () => void;
+    onStockEdit: () => void;
 }
 
-export function BulkEditToolbar({ selectedIds, products, onClearSelection, onSuccess, onRename }: BulkEditToolbarProps) {
+export function BulkEditToolbar({ selectedIds, products, onClearSelection, onSuccess, onRename, onStockEdit }: BulkEditToolbarProps) {
     const [actionType, setActionType] = useState<'price' | 'stock' | 'category' | 'description' | 'status'>('price');
     const [value, setValue] = useState('');
     const [modificationType, setModificationType] = useState<'fixed' | 'percent_inc' | 'percent_dec' | 'add' | 'set' | 'append'>('fixed');
@@ -292,6 +293,17 @@ export function BulkEditToolbar({ selectedIds, products, onClearSelection, onSuc
                         className="bg-[#C88A04]/10 border-[#C88A04]/20 text-[#C88A04] hover:bg-[#C88A04]/20 rounded-xl h-12 w-12"
                     >
                         <Type size={18} />
+                    </Button>
+
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={onStockEdit}
+                        disabled={isProcessing}
+                        title="Editar stock masivo"
+                        className="bg-[#C88A04]/10 border-[#C88A04]/20 text-[#C88A04] hover:bg-[#C88A04]/20 rounded-xl h-12 w-12"
+                    >
+                        <Ruler size={18} />
                     </Button>
 
                     <Button

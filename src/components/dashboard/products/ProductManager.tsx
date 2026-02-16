@@ -9,6 +9,7 @@ import { BulkImportModal } from './BulkImportModal';
 import { BulkImageUploadModal } from './BulkImageUploadModal';
 import { BulkEditToolbar } from './BulkEditToolbar';
 import { BulkRenameModal } from './BulkRenameModal';
+import { BulkStockModal } from './BulkStockModal';
 import { AISettingsModal } from './AISettingsModal';
 import { initializeProductSizes } from '@/app/actions/migrations';
 import {
@@ -33,6 +34,7 @@ export const ProductManager = () => {
   const [showImageUploadModal, setShowImageUploadModal] = useState(false);
   const [showAISettingsModal, setShowAISettingsModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
+  const [showStockModal, setShowStockModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductType | undefined>(undefined);
   const [search, setSearch] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
@@ -390,6 +392,14 @@ export const ProductManager = () => {
               <ArrowUpDown size={18} /> Exportar
             </button>
             <button
+              onClick={() => setShowStockModal(true)}
+              disabled={selectedIds.size === 0}
+              className={`px-6 py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 uppercase tracking-widest backdrop-blur-sm ${selectedIds.size > 0 ? 'text-[#C88A04] bg-[#C88A04]/10 border border-[#C88A04]/20 hover:bg-[#C88A04]/20' : 'text-gray-500 bg-white/5 border border-white/10 opacity-50 cursor-not-allowed'}`}
+              title="Editar Stock Masivamente"
+            >
+              <Ruler size={18} /> Editar Stock
+            </button>
+            <button
               onClick={() => setShowAISettingsModal(true)}
               className="px-4 py-4 rounded-2xl font-bold text-sm text-[#C88A04] bg-[#C88A04]/10 border border-[#C88A04]/20 hover:bg-[#C88A04]/20 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
               title="Configuración de IA"
@@ -672,6 +682,7 @@ export const ProductManager = () => {
           onClearSelection={() => setSelectedIds(new Set())}
           onSuccess={fetchProducts}
           onRename={() => setShowRenameModal(true)}
+          onStockEdit={() => setShowStockModal(true)}
         />
       )}
 
@@ -679,6 +690,18 @@ export const ProductManager = () => {
         <BulkRenameModal
           isOpen={showRenameModal}
           onClose={() => setShowRenameModal(false)}
+          selectedProducts={visibleProducts.filter(p => selectedIds.has(p.id))}
+          onSuccess={() => {
+            fetchProducts();
+            setSelectedIds(new Set());
+          }}
+        />
+      )}
+
+      {showStockModal && isAdmin && (
+        <BulkStockModal
+          isOpen={showStockModal}
+          onClose={() => setShowStockModal(false)}
           selectedProducts={visibleProducts.filter(p => selectedIds.has(p.id))}
           onSuccess={() => {
             fetchProducts();

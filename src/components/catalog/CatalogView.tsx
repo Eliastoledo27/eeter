@@ -22,12 +22,13 @@ export default function CatalogView({ initialProducts }: CatalogViewProps) {
 
     // Filter products
     const filteredProducts = useMemo(() => {
-        if (!selectedCategory) return initialProducts;
-        return initialProducts.filter((p) => p.category === selectedCategory);
+        const activeProducts = initialProducts.filter(p => p.is_active);
+        if (!selectedCategory) return activeProducts;
+        return activeProducts.filter((p) => p.category === selectedCategory);
     }, [initialProducts, selectedCategory]);
 
     return (
-        <section className="min-h-screen container mx-auto px-6 py-12">
+        <section className="min-h-screen container mx-auto px-4 md:px-6 py-6 md:py-12">
             <CatalogFilters
                 categories={categories}
                 selectedCategory={selectedCategory}

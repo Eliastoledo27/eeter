@@ -21,13 +21,13 @@ export function CatalogFilters({
   totalCount,
 }: CatalogFiltersProps) {
   return (
-    <div className="flex items-center justify-between gap-4 mb-4">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       {/* Category Pills */}
       <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1 flex-1">
         <button
           onClick={() => onCategorySelect(null)}
           className={cn(
-            'shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 border',
+            'shrink-0 px-5 py-2.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 border',
             !selectedCategory
               ? 'bg-[#ffd900] text-black border-[#ffd900] shadow-[0_0_20px_rgba(255,217,0,0.2)]'
               : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20'
@@ -42,7 +42,7 @@ export function CatalogFilters({
               onCategorySelect(selectedCategory === cat ? null : cat)
             }
             className={cn(
-              'shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 border',
+              'shrink-0 px-5 py-2.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 border',
               selectedCategory === cat
                 ? 'bg-[#ffd900] text-black border-[#ffd900] shadow-[0_0_20px_rgba(255,217,0,0.2)]'
                 : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20'

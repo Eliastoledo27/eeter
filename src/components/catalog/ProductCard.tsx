@@ -1,8 +1,8 @@
 'use client';
 
 import { Product } from '@/types';
-import { motion } from 'framer-motion';
-import { ShoppingCart } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ShoppingCart, ArrowUpRight, ShieldCheck, Zap } from 'lucide-react';
 import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
 import Image from 'next/image';
@@ -11,6 +11,7 @@ import { useState, useMemo } from 'react';
 export function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCartStore();
   const [selectedSize, setSelectedSize] = useState<string>('');
+  const [isHovered, setIsHovered] = useState(false);
 
   const availableSizes = useMemo(() => {
     if (!product.stockBySize) return [];
@@ -29,17 +30,16 @@ export function ProductCard({ product }: { product: Product }) {
     e.stopPropagation();
 
     if (availableSizes.length > 0 && !selectedSize) {
-      // If has sizes but none selected, try to select first or error
       if (availableSizes.length === 1) {
         addItem(product, availableSizes[0]);
         toast.success(`Agregado: ${product.name}`, {
-          style: { background: '#1C1917', color: '#FAFAF9', border: '1px solid #CA8A04' }
+          style: { background: '#0A0A0A', color: '#FAFAF9', border: '1px solid #C88A04' }
         });
         return;
       }
 
       toast.error('Por favor selecciona un talle', {
-        style: { background: '#1C1917', color: '#FAFAF9', border: '1px solid #CA8A04' }
+        style: { background: '#0A0A0A', color: '#FAFAF9', border: '1px solid #C88A04' }
       });
       return;
     }
@@ -49,9 +49,9 @@ export function ProductCard({ product }: { product: Product }) {
     addItem(product, sizeToAdd);
     toast.success(`Agregado: ${product.name} (Talle ${sizeToAdd})`, {
       style: {
-        background: '#1C1917',
+        background: '#0A0A0A',
         color: '#FAFAF9',
-        border: '1px solid #CA8A04',
+        border: '1px solid #C88A04',
       }
     });
   };
@@ -60,107 +60,139 @@ export function ProductCard({ product }: { product: Product }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -10 }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       onClick={() => {
-        // Al hacer click en la card (fuera de botones), vamos al detalle
         window.location.href = `/catalog/${product.id}`;
       }}
-      className="group relative bg-gradient-to-br from-[#111] to-[#050505] rounded-[2rem] overflow-hidden border border-white/5 hover:border-[#CA8A04]/30 transition-all duration-700 ease-out cursor-pointer shadow-2xl"
+      className="group relative bg-[#0A0A0A] rounded-[2.5rem] overflow-hidden border border-white/5 hover:border-[#C88A04]/40 transition-all duration-700 ease-[0.19,1,0.22,1] cursor-pointer shadow-2xl h-full flex flex-col"
     >
-      {/* Noise Texture */}
+      {/* Premium Tech Frame (Only visible on hover) */}
+      <div className="absolute inset-0 pointer-events-none z-30 transition-opacity duration-700 opacity-0 group-hover:opacity-100">
+        <div className="absolute top-0 left-0 w-12 h-12 border-t border-l border-[#C88A04]/40 rounded-tl-[2.5rem]" />
+        <div className="absolute bottom-0 right-0 w-12 h-12 border-b border-r border-[#C88A04]/40 rounded-br-[2.5rem]" />
+        <div className="absolute top-6 right-6 flex gap-2">
+          <div className="w-1 h-1 bg-[#C88A04]/40 rounded-full" />
+          <div className="w-1 h-1 bg-[#C88A04]/40 rounded-full animate-pulse" />
+        </div>
+      </div>
+
+      {/* Background Ambience */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
       }} />
 
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] bg-[#CA8A04]/5 rounded-full blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      {/* Dynamic Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#C88A04]/10 rounded-full blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
       {/* Image Container */}
-      <div className="aspect-[1/1] relative overflow-hidden bg-black/20">
+      <div className="aspect-[1/1] relative overflow-hidden bg-gradient-to-b from-[#111] to-transparent">
         <Image
           src={product.images[0] || '/placeholder-shoe.png'}
           alt={product.name}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-contain p-8 w-full h-full group-hover:scale-110 group-hover:-rotate-3 transition-all duration-1000 ease-out drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)]"
+          className="object-contain p-10 w-full h-full group-hover:scale-110 group-hover:-rotate-6 transition-all duration-1000 ease-[0.19,1,0.22,1] drop-shadow-[0_30px_50px_rgba(0,0,0,0.8)] z-10"
         />
 
-        {/* Hover Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+        {/* Hover Info Badges */}
+        <div className="absolute top-8 left-8 z-40 transition-all duration-700 opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 flex flex-col gap-2">
+          <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full text-[8px] font-bold text-white uppercase tracking-widest">
+            <ShieldCheck size={10} className="text-[#C88A04]" />
+            Auténtico
+          </div>
+          <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full text-[8px] font-bold text-white uppercase tracking-widest">
+            <Zap size={10} className="text-[#C88A04]" />
+            Limited
+          </div>
+        </div>
 
-        {/* Quick Add Button */}
+        {/* Action Button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             handleAddToCart(e);
           }}
-          className="absolute bottom-6 right-6 h-12 w-12 bg-white text-black flex items-center justify-center rounded-full shadow-[0_0_30px_rgba(255,255,255,0.2)] opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-700 hover:bg-[#CA8A04] hover:text-black active:scale-95 z-30"
+          className="absolute bottom-8 right-8 h-14 w-14 bg-white text-black flex items-center justify-center rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.4)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-700 hover:bg-[#C88A04] hover:scale-110 active:scale-95 z-40"
           aria-label="Agregar al carrito"
         >
-          <ShoppingCart size={20} />
+          <ShoppingCart size={22} strokeWidth={2.5} />
         </button>
 
-        {/* Status Badge */}
-        <div className="absolute top-6 left-6 z-20">
-          {product.status === 'active' ? (
-            <span className="px-3 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-[10px] font-bold text-emerald-400 uppercase tracking-widest backdrop-blur-md">
-              Disponible
-            </span>
-          ) : (
-            <span className="px-3 py-1.5 rounded-full border border-rose-500/20 bg-rose-500/10 text-[10px] font-bold text-rose-400 uppercase tracking-widest backdrop-blur-md">
-              Agotado
-            </span>
-          )}
+        {/* Availability Badge */}
+        <div className="absolute top-8 right-8 z-20">
+          <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-xl border ${product.status === 'active'
+            ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
+            : 'border-white/10 bg-white/5 text-gray-500'
+            }`}>
+            {product.status === 'active' ? 'En Stock' : 'Agotado'}
+          </span>
         </div>
       </div>
 
-      {/* Info */}
-      <div className="p-8 relative z-20">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-[10px] font-bold text-[#CA8A04] uppercase tracking-[0.3em] opacity-80">
-            {product.category}
-          </p>
-          <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">
-            EDICIÓN_LIMITED
+      {/* Info Section */}
+      <div className="p-10 pt-4 flex flex-col flex-1 relative z-20">
+        <div className="flex items-baseline justify-between mb-4">
+          <span className="text-[10px] font-mono text-[#C88A04] uppercase tracking-[0.4em] font-bold">
+            {product.category || 'ÉTER_CORE'}
+          </span>
+          <div className="h-px flex-1 mx-4 bg-white/10 group-hover:bg-[#C88A04]/40 transition-colors duration-700" />
+          <span className="text-[10px] font-mono text-gray-600 uppercase tracking-widest">
+            V2.6
           </span>
         </div>
 
-        <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-[#CA8A04] transition-colors duration-500 line-clamp-1 mb-4 uppercase">
+        <h3 className="text-2xl font-black text-white tracking-tighter group-hover:text-[#C88A04] transition-colors duration-500 uppercase leading-none mb-6">
           {product.name}
         </h3>
 
-        <div className="flex flex-col gap-6">
-          <div className="flex items-center justify-between">
-            <span className="text-3xl font-light text-white tracking-tighter">
-              ${product.basePrice.toLocaleString('es-AR')}
-            </span>
+        <div className="mt-auto space-y-8">
+          <div className="flex items-end justify-between">
+            <div className="flex flex-col">
+              <span className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mb-1">Precio_Inversión</span>
+              <span className="text-4xl font-light text-white tracking-tighter leading-none">
+                <span className="text-xl mr-1 opacity-50">$</span>
+                {product.basePrice.toLocaleString('es-AR')}
+              </span>
+            </div>
+
+            <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:border-[#C88A04] group-hover:text-[#C88A04] transition-all duration-500">
+              <ArrowUpRight size={18} />
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
-            {availableSizes.length > 0 && availableSizes[0] !== 'Unique' ? (
-              availableSizes.slice(0, 5).map(size => (
-                <button
-                  key={size}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setSelectedSize(size);
-                  }}
-                  className={`
-                        h-8 min-w-[32px] px-2 rounded-lg text-xs font-mono font-bold border transition-all duration-300
-                        ${selectedSize === size
-                      ? 'bg-[#CA8A04] border-[#CA8A04] text-black shadow-[0_0_15px_rgba(202,138,4,0.4)]'
-                      : 'bg-white/5 border-white/10 text-gray-400 hover:border-[#CA8A04] hover:text-[#CA8A04]'}
+          {/* Size Selector */}
+          <div className="pt-4 border-t border-white/5" onClick={(e) => e.stopPropagation()}>
+            <div className="flex flex-wrap gap-2">
+              {availableSizes.length > 0 && availableSizes[0] !== 'Unique' ? (
+                availableSizes.slice(0, 6).map(size => (
+                  <button
+                    key={size}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedSize(size);
+                    }}
+                    className={`
+                      h-10 min-w-[40px] px-3 rounded-xl text-[10px] font-mono font-black border transition-all duration-500
+                      ${selectedSize === size
+                        ? 'bg-[#C88A04] border-[#C88A04] text-black shadow-[0_0_20px_rgba(200,138,4,0.4)]'
+                        : 'bg-white/5 border-white/10 text-gray-400 hover:border-[#C88A04]/40 hover:text-white'}
                     `}
-                >
-                  {size}
-                </button>
-              ))
-            ) : (
-              <span className="h-8 flex items-center text-[10px] font-mono text-gray-600 uppercase tracking-tighter">Sin talles disponibles</span>
-            )}
-            {availableSizes.length > 5 && (
-              <span className="h-8 flex items-center text-[10px] font-mono text-gray-600 uppercase tracking-tighter">+{availableSizes.length - 5} MÁS</span>
-            )}
+                  >
+                    {size}
+                  </button>
+                ))
+              ) : (
+                <span className="text-[10px] font-mono text-gray-700 uppercase tracking-[0.2em]">Consultar disponibilidad</span>
+              )}
+              {availableSizes.length > 6 && (
+                <span className="h-10 flex items-center text-[10px] font-mono text-gray-600 uppercase tracking-widest px-2">
+                  +{availableSizes.length - 6}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -1,77 +1,113 @@
-import { GeneralPageLayout } from '@/components/layout/GeneralPageLayout';
-import { Target, Globe, Users, ShieldCheck, Heart, TrendingUp } from 'lucide-react';
+'use client';
+
+import { Navbar } from '@/components/layout/Navbar';
+import { Footer } from '@/components/layout/Footer';
+import { motion } from 'framer-motion';
+import { Sparkles, Trophy, Star, History } from 'lucide-react';
 import Image from 'next/image';
+
+const STATS = [
+    { label: 'Colecciones', value: '12+', icon: Sparkles },
+    { label: 'Vendedores', value: '500+', icon: Trophy },
+    { label: 'Satisfacción', value: '99%', icon: Star },
+    { label: 'Años', value: '5', icon: History },
+];
 
 export default function AboutPage() {
     return (
-        <GeneralPageLayout
-            title="NOSOTROS"
-            subtitle="NUESTRO ORIGEN"
-            description="Revolucionando el comercio digital en Latinoamérica. Éter no es solo una marca, es un ecosistema diseñado para democratizar el lujo y el éxito."
-            breadcrumb="EMPRESA / HISTORIA"
-        >
-            <div className="space-y-32">
-                {/* Intro Section */}
-                <div className="flex flex-col lg:flex-row gap-20 items-center">
-                    <div className="lg:w-1/2 space-y-8">
-                        <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">
-                            Democratizando el <br /> <span className="text-[#C88A04]">futuro.</span>
-                        </h2>
-                        <p className="text-gray-400 text-lg font-light leading-relaxed">
-                            Éter Store nació con una visión clara: eliminar las barreras entre los grandes productores de calzado brasilero y los emprendedores locales.
-                            Nuestra plataforma permite que cualquiera pueda vender productos de clase mundial sin los riesgos de stock tradicionales.
+        <main className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#C88A04] selection:text-black overflow-x-hidden">
+            <Navbar />
+
+            {/* Hero Section */}
+            <section className="relative pt-60 pb-32 overflow-hidden">
+                <div className="absolute inset-0 z-0">
+                    <div className="absolute inset-0 bg-radial-gradient from-[#C88A04]/10 to-transparent blur-3xl opacity-50" />
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(200,138,4,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(200,138,4,0.02)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_80%)] opacity-30" />
+                </div>
+
+                <div className="container relative z-10 px-6 mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="max-w-4xl mx-auto text-center"
+                    >
+                        <span className="px-4 py-2 rounded-full border border-[#C88A04]/30 bg-[#C88A04]/5 text-[#C88A04] text-[10px] font-black tracking-[0.3em] uppercase mb-8 inline-block">
+                            Ecosistema Éter
+                        </span>
+                        <h1 className="text-6xl md:text-8xl font-black mb-8 tracking-tighter uppercase leading-none">
+                            REDEFINIENDO EL <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C88A04] to-[#ECA413]">CALZADO DIGITAL</span>
+                        </h1>
+                        <p className="text-lg md:text-xl text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">
+                            No solo vendemos zapatillas. Construimos una plataforma donde cualquier persona puede iniciar su negocio premium de calzado brasilero con riesgo cero.
                         </p>
-                    </div>
-                    <div className="lg:w-1/2 relative aspect-video rounded-[3rem] overflow-hidden border border-white/10 group">
-                        <Image
-                            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=2000"
-                            alt="Equipo Éter"
-                            fill
-                            className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000 grayscale group-hover:grayscale-0"
-                        />
-                    </div>
+                    </motion.div>
                 </div>
+            </section>
 
-                {/* Mission / Vision */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                    {[
-                        { icon: Target, title: 'MISIÓN', desc: 'Proveer la infraestructura tecnológica necesaria para escalar marcas de moda.' },
-                        { icon: Globe, title: 'VISIÓN', desc: 'Liderar el mercado de dropshipping de lujo en toda la región para 2030.' },
-                        { icon: Users, title: 'COMUNIDAD', desc: 'Más de 5.000 emprendedores creciendo junto a nosotros cada mes.' }
-                    ].map((item, i) => (
-                        <div key={i} className="p-8 rounded-[2rem] border border-white/5 bg-white/[0.02] hover:border-[#C88A04]/30 transition-all">
-                            <item.icon className="text-[#C88A04] mb-6" size={40} />
-                            <h4 className="text-xl font-bold mb-4 uppercase">{item.title}</h4>
-                            <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
-                        </div>
-                    ))}
+            {/* Stats Grid */}
+            <section className="py-24 border-t border-white/5 bg-white/[0.01]">
+                <div className="container mx-auto px-6">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                        {STATS.map((stat, idx) => (
+                            <motion.div
+                                key={stat.label}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: idx * 0.1 }}
+                                className="flex flex-col items-center text-center p-8 rounded-[2rem] border border-white/5 bg-black/40 hover:border-[#C88A04]/30 transition-all group"
+                            >
+                                <stat.icon className="text-[#C88A04] mb-4 group-hover:scale-110 transition-transform" size={32} />
+                                <span className="text-4xl md:text-5xl font-black mb-2 text-white">{stat.value}</span>
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{stat.label}</span>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
+            </section>
 
-                {/* Values Section */}
-                <div className="relative p-12 md:p-24 rounded-[4rem] border border-white/5 bg-gradient-to-br from-[#111] to-black overflow-hidden">
-                    <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-                        <h2 className="text-[20vw] font-black italic">ETHOS</h2>
-                    </div>
-                    <h3 className="text-4xl font-black mb-16 text-center uppercase tracking-widest underline decoration-[#C88A04]">Valores Fundamentales</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-                        <div>
-                            <ShieldCheck className="mx-auto text-[#C88A04] mb-6" size={40} />
-                            <h5 className="font-bold mb-2 uppercase">Transparencia</h5>
-                            <p className="text-gray-500 text-xs">Sin costos ocultos ni letras chicas.</p>
-                        </div>
-                        <div>
-                            <Heart className="mx-auto text-[#C88A04] mb-6" size={40} />
-                            <h5 className="font-bold mb-2 uppercase">Pasión</h5>
-                            <p className="text-gray-500 text-xs">Cuidamos cada detalle del producto.</p>
-                        </div>
-                        <div>
-                            <TrendingUp className="mx-auto text-[#C88A04] mb-6" size={40} />
-                            <h5 className="font-bold mb-2 uppercase">Innovación</h5>
-                            <p className="text-gray-500 text-xs">Evolución tecnológica semanal.</p>
-                        </div>
+            {/* History / Vision Section */}
+            <section className="py-32 relative overflow-hidden">
+                <div className="container mx-auto px-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+                        <motion.div
+                            initial={{ opacity: 0, x: -50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            className="space-y-8"
+                        >
+                            <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-none uppercase">
+                                LA VISIÓN <br /> <span className="text-gray-400">DETRÁS DE</span> <br /> CADA PAR.
+                            </h2>
+                            <p className="text-gray-400 text-lg leading-relaxed">
+                                Nacimos de la necesidad de democratizar el acceso a productos de alta gama. Seleccionamos cuidadosamente cada modelo en las mejores fábricas de Brasil para asegurar una calidad que el pie argentino merece.
+                            </p>
+                            <div className="space-y-4">
+                                {['Calidad Brasilera Certificada', 'Packaging de Lujo', 'Envío Express a todo el país'].map((item, i) => (
+                                    <div key={i} className="flex items-center gap-4 text-sm font-bold uppercase tracking-widest text-[#C88A04]">
+                                        <div className="w-2 h-2 rounded-full bg-[#C88A04]" />
+                                        {item}
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, x: 50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            className="relative aspect-square rounded-[3rem] overflow-hidden border border-white/10"
+                        >
+                            <Image
+                                src="https://images.unsplash.com/photo-1595341888016-a392ef81b7de?q=80&w=1200"
+                                alt="Éter Vision"
+                                fill
+                                className="object-cover opacity-60"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+                        </motion.div>
                     </div>
                 </div>
-            </div>
-        </GeneralPageLayout>
+            </section>
+
+            <Footer />
+        </main>
     );
 }
