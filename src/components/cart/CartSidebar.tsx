@@ -2,243 +2,502 @@
 
 import { useCartStore } from '@/store/cart-store';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Minus, ShoppingBag, Trash2, ArrowRight, CreditCard, Truck, ShieldCheck, RefreshCw } from 'lucide-react';
+import {
+  X, Plus, Minus, ShoppingBag, Trash2, ArrowRight,
+  Truck, ShieldCheck, RefreshCw, User, Phone, MapPin,
+  CheckCircle2, FileText, Send, Building2
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
+import { createOrderFromCart } from '@/app/actions/orders';
+import { toast } from 'sonner';
+
+type CartStep = 'items' | 'checkout' | 'success';
 
 export function CartSidebar() {
-  const { items, isOpen, toggleCart, removeItem, updateQuantity, getTotal } = useCartStore();
-  const total = getTotal();
-  const freeShippingThreshold = 200000; // Example threshold
-  const [couponCode, setCouponCode] = useState('');
+  const { items, isOpen, toggleCart, removeItem, updateQuantity, getTotal, clearCart } = useCartStore();
+  const { user } = useAuth();
+  const [step, setStep] = useState<CartStep>('items');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [referenceCode, setReferenceCode] = useState<string | null>(null);
 
+  // Form State
+  const [formData, setFormData] = useState({
+    customerName: '',
+    customerPhone: '',
+    resellerName: user?.name || '',
+    deliveryAddress: '',
+    paymentMethod: 'transferencia' as 'transferencia' | 'efectivo' | 'mercado_pago' | 'tarjeta',
+    notes: ''
+  });
+
+  const total = getTotal();
+  const freeShippingThreshold = 250000;
   const progress = Math.min((total / freeShippingThreshold) * 100, 100);
   const remainingForFreeShipping = Math.max(freeShippingThreshold - total, 0);
+
+  const handleNextStep = () => {
+    if (step === 'items') {
+      if (items.length === 0) return;
+      setStep('checkout');
+    }
+  };
+
+  const handleCheckout = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.customerName || !formData.customerPhone || !formData.deliveryAddress || !formData.resellerName) {
+      toast.error('Por favor completa todos los campos obligatorios');
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const result = await createOrderFromCart({
+        items: items.map(item => ({
+          productId: item.id,
+          name: item.name,
+          price: item.basePrice,
+          quantity: item.quantity,
+          size: item.selectedSize,
+          image: item.images[0]
+        })),
+        customerName: formData.customerName,
+        customerPhone: formData.customerPhone,
+        resellerName: formData.resellerName,
+        deliveryAddress: formData.deliveryAddress,
+        paymentMethod: formData.paymentMethod,
+        notes: formData.notes
+      });
+
+      if (result.success) {
+        setOrderId(result.orderId!);
+        setReferenceCode(result.referenceCode!);
+        setStep('success');
+
+        // Prepare WhatsApp Message
+        const message = `*PEDIDO ÉTER STORE*%0A` +
+          `---------------------------%0A` +
+          `*Orden:* ${result.referenceCode}%0A` +
+          `*Revendedor:* ${formData.resellerName}%0A` +
+          `*Cliente:* ${formData.customerName}%0A` +
+          `*Teléfono:* ${formData.customerPhone}%0A` +
+          `*Dirección:* ${formData.deliveryAddress}%0A` +
+          `---------------------------%0A` +
+          `*PRODUCTOS:*%0A` +
+          items.map(item => `- ${item.quantity}x ${item.name} (${item.selectedSize}) - $${(item.basePrice * item.quantity).toLocaleString('es-AR')}`).join('%0A') +
+          `%0A---------------------------%0A` +
+          `*TOTAL: $${total.toLocaleString('es-AR')}*%0A` +
+          `*Método:* ${formData.paymentMethod === 'transferencia' ? 'Transferencia' : 'Efectivo'}%0A` +
+          (formData.notes ? `*Notas:* ${formData.notes}%0A` : '');
+
+        // Redirect after small delay
+        setTimeout(() => {
+          window.open(`https://wa.me/5492235025196?text=${message}`, '_blank');
+          clearCart();
+        }, 1500);
+      } else {
+        toast.error(result.message || 'Error al procesar el pedido');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Ocurrió un error inesperado');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={toggleCart}
-            className="fixed inset-0 bg-black/60 backdrop-blur-[4px] z-[60]"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60]"
           />
 
-          {/* Sidebar - Stitch Exact Design */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 bottom-0 w-full sm:w-[480px] bg-[#0a0a0a] border-l border-white/10 z-[70] shadow-2xl flex flex-col"
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed right-0 top-0 bottom-0 w-full sm:w-[500px] bg-[#050505] border-l border-white/5 z-[70] shadow-2xl flex flex-col overflow-hidden"
           >
-            {/* 1. Header */}
-            <header className="flex items-center justify-between px-6 py-5 border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-10 text-white">
-              <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold tracking-tight font-display">
-                  TU CARRITO <span className="text-[#ffd900] font-normal text-lg">({items.reduce((a, b) => a + b.quantity, 0)})</span>
+            {/* Header */}
+            <header className="flex items-center justify-between px-8 py-6 border-b border-white/5 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
+              <div>
+                <h2 className="text-xl font-black tracking-tighter text-white uppercase italic">
+                  {step === 'items' ? 'Tu Selección' : step === 'checkout' ? 'Datos de Envío' : 'Pedido Confirmado'}
                 </h2>
+                {step === 'items' && items.length > 0 && (
+                  <p className="text-[10px] font-bold text-[#C88A04] tracking-[0.3em] uppercase mt-1">
+                    {items.reduce((a, b) => a + b.quantity, 0)} PRODUCTOS LISTOS
+                  </p>
+                )}
               </div>
               <button
                 onClick={toggleCart}
-                className="group p-2 rounded-full hover:bg-white/5 transition-colors"
+                className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all active:scale-95"
               >
-                <X className="text-white/70 group-hover:text-[#ffd900] transition-colors" size={24} />
+                <X className="text-white/70" size={20} />
               </button>
             </header>
 
-            {/* Main Content Area (Scrollable) */}
-            <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col">
-
-              {/* 2. Free Shipping Progress */}
-              <div className="px-6 py-6 border-b border-white/5 bg-gradient-to-b from-[#0a0a0a] to-[#141414]/50">
-                <p className="text-sm font-body text-gray-300 mb-3 flex items-center gap-2">
-                  <Truck className="text-[#ffd900]" size={16} />
-                  {remainingForFreeShipping > 0 ? (
-                    <>
-                      ¡Estás a <span className="text-white font-bold">${remainingForFreeShipping.toLocaleString('es-AR')}</span> del envío gratis!
-                    </>
-                  ) : (
-                    <span className="text-[#ffd900] font-bold">¡Tenés envío gratis!</span>
-                  )}
-                </p>
-                <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-[#ffd900]/60 to-[#ffd900] h-2 rounded-full shadow-[0_0_10px_rgba(255,217,0,0.3)] transition-all duration-1000"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* 3. Cart Items List */}
-              <div className="px-6 py-6 space-y-6">
-                {items.length === 0 ? (
-                  <div className="text-center py-12 space-y-4">
-                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto text-gray-600">
-                      <ShoppingBag size={32} />
-                    </div>
-                    <p className="text-gray-400 font-display">Tu carrito está vacío</p>
-                    <Button
-                      onClick={toggleCart}
-                      className="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-full px-8"
-                    >
-                      Ver Catálogo
-                    </Button>
-                  </div>
-                ) : (
-                  items.map((item) => (
-                    <div key={`${item.id}-${item.selectedSize}`} className="group flex gap-4">
-                      {/* Image */}
-                      <div className="w-24 h-24 shrink-0 rounded-lg overflow-hidden border border-white/10 bg-white/5 relative">
-                        <Image
-                          src={item.images?.[0] || '/placeholder.png'}
-                          alt={item.name}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+            <div className="flex-1 overflow-y-auto no-scrollbar pt-2">
+              {step === 'items' && (
+                <div className="animate-in fade-in duration-500">
+                  {/* Shipping Progress */}
+                  {items.length > 0 && (
+                    <div className="px-8 py-8 border-b border-white/5">
+                      <div className="flex justify-between items-end mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-[#C88A04]/10 flex items-center justify-center">
+                            <Truck className="text-[#C88A04]" size={16} />
+                          </div>
+                          <span className="text-[10px] font-black tracking-widest uppercase text-gray-500">Logística Éter</span>
+                        </div>
+                        <span className="text-xs font-bold text-white">
+                          {remainingForFreeShipping > 0 ? (
+                            `Faltan $${remainingForFreeShipping.toLocaleString('es-AR')}`
+                          ) : (
+                            '¡ENVÍO GRATIS!'
+                          )}
+                        </span>
+                      </div>
+                      <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${progress}%` }}
+                          className="bg-[#C88A04] h-full shadow-[0_0_10px_#C88A04/50]"
                         />
                       </div>
+                    </div>
+                  )}
 
-                      {/* Content */}
-                      <div className="flex-1 flex flex-col justify-between py-1">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-bold text-white text-lg leading-tight font-display">{item.name}</h3>
-                            <p className="text-sm text-gray-400 font-body mt-1">Talle: {item.selectedSize}</p>
-                          </div>
-                          <button
-                            onClick={() => removeItem(item.id, item.selectedSize)}
-                            className="text-gray-500 hover:text-red-500 transition-colors"
-                          >
-                            <Trash2 size={18} />
-                          </button>
+                  {/* Items List */}
+                  <div className="px-8 py-8 space-y-8">
+                    {items.length === 0 ? (
+                      <div className="py-20 flex flex-col items-center justify-center text-center">
+                        <div className="w-24 h-24 bg-white/[0.02] border border-white/5 rounded-[2rem] flex items-center justify-center mb-8">
+                          <ShoppingBag className="text-gray-800" size={40} />
                         </div>
-
-                        <div className="flex justify-between items-end mt-2">
-                          {/* Quantity Control */}
-                          <div className="flex items-center bg-white/5 border border-white/10 rounded-md">
-                            <button
-                              onClick={() => updateQuantity(item.id, item.selectedSize, item.quantity - 1)}
-                              disabled={item.quantity <= 1}
-                              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-[#ffd900] hover:bg-white/5 transition-colors rounded-l-md disabled:opacity-50"
-                            >
-                              <Minus size={14} />
-                            </button>
-                            <span className="w-8 text-center text-sm font-medium text-white font-display">{item.quantity}</span>
-                            <button
-                              onClick={() => updateQuantity(item.id, item.selectedSize, item.quantity + 1)}
-                              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-[#ffd900] hover:bg-white/5 transition-colors rounded-r-md"
-                            >
-                              <Plus size={14} />
-                            </button>
+                        <h3 className="text-2xl font-black tracking-tighter text-white uppercase mb-4">MIRA EL CATÁLOGO</h3>
+                        <p className="text-gray-500 text-sm max-w-[240px] leading-relaxed mb-10">Tu carrito aún está esperando la mejor selección de sneakers brasileros.</p>
+                        <Button
+                          onClick={toggleCart}
+                          className="bg-white text-black font-black text-[10px] tracking-widest uppercase py-6 px-12 rounded-2xl"
+                        >
+                          Explorar Ahora
+                        </Button>
+                      </div>
+                    ) : (
+                      items.map((item) => (
+                        <motion.div
+                          layout
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          key={`${item.id}-${item.selectedSize}`}
+                          className="group flex gap-6"
+                        >
+                          <div className="w-28 h-28 shrink-0 rounded-2xl overflow-hidden border border-white/10 bg-white/5 relative">
+                            <Image
+                              src={item.images?.[0] || '/placeholder.png'}
+                              alt={item.name}
+                              fill
+                              className="object-cover transition-transform duration-700 group-hover:scale-110"
+                            />
                           </div>
+                          <div className="flex-1 flex flex-col py-1">
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <h3 className="font-black text-white text-lg tracking-tight uppercase leading-none mb-2">{item.name}</h3>
+                                <span className="text-[10px] font-black text-[#C88A04]/80 uppercase tracking-widest">TALLE {item.selectedSize}</span>
+                              </div>
+                              <button
+                                onClick={() => removeItem(item.id, item.selectedSize)}
+                                className="w-8 h-8 rounded-full border border-white/5 flex items-center justify-center text-gray-600 hover:text-red-500 hover:bg-red-500/10 transition-all"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                            <div className="mt-auto flex justify-between items-center">
+                              <div className="flex items-center bg-white/5 border border-white/10 rounded-xl px-1">
+                                <button
+                                  onClick={() => updateQuantity(item.id, item.selectedSize, item.quantity - 1)}
+                                  className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-white"
+                                >
+                                  <Minus size={12} />
+                                </button>
+                                <span className="w-8 text-center text-xs font-black text-white">{item.quantity}</span>
+                                <button
+                                  onClick={() => updateQuantity(item.id, item.selectedSize, item.quantity + 1)}
+                                  className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-white"
+                                >
+                                  <Plus size={12} />
+                                </button>
+                              </div>
+                              <span className="text-xl font-black text-white">
+                                ${(item.basePrice * item.quantity).toLocaleString('es-AR')}
+                              </span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
 
-                          {/* Price */}
-                          <span className="text-[#ffd900] font-bold tracking-wide font-display">
-                            ${(item.basePrice * item.quantity).toLocaleString('es-AR')}
-                          </span>
+              {step === 'checkout' && (
+                <div className="px-8 py-8 animate-in slide-in-from-right-10 duration-500">
+                  <form onSubmit={handleCheckout} className="space-y-8">
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Revendedor Responsable</label>
+                        <div className="relative">
+                          <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C88A04]" size={16} />
+                          <input
+                            required
+                            type="text"
+                            placeholder="Nombre del Revendedor / Empresa"
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-[#C88A04] transition-all"
+                            value={formData.resellerName}
+                            onChange={e => setFormData({ ...formData, resellerName: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Nombre del Cliente</label>
+                        <div className="relative">
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C88A04]" size={16} />
+                          <input
+                            required
+                            type="text"
+                            placeholder="Nombre y Apellido del Cliente"
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-[#C88A04] transition-all"
+                            value={formData.customerName}
+                            onChange={e => setFormData({ ...formData, customerName: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">WhatsApp Cliente</label>
+                        <div className="relative">
+                          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C88A04]" size={16} />
+                          <input
+                            required
+                            type="tel"
+                            placeholder="+54 9"
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-[#C88A04] transition-all"
+                            value={formData.customerPhone}
+                            onChange={e => setFormData({ ...formData, customerPhone: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Dirección de Envío</label>
+                        <div className="relative">
+                          <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C88A04]" size={16} />
+                          <input
+                            required
+                            type="text"
+                            placeholder="Calle, Número, Localidad"
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-[#C88A04] transition-all"
+                            value={formData.deliveryAddress}
+                            onChange={e => setFormData({ ...formData, deliveryAddress: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div
+                          onClick={() => setFormData({ ...formData, paymentMethod: 'transferencia' })}
+                          className={cn(
+                            "p-4 rounded-2xl border cursor-pointer transition-all text-center",
+                            formData.paymentMethod === 'transferencia'
+                              ? "bg-[#C88A04]/10 border-[#C88A04] text-white"
+                              : "bg-white/[0.02] border-white/5 text-gray-500 hover:border-white/20"
+                          )}
+                        >
+                          <span className="text-[9px] font-black uppercase tracking-widest block mb-1">Pago</span>
+                          <span className="text-xs font-bold uppercase">Transferencia</span>
+                        </div>
+                        <div
+                          onClick={() => setFormData({ ...formData, paymentMethod: 'efectivo' })}
+                          className={cn(
+                            "p-4 rounded-2xl border cursor-pointer transition-all text-center",
+                            formData.paymentMethod === 'efectivo'
+                              ? "bg-[#C88A04]/10 border-[#C88A04] text-white"
+                              : "bg-white/[0.02] border-white/5 text-gray-500 hover:border-white/20"
+                          )}
+                        >
+                          <span className="text-[9px] font-black uppercase tracking-widest block mb-1">Pago</span>
+                          <span className="text-xs font-bold uppercase">Efectivo</span>
                         </div>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
 
-              {/* 4. Coupon Section */}
-              {items.length > 0 && (
-                <>
-                  <div className="px-6 py-6 border-t border-white/5 mt-auto">
-                    <label htmlFor="coupon" className="block text-xs font-body uppercase tracking-wider text-gray-500 mb-2">
-                      Código promocional
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        id="coupon"
-                        type="text"
-                        placeholder="Código de descuento"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        className="flex-1 bg-white/5 border border-white/10 rounded-md px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#ffd900] focus:border-[#ffd900] transition-all font-display"
-                      />
-                      <button className="px-5 py-2 bg-transparent border border-[#ffd900] text-[#ffd900] font-bold text-sm rounded-md hover:bg-[#ffd900] hover:text-black transition-all font-display">
-                        APLICAR
-                      </button>
+                    <button
+                      type="submit"
+                      disabled={isProcessing}
+                      className="w-full bg-[#C88A04] h-16 rounded-2xl flex items-center justify-center gap-3 text-black font-black text-xs tracking-[0.2em] uppercase hover:bg-[#ECA413] transition-all disabled:opacity-50 shadow-[0_10px_30px_rgba(200,138,4,0.3)]"
+                    >
+                      {isProcessing ? 'Procesando...' : 'Finalizar Pedido'}
+                      <ArrowRight size={16} />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setStep('items')}
+                      className="w-full text-[9px] font-black text-gray-600 uppercase tracking-widest hover:text-white transition-colors"
+                    >
+                      Revisar Productos
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              {step === 'success' && (
+                <div className="px-8 py-12 flex flex-col items-center animate-in zoom-in-95 duration-700">
+                  <div className="w-24 h-24 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-8">
+                    <CheckCircle2 className="text-emerald-500" size={48} />
+                  </div>
+                  <h2 className="text-4xl font-black tracking-tighter text-white uppercase mb-4 text-center leading-[0.9]">GRACIAS POR <br /> TU COMPRA</h2>
+                  <p className="text-gray-500 text-[10px] font-black tracking-[0.4em] uppercase mb-12 text-center">PROTOCOLO DE PEDIDO CONFIRMADO</p>
+
+                  {/* Digital Ticket */}
+                  <div className="w-full bg-[#111] border border-white/10 rounded-[2.5rem] p-10 relative overflow-hidden shadow-2xl">
+                    <div className="absolute top-0 left-0 w-full h-2 bg-[#C88A04] shadow-[0_4px_20px_rgba(200,138,4,0.4)]" />
+
+                    <div className="flex justify-between items-start mb-8">
+                      <div>
+                        <span className="text-[8px] font-black text-[#C88A04] tracking-[0.4em] uppercase block mb-1">ID REFERENCIA</span>
+                        <h4 className="text-xl font-black text-white tracking-tighter">{referenceCode}</h4>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[8px] font-black text-gray-600 tracking-[0.3em] uppercase block mb-1">FECHA</span>
+                        <span className="text-[10px] font-bold text-white">{new Date().toLocaleDateString('es-AR')}</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 mb-8 border-y border-white/5 py-8">
+                      {items.map(item => (
+                        <div key={`${item.id}-${item.selectedSize}`} className="flex justify-between text-xs font-bold uppercase tracking-tight">
+                          <span className="text-gray-400">{item.quantity}x {item.name} <span className="text-[9px] text-[#C88A04]/60 ml-2">{item.selectedSize}</span></span>
+                          <span className="text-white">${(item.basePrice * item.quantity).toLocaleString('es-AR')}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex justify-between items-center mb-8">
+                      <span className="text-[10px] font-black text-[#C88A04] tracking-widest uppercase">TOTAL DEL PEDIDO</span>
+                      <span className="text-3xl font-black text-white">${total.toLocaleString('es-AR')}</span>
+                    </div>
+
+                    <div className="bg-white/5 rounded-2xl p-6 space-y-4 mb-8">
+                      <div className="flex justify-between text-[10px]">
+                        <span className="text-gray-500 uppercase font-black tracking-widest leading-none">Reseller Jefe</span>
+                        <span className="text-white font-bold">{formData.resellerName}</span>
+                      </div>
+                      <div className="flex justify-between text-[10px]">
+                        <span className="text-gray-500 uppercase font-black tracking-widest leading-none">Cliente Final</span>
+                        <span className="text-white font-bold">{formData.customerName}</span>
+                      </div>
+                    </div>
+
+                    <div className="mt-8 pt-8 border-t border-dashed border-white/10 flex flex-col items-center gap-4">
+                      <div className="w-full h-12 bg-white flex items-center justify-center rounded-xl p-2 px-6">
+                        <div className="w-full h-full flex items-center justify-center gap-[2px]">
+                          {[...Array(40)].map((_, i) => (
+                            <div key={i} className={cn("bg-black rounded-full", i % 7 === 0 ? "w-[3px] h-full" : i % 3 === 0 ? "w-[1px] h-3/4" : "w-[2px] h-2/3")} />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-[8px] font-black text-gray-700 tracking-[0.6em] uppercase">ÉTER DIGITAL RECEIPT</p>
                     </div>
                   </div>
-                  <div className="h-6"></div> {/* Spacer */}
-                </>
-              )}
-            </div>
 
-            {/* 5, 6, 7. Footer Summary & Actions */}
-            {items.length > 0 && (
-              <div className="bg-[#141414] border-t border-white/10 px-6 py-6 shadow-[0_-5px_30px_rgba(0,0,0,0.5)] z-20">
-                {/* Summary */}
-                <div className="space-y-3 mb-6 font-body text-sm">
-                  <div className="flex justify-between text-gray-400">
-                    <span>Subtotal</span>
-                    <span className="text-white font-display">${total.toLocaleString('es-AR')}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-400">
-                    <span>Descuento</span>
-                    <span className="text-white font-display">-</span>
-                  </div>
-                  <div className="flex justify-between text-gray-400 items-center">
-                    <span>Envío</span>
-                    {remainingForFreeShipping <= 0 ? (
-                      <span className="text-emerald-400 font-bold text-xs bg-emerald-400/10 px-2 py-0.5 rounded">GRATIS</span>
-                    ) : (
-                      <span className="text-gray-500 text-xs">Calculado en checkout</span>
-                    )}
-                  </div>
-                  <div className="flex justify-between items-end pt-4 border-t border-white/10">
-                    <span className="text-white font-bold text-lg font-display">Total</span>
-                    <span className="text-3xl font-bold text-[#ffd900] tracking-tight font-display">${total.toLocaleString('es-AR')}</span>
-                  </div>
-                </div>
+                  <div className="mt-12 w-full space-y-4">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        const message = `*PEDIDO ÉTER STORE*%0A` +
+                          `---------------------------%0A` +
+                          `*Orden:* ${referenceCode}%0A` +
+                          `*Revendedor:* ${formData.resellerName}%0A` +
+                          `*Cliente:* ${formData.customerName}%0A` +
+                          `*Teléfono:* ${formData.customerPhone}%0A` +
+                          `*Dirección:* ${formData.deliveryAddress}%0A` +
+                          `---------------------------%0A` +
+                          `*PRODUCTOS:*%0A` +
+                          items.map(item => `- ${item.quantity}x ${item.name} (${item.selectedSize}) - $${(item.basePrice * item.quantity).toLocaleString('es-AR')}`).join('%0A') +
+                          `%0A---------------------------%0A` +
+                          `*TOTAL: $${total.toLocaleString('es-AR')}*%0A` +
+                          `*Método:* ${formData.paymentMethod === 'transferencia' ? 'Transferencia' : 'Efectivo'}%0A` +
+                          (formData.notes ? `*Notas:* ${formData.notes}%0A` : '');
 
-                {/* Actions */}
-                <div className="space-y-3">
-                  <Button
-                    onClick={() => {
-                      const message = `Hola Éter Store, quiero realizar el siguiente pedido:%0A%0A${items.map(item => `- ${item.quantity}x ${item.name} (Talle: ${item.selectedSize}) - $${(item.basePrice * item.quantity).toLocaleString('es-AR')}`).join('%0A')}%0A%0ATotal: $${total.toLocaleString('es-AR')}`;
-                      window.open(`https://wa.me/5492235025196?text=${message}`, '_blank');
-                      toggleCart();
-                    }}
-                    className="w-full bg-[#ffd900] text-black font-bold py-4 rounded-md text-lg tracking-wide hover:bg-yellow-400 hover:shadow-[0_0_20px_rgba(255,217,0,0.3)] transition-all transform active:scale-[0.99] flex items-center justify-center gap-2 group font-display h-auto"
-                  >
-                    REALIZAR PEDIDO POR WHATSAPP
-                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                  <button className="w-full bg-[#009EE3] text-white font-medium py-3 rounded-md hover:bg-[#008bc7] transition-colors flex items-center justify-center gap-2 font-body">
-                    <span className="text-sm">Pagar con</span>
-                    <span className="font-bold italic">mercadopago</span>
-                    <CreditCard size={18} />
-                  </button>
-                  <div className="text-center pt-2">
-                    <button onClick={toggleCart} className="text-sm text-gray-400 hover:text-[#ffd900] transition-colors border-b border-transparent hover:border-[#ffd900] pb-0.5 font-display">
-                      Continuar comprando
+                        window.open(`https://wa.me/5492235025196?text=${message}`, '_blank');
+                      }}
+                      className="w-full bg-[#25D366] text-white h-16 rounded-2xl flex items-center justify-center gap-3 font-black text-xs tracking-widest uppercase shadow-[0_10px_30px_rgba(37,211,102,0.3)]"
+                    >
+                      Enviar de nuevo a WhatsApp
+                    </motion.button>
+                    <button
+                      onClick={() => {
+                        setStep('items');
+                        toggleCart();
+                      }}
+                      className="w-full py-4 text-[10px] font-black text-zinc-600 hover:text-white uppercase tracking-widest transition-colors"
+                    >
+                      Cerrar y volver a la tienda
                     </button>
                   </div>
                 </div>
+              )}
+            </div>
 
-                {/* Trust Badges */}
-                <div className="grid grid-cols-3 gap-2 mt-6 pt-4 border-t border-white/5 opacity-60">
-                  <div className="flex flex-col items-center gap-1 text-center">
-                    <ShieldCheck className="text-[#ffd900]" size={18} />
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wide font-display">Pago Seguro</span>
+            {/* Footer Summary (Only for items step) */}
+            {step === 'items' && items.length > 0 && (
+              <div className="bg-black border-t border-white/10 px-8 py-8 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
+                <div className="space-y-4 mb-8">
+                  <div className="flex justify-between">
+                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Subtotal</span>
+                    <span className="text-sm font-black text-white">${total.toLocaleString('es-AR')}</span>
                   </div>
-                  <div className="flex flex-col items-center gap-1 text-center">
-                    <RefreshCw className="text-[#ffd900]" size={18} />
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wide font-display">Devolución Fácil</span>
+                  <div className="flex justify-between items-center pt-4 border-t border-white/5">
+                    <span className="text-[11px] font-black text-white uppercase tracking-[0.2em] italic">Total Inversión</span>
+                    <span className="text-3xl font-black text-white tracking-tighter tracking-tighter">${total.toLocaleString('es-AR')}</span>
                   </div>
-                  <div className="flex flex-col items-center gap-1 text-center">
-                    <ShieldCheck className="text-[#ffd900]" size={18} />
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wide font-display">Autenticidad</span>
+                </div>
+
+                <div className="space-y-3">
+                  <button
+                    onClick={handleNextStep}
+                    className="w-full bg-white h-16 rounded-2xl flex items-center justify-center gap-3 text-black font-black text-xs tracking-[0.2em] uppercase hover:bg-zinc-200 transition-all shadow-[0_10px_30px_rgba(255,255,255,0.1)] group"
+                  >
+                    Siguiente Paso
+                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+
+                  <div className="grid grid-cols-2 gap-4 mt-6">
+                    <div className="flex items-center gap-2 opacity-40">
+                      <ShieldCheck size={14} className="text-[#C88A04]" />
+                      <span className="text-[8px] font-black uppercase tracking-widest">Protocolo Seguro</span>
+                    </div>
+                    <div className="flex items-center gap-2 opacity-40">
+                      <RefreshCw size={14} className="text-[#C88A04]" />
+                      <span className="text-[8px] font-black uppercase tracking-widest">Garantía Éter</span>
+                    </div>
                   </div>
                 </div>
               </div>
