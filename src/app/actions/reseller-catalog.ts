@@ -68,7 +68,9 @@ export async function getResellerProducts(resellerId: string, defaultMarkup: num
         return {
             ...product,
             resellerPrice: finalPrice,
-            displayPrice: finalPrice
+            displayPrice: finalPrice,
+            hasOverride: !!overridePrice && overridePrice > 0,
+            overridePrice: overridePrice || 0
         };
     });
 

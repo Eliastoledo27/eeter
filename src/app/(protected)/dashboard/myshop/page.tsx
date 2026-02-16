@@ -31,18 +31,29 @@ export default function MyShopPage() {
             if (p) {
                 setProfile(p);
                 setSlug(p.reseller_slug || '');
-                setMarkup((p as any).reseller_markup || 10000);
+                const currentMarkup = (p as any).reseller_markup || 10000;
+                setMarkup(currentMarkup);
                 const savedNum = p.whatsapp_number || '';
                 const cleanNum = savedNum.startsWith('549') ? savedNum.slice(3) : savedNum;
                 setWhatsapp(cleanNum);
 
-                const prods = await getResellerProducts(p.id, (p as any).reseller_markup || 10000);
+                const prods = await getResellerProducts(p.id, currentMarkup);
                 setProducts(prods);
             }
             setLoading(false);
         };
         loadData();
     }, []);
+
+    // Reactive update of products when markup changes (only for those without overrides)
+    useEffect(() => {
+        if (!products.length || loading) return;
+        setProducts(current => current.map(p => {
+            if (p.hasOverride) return p;
+            const newPrice = p.base_price + markup;
+            return { ...p, displayPrice: newPrice, resellerPrice: newPrice };
+        }));
+    }, [markup]);
 
     const copyLink = () => {
         const link = `${window.location.origin}/c/${slug}`;
@@ -83,7 +94,12 @@ export default function MyShopPage() {
         const result = await updateProductOverride(productId, newPrice);
         if (result.success) {
             toast.success('Precio individual modificado');
-            setProducts(products.map(p => p.id === productId ? { ...p, resellerPrice: newPrice, displayPrice: newPrice } : p));
+            setProducts(products.map(p => p.id === productId ? {
+                ...p,
+                resellerPrice: newPrice,
+                displayPrice: newPrice,
+                hasOverride: true
+            } : p));
         } else {
             toast.error(result.error || 'No se pudo actualizar el precio');
         }
@@ -396,6 +412,7 @@ export default function MyShopPage() {
                                         <div className="w-full md:w-auto xl:w-[240px] space-y-4">
                                             <div className="relative">
                                                 <input
+                                                    key={`${product.id}-${product.displayPrice}`}
                                                     type="number"
                                                     defaultValue={product.displayPrice}
                                                     onBlur={(e) => {
