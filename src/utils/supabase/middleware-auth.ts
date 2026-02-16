@@ -86,12 +86,10 @@ export async function checkUserPermissions(): Promise<PermissionCheckResult> {
             }
         }
 
-        // Priority 4: Hardcoded admin email override (DISABLED)
-        /* 
+        // Priority 4: Hardcoded admin email override
         if (user.email?.toLowerCase() === 'feitopepe510@gmail.com') {
             role = 'admin'
         }
-        */
 
         const isAdmin = role === 'admin'
         const isStaff = role === 'admin' || role === 'support'
