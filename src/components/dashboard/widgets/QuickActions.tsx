@@ -53,6 +53,10 @@ export function QuickActions() {
                 Atajos
             </h3>
             <div className="flex gap-4 flex-wrap">
+                <button onClick={() => handleNav('/dashboard/myshop')} className="flex-1 min-w-[140px] border border-[#C88A04]/50 text-[#C88A04] hover:bg-[#C88A04]/10 hover:border-[#C88A04] rounded-lg py-4 px-4 flex items-center justify-center gap-2 transition-all uppercase tracking-wider text-xs font-bold group bg-black/40 backdrop-blur-sm font-mono">
+                    <ShoppingBag size={16} className="group-hover:scale-110 transition-transform" />
+                    Mi Tienda
+                </button>
                 <button onClick={() => handleNav('/dashboard/catalogue')} className="flex-1 min-w-[140px] border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500 rounded-lg py-4 px-4 flex items-center justify-center gap-2 transition-all uppercase tracking-wider text-xs font-bold group bg-black/40 backdrop-blur-sm font-mono">
                     <ShoppingBag size={16} className="group-hover:scale-110 transition-transform" />
                     Catálogo

@@ -17,7 +17,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     }
   }, [user, loading, router]);
 
-  if (loading) {
+  if (loading && !user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white gap-4">
         <Loader2 className="w-8 h-8 animate-spin text-accent-gold" />
@@ -25,6 +25,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
       </div>
     );
   }
+
 
   if (!user) return null;
 

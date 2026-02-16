@@ -7,6 +7,7 @@ import { TopBar } from '@/components/layout/TopBar'
 import { useAuthStore } from '@/store/auth-store'
 import { toast } from 'sonner'
 import { Menu, X } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { isInitialized, isAuthenticated, isLoading } = useAuthStore()
@@ -31,8 +32,10 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   }, [isInitialized, isAuthenticated, isLoading, router])
 
-  // Loading state
-  if (!isInitialized || isLoading) {
+  // Loading state: Only show full-screen loader if not initialized 
+  // or if we are loading but not yet authenticated.
+  // This prevents background token refreshes from interrupting the user.
+  if (!isInitialized || (isLoading && !isAuthenticated)) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -66,18 +69,30 @@ export default function ProtectedLayout({
   children: React.ReactNode
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Initialize from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('sidebar-collapsed')
+    if (saved === 'true') {
+      setIsSidebarCollapsed(true)
+    }
+    setIsMounted(true)
+  }, [])
+
+  const toggleSidebar = () => {
+    const newState = !isSidebarCollapsed
+    setIsSidebarCollapsed(newState)
+    localStorage.setItem('sidebar-collapsed', String(newState))
+  }
+
+  // Prevent layout jump by not rendering until mounted if we depend on localStorage
+  // Or handle it with a default class
 
   return (
     <AuthGuard>
       <div className="min-h-screen bg-[#0A0A0A] font-sans text-white selection:bg-[#c88a04]/20 overflow-x-hidden">
-        {/* Mobile hamburger button */}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="fixed top-4 left-4 z-[60] p-2 bg-black/80 border border-white/10 rounded-lg md:hidden backdrop-blur-sm"
-          aria-label="Toggle menu"
-        >
-          {sidebarOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
-        </button>
 
         {/* Mobile overlay */}
         {sidebarOpen && (
@@ -88,19 +103,27 @@ export default function ProtectedLayout({
         )}
 
         {/* Sidebar — fixed on desktop, sliding drawer on mobile */}
-        <div className={`
-          fixed left-0 top-0 h-full z-50 transition-transform duration-300 ease-out
-          md:translate-x-0
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}>
-          <Sidebar />
+        <div className={cn(
+          "fixed left-0 top-0 h-full z-50 transition-all duration-300 ease-in-out",
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+          isSidebarCollapsed ? 'w-[70px]' : 'w-[180px]'
+        )}>
+          <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
         </div>
 
         {/* Main Content Wrapper */}
-        <div className="md:ml-[180px] min-h-screen flex flex-col relative bg-[linear-gradient(rgba(200,138,4,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,138,4,0.03)_1px,transparent_1px)] bg-[size:40px_40px]">
+        <div className={cn(
+          "min-h-screen flex flex-col relative bg-[linear-gradient(rgba(200,138,4,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,138,4,0.03)_1px,transparent_1px)] bg-[size:40px_40px] transition-all duration-300 ease-in-out",
+          isSidebarCollapsed ? "md:ml-[70px]" : "md:ml-[180px]"
+        )}>
 
           {/* Fixed Header */}
-          <TopBar />
+          <TopBar
+            isSidebarCollapsed={isSidebarCollapsed}
+            onToggleSidebar={toggleSidebar}
+            mobileMenuOpen={sidebarOpen}
+            onToggleMobileMenu={() => setSidebarOpen(!sidebarOpen)}
+          />
 
           {/* Page Content */}
           <main className="flex-1 p-4 md:p-8 pt-20 md:pt-24 relative z-0">
@@ -113,3 +136,4 @@ export default function ProtectedLayout({
     </AuthGuard>
   )
 }
+

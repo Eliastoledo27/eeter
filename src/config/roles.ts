@@ -1,6 +1,6 @@
 import {
   Home, ShoppingBag, BookOpen, Trophy, Users, Package,
-  MessageSquare, BarChart2, ClipboardList, Settings,
+  MessageSquare, BarChart2, ClipboardList, Settings, LayoutDashboard,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -23,7 +23,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     'view_dashboard', 'view_analytics', 'view_catalog', 'view_academy',
     'view_ranking', 'manage_users', 'manage_products', 'view_crm',
     'manage_messages', 'manage_purchases', 'manage_orders', 'manage_settings',
-    'view_messages', 'view_orders', 'view_profiles',
+    'view_messages', 'view_orders', 'view_profiles', 'manage_reseller_shop',
     'view_inventory', 'manage_inventory', 'view_notifications',
   ],
   support: [
@@ -34,10 +34,11 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   reseller: [
     'view_dashboard', 'view_catalog', 'view_academy', 'view_ranking',
     'view_crm', 'view_messages', 'view_orders', 'view_notifications',
+    'manage_reseller_shop',
   ],
   user: [
     'view_dashboard', 'view_catalog', 'view_academy', 'view_messages',
-    'view_orders', 'view_notifications',
+    'view_orders', 'view_notifications', 'manage_reseller_shop',
   ],
 }
 
@@ -54,6 +55,8 @@ export const ROUTE_PERMISSIONS: Record<string, string> = {
   '/dashboard/orders': 'view_orders',
   '/dashboard/inventory': 'view_inventory',
   '/dashboard/ranking': 'view_ranking',
+  '/dashboard/myshop': 'manage_reseller_shop',
+  '/dashboard/panel': 'view_dashboard',
   '/dashboard': 'view_dashboard',
   '/academy': 'view_academy',
 }
@@ -70,15 +73,19 @@ export const ROUTE_ROLES: Record<string, UserRole[]> = {
   '/dashboard/orders': ['admin', 'support', 'reseller', 'user'],
   '/dashboard/inventory': ['admin', 'support'],
   '/dashboard/ranking': ['admin', 'reseller'],
+  '/dashboard/myshop': ['admin', 'reseller'],
+  '/dashboard/panel': ['admin', 'support', 'reseller', 'user'],
   '/dashboard': ['admin', 'support', 'reseller', 'user'],
   '/academy': ['admin', 'support', 'reseller', 'user'],
 }
 
 // ─── Navigation Modules ──────────────────────────────────────────────
 export const DASHBOARD_MODULES: NavItem[] = [
-  { id: 'dashboard', label: 'Panel Principal', icon: Home, href: '/dashboard', requiredPermission: 'view_dashboard' },
+  { id: 'dashboard', label: 'Inicio', icon: Home, href: '/dashboard', requiredPermission: 'view_dashboard' },
+  { id: 'panel', label: 'Panel Control', icon: LayoutDashboard, href: '/dashboard/panel', requiredPermission: 'view_dashboard' },
   { id: 'analytics', label: 'Análisis', icon: BarChart2, href: '/dashboard/analytics', requiredPermission: 'view_analytics' },
   { id: 'catalog', label: 'Catálogo', icon: ShoppingBag, href: '/dashboard/catalogue', requiredPermission: 'view_catalog' },
+  { id: 'myshop', label: 'Mi Tienda', icon: BarChart2, href: '/dashboard/myshop', requiredPermission: 'manage_reseller_shop' },
   { id: 'orders', label: 'Pedidos', icon: ClipboardList, href: '/dashboard/orders', requiredPermission: 'view_orders' },
   { id: 'academy', label: 'Academia VIP', icon: BookOpen, href: '/academy', requiredPermission: 'view_academy' },
   { id: 'ranking', label: 'Ranking', icon: Trophy, href: '/dashboard/ranking', requiredPermission: 'view_ranking' },

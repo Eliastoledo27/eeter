@@ -8,6 +8,7 @@ export interface Profile {
     email: string | null;
     role: UserRole;
     reseller_slug: string | null;
+    reseller_markup: number;
     whatsapp_number: string | null;
     commission_rate: number;
     is_premium: boolean;

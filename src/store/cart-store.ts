@@ -16,6 +16,8 @@ interface CartStore {
   clearCart: () => void;
   toggleCart: () => void;
   getTotal: () => number;
+  resellerWhatsApp: string | null;
+  setResellerWhatsApp: (num: string | null) => void;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -23,6 +25,9 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       isOpen: false,
+      resellerWhatsApp: null,
+
+      setResellerWhatsApp: (num) => set({ resellerWhatsApp: num }),
 
       addItem: (product, size) => {
         const { items } = get();

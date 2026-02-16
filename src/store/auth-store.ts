@@ -13,6 +13,8 @@ export interface AuthProfile {
   points: number
   streak_days: number
   avatar_url?: string
+  whatsapp_number?: string | null
+  reseller_slug?: string | null
 }
 
 interface AuthState {
@@ -156,7 +158,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Fetch profile from DB
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('id, full_name, role, is_premium, points, streak_days, avatar_url')
+        .select('id, full_name, role, is_premium, points, streak_days, avatar_url, whatsapp_number, reseller_slug')
         .eq('id', user.id)
         .single()
 

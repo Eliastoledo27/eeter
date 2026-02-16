@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 type CartStep = 'items' | 'checkout' | 'success';
 
 export function CartSidebar() {
-  const { items, isOpen, toggleCart, removeItem, updateQuantity, getTotal, clearCart } = useCartStore();
+  const { items, isOpen, toggleCart, removeItem, updateQuantity, getTotal, clearCart, resellerWhatsApp } = useCartStore();
   const { user } = useAuth();
   const [step, setStep] = useState<CartStep>('items');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -56,6 +56,7 @@ export function CartSidebar() {
 
     setIsProcessing(true);
     try {
+      const fullCustomerPhone = `549${formData.customerPhone}`;
       const result = await createOrderFromCart({
         items: items.map(item => ({
           productId: item.id,
@@ -66,7 +67,7 @@ export function CartSidebar() {
           image: item.images[0]
         })),
         customerName: formData.customerName,
-        customerPhone: formData.customerPhone,
+        customerPhone: fullCustomerPhone,
         resellerName: formData.resellerName,
         deliveryAddress: formData.deliveryAddress,
         paymentMethod: formData.paymentMethod,
@@ -84,7 +85,7 @@ export function CartSidebar() {
           `*Orden:* ${result.referenceCode}%0A` +
           `*Revendedor:* ${formData.resellerName}%0A` +
           `*Cliente:* ${formData.customerName}%0A` +
-          `*Teléfono:* ${formData.customerPhone}%0A` +
+          `*Teléfono:* ${fullCustomerPhone}%0A` +
           `*Dirección:* ${formData.deliveryAddress}%0A` +
           `---------------------------%0A` +
           `*PRODUCTOS:*%0A` +
@@ -95,10 +96,12 @@ export function CartSidebar() {
           (formData.notes ? `*Notas:* ${formData.notes}%0A` : '');
 
         // Redirect after small delay
+        const waNumber = resellerWhatsApp || '5492235025196';
         setTimeout(() => {
-          window.open(`https://wa.me/5492235025196?text=${message}`, '_blank');
+          window.open(`https://wa.me/${waNumber}?text=${message}`, '_blank');
           clearCart();
         }, 1500);
+
       } else {
         toast.error(result.message || 'Error al procesar el pedido');
       }
@@ -110,6 +113,7 @@ export function CartSidebar() {
     }
   };
 
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -119,7 +123,7 @@ export function CartSidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={toggleCart}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60]"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200]"
           />
 
           <motion.div
@@ -127,25 +131,25 @@ export function CartSidebar() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 bottom-0 w-full sm:w-[500px] bg-[#050505] border-l border-white/5 z-[70] shadow-2xl flex flex-col overflow-hidden"
+            className="fixed right-0 top-0 bottom-0 w-full sm:w-[500px] bg-[#050505] border-l border-white/5 z-[210] shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
-            <header className="flex items-center justify-between px-8 py-6 border-b border-white/5 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
+            <header className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-white/5 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
               <div>
-                <h2 className="text-xl font-black tracking-tighter text-white uppercase italic">
+                <h2 className="text-lg md:text-xl font-black tracking-tighter text-white uppercase italic">
                   {step === 'items' ? 'Tu Selección' : step === 'checkout' ? 'Datos de Envío' : 'Pedido Confirmado'}
                 </h2>
                 {step === 'items' && items.length > 0 && (
-                  <p className="text-[10px] font-bold text-[#C88A04] tracking-[0.3em] uppercase mt-1">
+                  <p className="text-[9px] md:text-[10px] font-bold text-[#C88A04] tracking-[0.3em] uppercase mt-1">
                     {items.reduce((a, b) => a + b.quantity, 0)} PRODUCTOS LISTOS
                   </p>
                 )}
               </div>
               <button
                 onClick={toggleCart}
-                className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all active:scale-95"
+                className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all active:scale-95 group"
               >
-                <X className="text-white/70" size={20} />
+                <X className="text-white/70 group-hover:text-white" size={20} />
               </button>
             </header>
 
@@ -291,17 +295,18 @@ export function CartSidebar() {
                       <div className="space-y-2">
                         <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">WhatsApp Cliente</label>
                         <div className="relative">
-                          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C88A04]" size={16} />
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C88A04] font-bold text-sm whitespace-nowrap">+54 9</span>
                           <input
                             required
                             type="tel"
-                            placeholder="+54 9"
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-[#C88A04] transition-all"
+                            placeholder="2235000000"
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-20 pr-4 text-sm text-white focus:outline-none focus:border-[#C88A04] transition-all"
                             value={formData.customerPhone}
-                            onChange={e => setFormData({ ...formData, customerPhone: e.target.value })}
+                            onChange={e => setFormData({ ...formData, customerPhone: e.target.value.replace(/[^0-9]/g, '') })}
                           />
                         </div>
                       </div>
+
 
                       <div className="space-y-2">
                         <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Dirección de Envío</label>
@@ -431,12 +436,13 @@ export function CartSidebar() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
+                        const fullCustomerPhone = `549${formData.customerPhone}`;
                         const message = `*PEDIDO ÉTER STORE*%0A` +
                           `---------------------------%0A` +
                           `*Orden:* ${referenceCode}%0A` +
                           `*Revendedor:* ${formData.resellerName}%0A` +
                           `*Cliente:* ${formData.customerName}%0A` +
-                          `*Teléfono:* ${formData.customerPhone}%0A` +
+                          `*Teléfono:* ${fullCustomerPhone}%0A` +
                           `*Dirección:* ${formData.deliveryAddress}%0A` +
                           `---------------------------%0A` +
                           `*PRODUCTOS:*%0A` +
@@ -446,7 +452,8 @@ export function CartSidebar() {
                           `*Método:* ${formData.paymentMethod === 'transferencia' ? 'Transferencia' : 'Efectivo'}%0A` +
                           (formData.notes ? `*Notas:* ${formData.notes}%0A` : '');
 
-                        window.open(`https://wa.me/5492235025196?text=${message}`, '_blank');
+                        const waNumber = resellerWhatsApp || '5492235025196';
+                        window.open(`https://wa.me/${waNumber}?text=${message}`, '_blank');
                       }}
                       className="w-full bg-[#25D366] text-white h-16 rounded-2xl flex items-center justify-center gap-3 font-black text-xs tracking-widest uppercase shadow-[0_10px_30px_rgba(37,211,102,0.3)]"
                     >

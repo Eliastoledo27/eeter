@@ -140,14 +140,24 @@ export function Navbar() {
                 </motion.button>
               </Link>
             ) : (
-              <Link href="/login">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  className="bg-white text-black px-6 h-12 rounded-2xl font-black text-[10px] tracking-widest uppercase hidden md:block"
-                >
-                  Ingresar
-                </motion.button>
-              </Link>
+              <div className="hidden md:flex items-center gap-2">
+                <Link href="/login">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    className="text-white hover:text-[#C88A04] px-4 font-black text-[10px] tracking-widest uppercase transition-colors"
+                  >
+                    Ingresar
+                  </motion.button>
+                </Link>
+                <Link href="/register">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    className="bg-white text-black px-6 h-12 rounded-2xl font-black text-[10px] tracking-widest uppercase"
+                  >
+                    Regístrate
+                  </motion.button>
+                </Link>
+              </div>
             )}
 
             <button
@@ -194,6 +204,43 @@ export function Navbar() {
                       </Link>
                     </motion.div>
                   ))}
+
+                  {/* Mobile Mobile Auth Actions */}
+                  {!user && !isLoading && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 }}
+                      className="mt-8 flex flex-col gap-4 px-4"
+                    >
+                      <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                        <button className="w-full py-5 rounded-3xl border border-white/10 text-white font-black text-xs tracking-widest uppercase hover:bg-white/5 transition-all">
+                          Ingresar
+                        </button>
+                      </Link>
+                      <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                        <button className="w-full py-5 rounded-3xl bg-[#C88A04] text-black font-black text-xs tracking-widest uppercase hover:bg-[#ECA413] transition-all shadow-[0_10px_30px_rgba(200,138,4,0.3)]">
+                          Regístrate
+                        </button>
+                      </Link>
+                    </motion.div>
+                  )}
+
+                  {user && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 }}
+                      className="mt-8 px-4"
+                    >
+                      <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                        <button className="w-full py-5 rounded-3xl bg-[#C88A04] text-black font-black text-xs tracking-widest uppercase flex items-center justify-center gap-3">
+                          <LayoutDashboard size={18} />
+                          Panel de Control
+                        </button>
+                      </Link>
+                    </motion.div>
+                  )}
                 </div>
               </div>
 

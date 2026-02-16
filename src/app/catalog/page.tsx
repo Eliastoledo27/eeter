@@ -177,7 +177,7 @@ export default function CatalogPage() {
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className={`grid grid-cols-1 sm:grid-cols-2 ${isSidebarOpen ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} gap-x-8 gap-y-16 transition-all duration-500`}
+                                className={`grid grid-cols-2 sm:grid-cols-2 ${isSidebarOpen ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} gap-x-4 md:gap-x-8 gap-y-8 md:gap-y-16 transition-all duration-500`}
                             >
                                 <AnimatePresence mode='popLayout'>
                                     {filteredProducts.map((product, idx) => (

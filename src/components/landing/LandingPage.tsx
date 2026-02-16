@@ -150,7 +150,7 @@ const HeroSection = ({ products }: { products: Product[] }) => {
 
                 <motion.div
                     style={{ y: useTransform(scrollY, [0, 1000], [0, 400]) }}
-                    className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[80vw] h-[80vw] bg-radial-gradient from-[#C88A04]/15 to-transparent blur-[120px] animate-pulse-slow"
+                    className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[80vw] h-[80vw] bg-[#C88A04]/10 rounded-full blur-[120px] animate-pulse-slow"
                 />
 
                 {/* Visual Grid */}
@@ -200,7 +200,7 @@ const HeroSection = ({ products }: { products: Product[] }) => {
                                 VER CATÁLOGO
                             </MagneticButton>
                         </Link>
-                        <Link href="#journal">
+                        <Link href="/register">
                             <MagneticButton variant="outline" className="h-16 px-10 text-lg border-white/10 text-white hover:bg-white/5 font-bold rounded-full backdrop-blur-sm">
                                 <Play size={20} className="mr-3 fill-white" />
                                 COMENZAR AHORA
@@ -209,8 +209,6 @@ const HeroSection = ({ products }: { products: Product[] }) => {
                     </div>
                 </motion.div>
             </div>
-
-
 
             {/* Scroll Indicator */}
             <motion.div

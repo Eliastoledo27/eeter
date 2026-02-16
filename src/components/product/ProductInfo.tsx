@@ -10,9 +10,10 @@ import Link from 'next/link'
 
 interface ProductInfoProps {
     product: ProductType
+    hideOutboundLinks?: boolean
 }
 
-export function ProductInfo({ product }: ProductInfoProps) {
+export function ProductInfo({ product, hideOutboundLinks }: ProductInfoProps) {
     const { addItem, openCart } = useCart()
     const [selectedSize, setSelectedSize] = useState<string | null>(null)
     const quantity = 1
@@ -99,7 +100,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 <div className="space-y-6">
                     <div className="flex items-center justify-between">
                         <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Seleccionar Talle</label>
-                        <Link href="/size-guide" className="text-[10px] text-[#CA8A04] hover:underline font-bold uppercase tracking-widest">Guía de talles</Link>
+                        {!hideOutboundLinks && (
+                            <Link href="/size-guide" className="text-[10px] text-[#CA8A04] hover:underline font-bold uppercase tracking-widest">Guía de talles</Link>
+                        )}
                     </div>
                     <div className="grid grid-cols-4 gap-3">
                         {availableSizes.map((size) => (
