@@ -15,7 +15,7 @@ interface ProductQuickViewProps {
 }
 
 export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
-    const { addItem, openCart } = useCart();
+    const { addItem, openCart, setCartStep } = useCart();
     const [selectedImage, setSelectedImage] = useState(0);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [quantity, setQuantity] = useState(1);
@@ -54,13 +54,13 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
             : ['https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200']
     ));
 
-    const handleAddToCart = () => {
+    const handleAddToCart = (silent = false) => {
         if (!selectedSize) {
             toast.error('Por favor seleccioná un talle');
-            return;
+            return false;
         }
 
-        setIsAdding(true);
+        if (!silent) setIsAdding(true);
 
         // Convert ProductType back to Product entity for the store
         const productToCart: any = {
@@ -78,27 +78,33 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
 
         addItem(productToCart, selectedSize, quantity);
 
-        setTimeout(() => {
-            setIsAdding(false);
-            toast.success('¡Producto agregado!', {
-                description: `${quantity}x ${product.name} - Talle ${selectedSize}`,
-                action: {
-                    label: 'Ver carrito',
-                    onClick: () => {
-                        onClose();
-                        openCart();
+        if (!silent) {
+            setTimeout(() => {
+                setIsAdding(false);
+                toast.success('¡Producto agregado!', {
+                    description: `${quantity}x ${product.name} - Talle ${selectedSize}`,
+                    action: {
+                        label: 'Ver carrito',
+                        onClick: () => {
+                            setCartStep('items');
+                            onClose();
+                            openCart();
+                        },
                     },
-                },
-            });
-        }, 500);
+                });
+            }, 500);
+        }
+        return true;
     };
 
     const handleBuyNow = () => {
-        handleAddToCart();
-        setTimeout(() => {
+        const added = handleAddToCart(true);
+        if (added) {
+            setCartStep('checkout');
             onClose();
-            openCart();
-        }, 800);
+            // Use timeout to ensure state propagation before opening
+            setTimeout(() => openCart(), 0);
+        }
     };
 
     return (
@@ -119,50 +125,40 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
 
             {/* Modal */}
             <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                initial={{ opacity: 0, scale: 0.95, y: 50 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="relative w-full max-w-5xl max-h-[90vh] bg-[#111]/95 backdrop-blur-3xl rounded-[2rem] border border-white/10 overflow-hidden shadow-2xl shadow-black/60"
+                exit={{ opacity: 0, scale: 0.95, y: 50 }}
+                transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+                className="relative w-full max-w-5xl h-full sm:h-auto sm:max-h-[90vh] bg-[#0A0A0A] sm:bg-[#111]/95 backdrop-blur-3xl sm:rounded-[2.5rem] rounded-t-[2.5rem] border-t sm:border border-white/10 overflow-hidden shadow-2xl shadow-black"
             >
                 {/* Header / Close Controller */}
-                <div className="absolute top-0 left-0 right-0 z-[60] p-6 md:p-8 flex justify-between items-center pointer-events-none">
-                    <div className="flex items-center gap-4 bg-black/80 backdrop-blur-3xl px-5 py-2.5 rounded-[1.5rem] border border-white/10 pointer-events-auto shadow-2xl">
+                <div className="absolute top-0 left-0 right-0 z-[60] p-4 sm:p-8 flex justify-between items-center pointer-events-none">
+                    <div className="flex items-center gap-2 sm:gap-4 bg-black/80 backdrop-blur-3xl px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full border border-white/10 pointer-events-auto shadow-2xl">
                         <div className="relative">
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#ffd900] animate-pulse" />
-                            <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-[#ffd900] animate-ping opacity-30" />
+                            <div className="w-2 h-2 sm:w-2.5 h-2.5 rounded-full bg-[#ffd900] animate-pulse" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">
+                            <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-white">
                                 Vista_Rápida
-                            </span>
-                            <span className="text-[7px] font-mono text-gray-500 uppercase tracking-widest">
-                                Protocolo_Core // v2.6.4
                             </span>
                         </div>
                     </div>
 
                     <button
                         onClick={onClose}
-                        className="group flex items-center gap-4 bg-white/5 hover:bg-rose-500/20 backdrop-blur-3xl border border-white/10 hover:border-rose-500/30 px-6 py-3 rounded-[1.5rem] transition-all duration-700 pointer-events-auto relative overflow-hidden"
+                        className="group flex items-center gap-2 sm:gap-4 bg-white/5 hover:bg-rose-500/20 backdrop-blur-3xl border border-white/10 px-3 sm:px-6 py-1.5 sm:py-3 rounded-full transition-all duration-700 pointer-events-auto"
                     >
-                        <div className="absolute inset-0 bg-rose-500 opacity-0 group-hover:opacity-10 transition-opacity" />
-                        <div className="flex flex-col items-end">
-                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 group-hover:text-rose-400 transition-colors">
-                                Desconectar
-                            </span>
-                            <span className="text-[7px] font-mono text-gray-600 group-hover:text-rose-500/60 uppercase">
-                                Cerrar_Acceso
-                            </span>
-                        </div>
-                        <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 group-hover:bg-rose-500/20 group-hover:scale-110 transition-all">
-                            <X className="text-gray-400 group-hover:text-rose-400" size={18} />
+                        <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 group-hover:text-rose-400">
+                            Cerrar
+                        </span>
+                        <div className="w-6 h-6 sm:w-8 h-8 flex items-center justify-center rounded-full bg-white/5 border border-white/10 group-hover:bg-rose-500/20">
+                            <X className="text-gray-400 group-hover:text-rose-400" size={14} />
                         </div>
                     </button>
                 </div>
 
                 {/* Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-y-auto max-h-[90vh]">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-y-auto h-full sm:max-h-[90vh] pb-32 sm:pb-0">
                     {/* LEFT: Gallery */}
                     <div className="p-6 lg:p-8 space-y-4">
                         {/* Main Image Stage */}
@@ -179,7 +175,7 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
                                     <Image
                                         src={displayImages[selectedImage]}
                                         fill
-                                        className="object-cover"
+                                        className="object-contain p-4 sm:p-0"
                                         alt={product.name}
                                         priority
                                         sizes="(max-width: 768px) 100vw, 50vw"
@@ -236,7 +232,7 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
                                         <Image
                                             src={img}
                                             fill
-                                            className="object-cover"
+                                            className="object-contain p-1"
                                             alt={`Vista ${idx + 1}`}
                                         />
                                     </button>
@@ -266,7 +262,7 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
                     </div>
 
                     {/* RIGHT: Product Info */}
-                    <div className="p-6 lg:p-8 flex flex-col bg-white/[0.02] border-l border-white/5">
+                    <div className="p-6 lg:p-10 flex flex-col bg-white/[0.02] border-l border-white/5 relative">
                         {/* Product Header / Identity */}
                         <div className="mb-10 mt-8 lg:mt-0">
                             <div className="flex items-center gap-3 mb-4">
@@ -385,9 +381,9 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
 
                             <div className="flex flex-col sm:flex-row gap-3">
                                 <button
-                                    onClick={handleAddToCart}
+                                    onClick={() => handleAddToCart()}
                                     disabled={isAdding || availableSizes.length === 0}
-                                    className="flex-[3] h-16 bg-[#ffd900] hover:bg-[#ffe033] disabled:opacity-30 text-black font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-[#ffd900]/10"
+                                    className="flex-[3] h-14 sm:h-16 bg-[#ffd900] hover:bg-[#ffe033] disabled:opacity-30 text-black font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-[#ffd900]/10"
                                 >
                                     {isAdding ? (
                                         <motion.div
@@ -405,21 +401,66 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
                                 <button
                                     onClick={handleBuyNow}
                                     disabled={availableSizes.length === 0}
-                                    className="flex-[2] h-16 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl transition-all"
+                                    className="hidden sm:flex flex-[2] h-16 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl transition-all items-center justify-center"
                                 >
                                     COMPRA FLASH
                                 </button>
                             </div>
-
                             <Link
                                 href={`/catalog/${product.id}`}
-                                className="block w-full py-4 text-[9px] font-black uppercase tracking-[0.5em] text-gray-700 hover:text-[#ffd900] transition-colors text-center"
+                                className="hidden sm:block w-full py-8 text-[9px] font-black uppercase tracking-[0.5em] text-gray-700 hover:text-[#ffd900] transition-colors text-center"
                             >
                                 / ver_archivo_completo
                             </Link>
                         </div>
                     </div>
                 </div>
+
+                {/* Mobile Sticky Footer */}
+                <div className="lg:hidden absolute bottom-0 left-0 right-0 p-6 bg-black/90 backdrop-blur-2xl border-t border-white/10 z-[70] flex flex-col gap-4">
+                    <div className="flex items-center justify-between px-2">
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Precio Final</span>
+                            <span className="text-2xl font-black text-[#ffd900] tracking-tighter">
+                                ${product.base_price.toLocaleString('es-AR')}
+                            </span>
+                        </div>
+                        {selectedSize && (
+                            <div className="text-right">
+                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Talle Seleccionado</span>
+                                <p className="text-sm font-black text-white">{selectedSize}</p>
+                            </div>
+                        )}
+                    </div>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={() => handleAddToCart()}
+                            disabled={isAdding || availableSizes.length === 0}
+                            className="flex-[3] h-16 bg-white/5 text-white border border-white/10 font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl flex items-center justify-center gap-3 active:scale-[0.95] transition-all"
+                        >
+                            {isAdding ? (
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                                />
+                            ) : (
+                                <>
+                                    <ShoppingCart size={18} />
+                                    CARRITO
+                                </>
+                            )}
+                        </button>
+                        <button
+                            onClick={handleBuyNow}
+                            disabled={availableSizes.length === 0}
+                            className="flex-[4] h-16 bg-[#ffd900] text-black font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl flex items-center justify-center gap-3 active:scale-[0.95] transition-all shadow-2xl shadow-[#ffd900]/20"
+                        >
+                            COMPRA FLASH
+                        </button>
+                    </div>
+                </div>
+
             </motion.div>
         </motion.div>
     );

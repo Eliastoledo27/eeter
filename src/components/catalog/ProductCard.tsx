@@ -7,9 +7,11 @@ import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 
 export function ProductCard({ product, href, onQuickView }: { product: Product; href?: string; onQuickView?: () => void }) {
-  const { addItem } = useCartStore();
+  const router = useRouter();
+  const { addItem, setIsOpen } = useCartStore();
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [isHovered, setIsHovered] = useState(false);
 
@@ -47,6 +49,7 @@ export function ProductCard({ product, href, onQuickView }: { product: Product; 
     const sizeToAdd = selectedSize || (availableSizes.length > 0 ? availableSizes[0] : 'Unique');
 
     addItem(product, sizeToAdd);
+    setIsOpen(true);
     toast.success(`Agregado: ${product.name} (Talle ${sizeToAdd})`, {
       style: {
         background: '#0A0A0A',
@@ -65,9 +68,9 @@ export function ProductCard({ product, href, onQuickView }: { product: Product; 
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => {
         if (href) {
-          window.location.href = href;
+          router.push(href);
         } else {
-          window.location.href = `/catalog/${product.id}`;
+          router.push(`/catalog/${product.id}`);
         }
       }}
       className="group relative bg-gradient-to-b from-[#0F0F0F] to-[#050505] rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-white/5 hover:border-[#C88A04]/50 transition-all duration-1000 ease-[0.19,1,0.22,1] cursor-pointer shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] h-full flex flex-col group/card"

@@ -17,6 +17,7 @@ interface CartStore {
   updateQuantity: (productId: string, size: string, quantity: number) => void;
   clearCart: () => void;
   toggleCart: () => void;
+  setIsOpen: (open: boolean) => void;
   getSubtotal: () => number;
   getDiscountAmount: () => number;
   getTotal: () => number;
@@ -24,6 +25,8 @@ interface CartStore {
   removeCoupon: () => void;
   resellerWhatsApp: string | null;
   setResellerWhatsApp: (num: string | null) => void;
+  cartStep: 'items' | 'checkout' | 'success';
+  setCartStep: (step: 'items' | 'checkout' | 'success') => void;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -33,8 +36,10 @@ export const useCartStore = create<CartStore>()(
       isOpen: false,
       appliedCoupon: null,
       resellerWhatsApp: null,
+      cartStep: 'items',
 
       setResellerWhatsApp: (num) => set({ resellerWhatsApp: num }),
+      setCartStep: (step) => set({ cartStep: step }),
 
       addItem: (product, size, quantity = 1) => {
         const { items } = get();
@@ -49,12 +54,10 @@ export const useCartStore = create<CartStore>()(
                 ? { ...item, quantity: item.quantity + quantity }
                 : item
             ),
-            isOpen: true,
           });
         } else {
           set({
             items: [...items, { ...product, selectedSize: size, quantity }],
-            isOpen: true,
           });
         }
       },
@@ -81,6 +84,7 @@ export const useCartStore = create<CartStore>()(
       clearCart: () => set({ items: [], appliedCoupon: null }),
 
       toggleCart: () => set({ isOpen: !get().isOpen }),
+      setIsOpen: (open) => set({ isOpen: open }),
 
       getSubtotal: () => {
         return get().items.reduce(

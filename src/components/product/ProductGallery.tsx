@@ -51,7 +51,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-                    className="relative aspect-square rounded-[4rem] overflow-hidden bg-gradient-to-br from-[#111] to-[#050505] border border-white/5 shadow-2xl group"
+                    className="relative aspect-square lg:rounded-[4rem] overflow-hidden bg-gradient-to-br from-[#111] to-[#050505] lg:border border-white/5 shadow-2xl group"
                 >
                     {/* Visual Grid for Main Stage */}
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(200,138,4,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(200,138,4,0.02)_1px,transparent_1px)] bg-[size:50px_50px] opacity-40 pointer-events-none" />
@@ -59,7 +59,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                     <Image
                         src={displayImages[selectedImage]}
                         fill
-                        className="object-contain p-12 transition-all duration-1000 group-hover:scale-110 group-hover:-rotate-3 drop-shadow-[0_40px_80px_rgba(0,0,0,0.8)]"
+                        className="object-contain p-6 sm:p-12 transition-all duration-1000 group-hover:scale-110 group-hover:-rotate-3 drop-shadow-[0_40px_80px_rgba(0,0,0,0.8)]"
                         alt={`${productName} - Vista ${selectedImage + 1}`}
                         priority
                         sizes="(max-width: 768px) 100vw, 60vw"

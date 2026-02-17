@@ -10,6 +10,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FilterSidebar } from '@/components/catalog/FilterSidebar';
 import { ProductQuickView } from '@/components/catalog/ProductQuickView';
 import { useAuth } from '@/hooks/useAuth';
+import { CatalogSkeleton } from '@/components/catalog/ProductSkeleton';
+import { useCartStore } from '@/store/cart-store';
 
 export default function CatalogPage() {
     const { loading, categories, products } = useCatalog();
@@ -123,13 +125,27 @@ export default function CatalogPage() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+                        className="flex flex-col lg:flex-row lg:items-end justify-between gap-8"
                     >
-                        <span className="text-[#C88A04] font-mono text-sm tracking-[0.4em] uppercase mb-4 block text-center lg:text-left">
-                            ARCHIVO 2026
-                        </span>
-                        <h1 className="text-6xl md:text-9xl font-black tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/20 uppercase text-center lg:text-left">
-                            Catálogo <span className="text-[#C88A04]">Éter</span>
-                        </h1>
+                        <div>
+                            <span className="text-[#C88A04] font-mono text-sm tracking-[0.4em] uppercase mb-4 block text-center lg:text-left">
+                                ARCHIVO 2026
+                            </span>
+                            <h1 className="text-6xl md:text-9xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/20 uppercase text-center lg:text-left leading-[0.8]">
+                                Catálogo <br /> <span className="text-[#C88A04]">Éter</span>
+                            </h1>
+                        </div>
+
+                        <div className="flex items-center gap-4 bg-white/5 border border-white/10 p-4 rounded-3xl backdrop-blur-xl">
+                            <div className="px-6 text-center border-r border-white/10">
+                                <span className="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1">Archivos</span>
+                                <span className="text-2xl font-black text-white">{products.length}</span>
+                            </div>
+                            <div className="px-6 text-center">
+                                <span className="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1">Estatus</span>
+                                <span className="text-2xl font-black text-emerald-500">SYNC</span>
+                            </div>
+                        </div>
                     </motion.div>
                 </div>
 
@@ -294,13 +310,7 @@ export default function CatalogPage() {
                         </div>
 
                         {loading ? (
-                            <div className="min-h-[500px] flex flex-col items-center justify-center gap-6">
-                                <div className="relative">
-                                    <div className="w-16 h-16 border-2 border-[#C88A04]/20 rounded-full animate-ping absolute inset-0" />
-                                    <Loader2 className="animate-spin text-[#C88A04]" size={64} />
-                                </div>
-                                <p className="text-gray-500 font-mono text-sm tracking-[0.3em] uppercase animate-pulse">Sincronizando Archivo...</p>
-                            </div>
+                            <CatalogSkeleton />
                         ) : filteredProducts.length > 0 ? (
                             <>
                                 <motion.div

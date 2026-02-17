@@ -5,24 +5,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Plus, Minus, ShoppingBag, Trash2, ArrowRight,
   ShieldCheck, RefreshCw, User, Phone, MapPin,
-  CheckCircle2, FileText, Send, Building2
+  CheckCircle2, Building2, Tag, Percent, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { createOrderFromCart } from '@/app/actions/orders';
 import { validateCoupon } from '@/app/actions/coupons';
 import { toast } from 'sonner';
-import { Ticket, Tag, Percent, Loader2 } from 'lucide-react';
-
-type CartStep = 'items' | 'checkout' | 'success';
 
 export function CartSidebar() {
-  const { items, isOpen, toggleCart, removeItem, updateQuantity, getTotal, clearCart, resellerWhatsApp } = useCartStore();
+  const {
+    items, isOpen, toggleCart, removeItem, updateQuantity,
+    clearCart, resellerWhatsApp, cartStep, setCartStep,
+    getSubtotal, getDiscountAmount, getTotal: getFinalTotal,
+    appliedCoupon, applyCoupon, removeCoupon
+  } = useCartStore();
+
   const { user } = useAuth();
-  const [step, setStep] = useState<CartStep>('items');
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [referenceCode, setReferenceCode] = useState<string | null>(null);
@@ -42,26 +44,15 @@ export function CartSidebar() {
   // Coupon State
   const [couponCode, setCouponCode] = useState('');
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
-  const {
-    getSubtotal,
-    getDiscountAmount,
-    getTotal: getFinalTotal,
-    appliedCoupon,
-    applyCoupon,
-    removeCoupon
-  } = useCartStore();
 
   const subtotal = getSubtotal();
   const discount = getDiscountAmount();
   const total = getFinalTotal();
-  const freeShippingThreshold = 250000;
-  const progress = Math.min((total / freeShippingThreshold) * 100, 100);
-  const remainingForFreeShipping = Math.max(freeShippingThreshold - total, 0);
 
   const handleNextStep = () => {
-    if (step === 'items') {
+    if (cartStep === 'items') {
       if (items.length === 0) return;
-      setStep('checkout');
+      setCartStep('checkout');
     }
   };
 
@@ -94,14 +85,12 @@ export function CartSidebar() {
       });
 
       if (result.success) {
-        // Capture data for success screen before clearing cart
         setOrderedItems([...items]);
         setOrderedTotal(total);
         setOrderId(result.orderId!);
         setReferenceCode(result.referenceCode!);
-        setStep('success');
+        setCartStep('success');
 
-        // Prepare WhatsApp Message
         const message = `*PEDIDO ÉTER STORE*%0A` +
           `---------------------------%0A` +
           `*Orden:* ${result.referenceCode}%0A` +
@@ -117,12 +106,9 @@ export function CartSidebar() {
           `*Método:* ${formData.paymentMethod === 'transferencia' ? 'Transferencia' : 'Efectivo'}%0A` +
           (formData.notes ? `*Notas:* ${formData.notes}%0A` : '');
 
-        // Redirect after small delay
         const waNumber = resellerWhatsApp || '5492235025196';
 
-        // Clear cart after a delay to allow success screen transition
         setTimeout(() => {
-          // Attempt to open WhatsApp, but handle potential block
           try {
             window.open(`https://wa.me/${waNumber}?text=${message}`, '_blank');
           } catch (e) {
@@ -161,7 +147,6 @@ export function CartSidebar() {
     }
   };
 
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -185,9 +170,9 @@ export function CartSidebar() {
             <header className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-white/5 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
               <div>
                 <h2 className="text-lg md:text-xl font-black tracking-tighter text-white uppercase italic">
-                  {step === 'items' ? 'Tu Selección' : step === 'checkout' ? 'Datos de Envío' : 'Pedido Confirmado'}
+                  {cartStep === 'items' ? 'Tu Selección' : cartStep === 'checkout' ? 'Datos de Envío' : 'Pedido Confirmado'}
                 </h2>
-                {step === 'items' && items.length > 0 && (
+                {cartStep === 'items' && items.length > 0 && (
                   <p className="text-[9px] md:text-[10px] font-bold text-[#C88A04] tracking-[0.3em] uppercase mt-1">
                     {items.reduce((a, b) => a + b.quantity, 0)} PRODUCTOS LISTOS
                   </p>
@@ -202,11 +187,8 @@ export function CartSidebar() {
             </header>
 
             <div className="flex-1 overflow-y-auto no-scrollbar pt-2">
-              {step === 'items' && (
+              {cartStep === 'items' && (
                 <div className="animate-in fade-in duration-500">
-
-
-                  {/* Items List */}
                   <div className="px-8 py-8 space-y-8">
                     {items.length === 0 ? (
                       <div className="py-20 flex flex-col items-center justify-center text-center">
@@ -280,7 +262,7 @@ export function CartSidebar() {
                 </div>
               )}
 
-              {step === 'checkout' && (
+              {cartStep === 'checkout' && (
                 <div className="px-8 py-8 animate-in slide-in-from-right-10 duration-500">
                   <form onSubmit={handleCheckout} className="space-y-8">
                     <div className="space-y-6">
@@ -328,7 +310,6 @@ export function CartSidebar() {
                           />
                         </div>
                       </div>
-
 
                       <div className="space-y-2">
                         <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Dirección de Envío</label>
@@ -394,7 +375,7 @@ export function CartSidebar() {
 
                     <button
                       type="button"
-                      onClick={() => setStep('items')}
+                      onClick={() => setCartStep('items')}
                       className="w-full text-[9px] font-black text-gray-600 uppercase tracking-widest hover:text-white transition-colors"
                     >
                       Revisar Productos
@@ -403,7 +384,7 @@ export function CartSidebar() {
                 </div>
               )}
 
-              {step === 'success' && (
+              {cartStep === 'success' && (
                 <div className="px-8 py-12 flex flex-col items-center animate-in zoom-in-95 duration-700">
                   <div className="w-24 h-24 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-8">
                     <CheckCircle2 className="text-emerald-500" size={48} />
@@ -493,7 +474,7 @@ export function CartSidebar() {
                     </motion.button>
                     <button
                       onClick={() => {
-                        setStep('items');
+                        setCartStep('items');
                         toggleCart();
                       }}
                       className="w-full py-4 text-[10px] font-black text-zinc-600 hover:text-white uppercase tracking-widest transition-colors"
@@ -506,9 +487,8 @@ export function CartSidebar() {
             </div>
 
             {/* Footer Summary (Only for items step) */}
-            {step === 'items' && items.length > 0 && (
+            {cartStep === 'items' && items.length > 0 && (
               <div className="bg-black border-t border-white/10 px-8 py-8 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
-
                 {/* Coupon Section */}
                 <div className="mb-6 space-y-3">
                   <div className="flex items-center justify-between gap-2">

@@ -48,20 +48,23 @@ export default async function ProductDetailPage({
             />
 
             {/* Main Content */}
-            <section className="py-20 px-6 relative z-10">
+            <section className="py-8 lg:py-20 px-4 md:px-6 relative z-10">
                 <div className="container mx-auto max-w-7xl">
-                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 xl:gap-24">
-                        {/* LEFT: Product Gallery (60% / 3 cols) */}
-                        <div className="lg:col-span-3">
-                            <ProductGallery
-                                images={product.images.length > 0 ? product.images : ['/placeholder-shoe.png']}
-                                productName={product.name}
-                            />
-                        </div>
+                    {/* Unified Mobile Globe */}
+                    <div className="bg-white/[0.02] backdrop-blur-3xl rounded-[2.5rem] border border-white/5 lg:bg-transparent lg:backdrop-blur-none lg:rounded-none lg:border-0 overflow-hidden lg:overflow-visible">
+                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-0 lg:gap-16 xl:gap-24">
+                            {/* LEFT: Product Gallery (60% / 3 cols) */}
+                            <div className="lg:col-span-3">
+                                <ProductGallery
+                                    images={product.images.length > 0 ? product.images : ['/placeholder-shoe.png']}
+                                    productName={product.name}
+                                />
+                            </div>
 
-                        {/* RIGHT: Product Info (40% / 2 cols) */}
-                        <div className="lg:col-span-2">
-                            <ProductInfo product={product} />
+                            {/* RIGHT: Product Info (40% / 2 cols) */}
+                            <div className="lg:col-span-2">
+                                <ProductInfo product={product} />
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -63,10 +63,10 @@ export function useCart() {
         addItem, // Override with adapter
         removeItem,
         openCart: () => {
-            if (!store.isOpen) store.toggleCart();
+            store.setIsOpen(true);
         },
         closeCart: () => {
-            if (store.isOpen) store.toggleCart();
+            store.setIsOpen(false);
         },
         totals,
     };
