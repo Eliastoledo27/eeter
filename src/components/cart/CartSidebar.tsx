@@ -4,7 +4,7 @@ import { useCartStore } from '@/store/cart-store';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Plus, Minus, ShoppingBag, Trash2, ArrowRight,
-  Truck, ShieldCheck, RefreshCw, User, Phone, MapPin,
+  ShieldCheck, RefreshCw, User, Phone, MapPin,
   CheckCircle2, FileText, Send, Building2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,9 @@ import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { createOrderFromCart } from '@/app/actions/orders';
+import { validateCoupon } from '@/app/actions/coupons';
 import { toast } from 'sonner';
+import { Ticket, Tag, Percent, Loader2 } from 'lucide-react';
 
 type CartStep = 'items' | 'checkout' | 'success';
 
@@ -37,7 +39,21 @@ export function CartSidebar() {
     notes: ''
   });
 
-  const total = getTotal();
+  // Coupon State
+  const [couponCode, setCouponCode] = useState('');
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+  const {
+    getSubtotal,
+    getDiscountAmount,
+    getTotal: getFinalTotal,
+    appliedCoupon,
+    applyCoupon,
+    removeCoupon
+  } = useCartStore();
+
+  const subtotal = getSubtotal();
+  const discount = getDiscountAmount();
+  const total = getFinalTotal();
   const freeShippingThreshold = 250000;
   const progress = Math.min((total / freeShippingThreshold) * 100, 100);
   const remainingForFreeShipping = Math.max(freeShippingThreshold - total, 0);
@@ -73,7 +89,8 @@ export function CartSidebar() {
         resellerName: formData.resellerName,
         deliveryAddress: formData.deliveryAddress,
         paymentMethod: formData.paymentMethod,
-        notes: formData.notes
+        notes: formData.notes,
+        couponCode: appliedCoupon?.code
       });
 
       if (result.success) {
@@ -125,6 +142,25 @@ export function CartSidebar() {
     }
   };
 
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setIsValidatingCoupon(true);
+    try {
+      const result = await validateCoupon(couponCode, subtotal);
+      if (result.success && result.coupon) {
+        applyCoupon(result.coupon);
+        setCouponCode('');
+        toast.success(`Cupón ${result.coupon.code} aplicado con éxito`);
+      } else {
+        toast.error(result.error || 'Error al validar el cupón');
+      }
+    } catch (error) {
+      toast.error('Error de conexión al validar el cupón');
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
+
 
   return (
     <AnimatePresence>
@@ -168,33 +204,7 @@ export function CartSidebar() {
             <div className="flex-1 overflow-y-auto no-scrollbar pt-2">
               {step === 'items' && (
                 <div className="animate-in fade-in duration-500">
-                  {/* Shipping Progress */}
-                  {items.length > 0 && (
-                    <div className="px-8 py-8 border-b border-white/5">
-                      <div className="flex justify-between items-end mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-[#C88A04]/10 flex items-center justify-center">
-                            <Truck className="text-[#C88A04]" size={16} />
-                          </div>
-                          <span className="text-[10px] font-black tracking-widest uppercase text-gray-500">Logística Éter</span>
-                        </div>
-                        <span className="text-xs font-bold text-white">
-                          {remainingForFreeShipping > 0 ? (
-                            `Faltan $${remainingForFreeShipping.toLocaleString('es-AR')}`
-                          ) : (
-                            '¡ENVÍO GRATIS!'
-                          )}
-                        </span>
-                      </div>
-                      <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${progress}%` }}
-                          className="bg-[#C88A04] h-full shadow-[0_0_10px_#C88A04/50]"
-                        />
-                      </div>
-                    </div>
-                  )}
+
 
                   {/* Items List */}
                   <div className="px-8 py-8 space-y-8">
@@ -498,14 +508,71 @@ export function CartSidebar() {
             {/* Footer Summary (Only for items step) */}
             {step === 'items' && items.length > 0 && (
               <div className="bg-black border-t border-white/10 px-8 py-8 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
-                <div className="space-y-4 mb-8">
+
+                {/* Coupon Section */}
+                <div className="mb-6 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">¿Tienes un cupón?</span>
+                    {appliedCoupon && (
+                      <button
+                        onClick={removeCoupon}
+                        className="text-[9px] font-bold text-red-400 uppercase tracking-tighter hover:text-red-300 transition-colors"
+                      >
+                        Remover {appliedCoupon.code}
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" size={12} />
+                      <input
+                        type="text"
+                        placeholder="CÓDIGO"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        className="w-full bg-white/[0.03] border border-white/5 rounded-xl py-2 pl-9 pr-4 text-[10px] font-black text-white placeholder:text-gray-700 focus:outline-none focus:border-[#C88A04]/50 transition-all uppercase"
+                      />
+                    </div>
+                    <button
+                      onClick={handleApplyCoupon}
+                      disabled={isValidatingCoupon || !couponCode.trim()}
+                      className="px-4 py-2 bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest text-white rounded-xl border border-white/5 disabled:opacity-30 transition-all"
+                    >
+                      {isValidatingCoupon ? <Loader2 className="animate-spin" size={12} /> : 'Aplicar'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-8 pt-6 border-t border-white/5">
                   <div className="flex justify-between">
                     <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Subtotal</span>
-                    <span className="text-sm font-black text-white">${total.toLocaleString('es-AR')}</span>
+                    <span className="text-sm font-black text-white">${subtotal.toLocaleString('es-AR')}</span>
                   </div>
+
+                  {appliedCoupon && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="flex justify-between items-center"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Percent size={10} className="text-emerald-400" />
+                        <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Descuento ({appliedCoupon.code})</span>
+                      </div>
+                      <span className="text-sm font-black text-emerald-400">-${discount.toLocaleString('es-AR')}</span>
+                    </motion.div>
+                  )}
+
                   <div className="flex justify-between items-center pt-4 border-t border-white/5">
                     <span className="text-[11px] font-black text-white uppercase tracking-[0.2em] italic">Total Inversión</span>
-                    <span className="text-3xl font-black text-white tracking-tighter tracking-tighter">${total.toLocaleString('es-AR')}</span>
+                    <span className="relative">
+                      {appliedCoupon && (
+                        <span className="absolute -top-4 right-0 text-[10px] text-gray-600 line-through font-bold">
+                          ${subtotal.toLocaleString('es-AR')}
+                        </span>
+                      )}
+                      <span className="text-3xl font-black text-white tracking-tighter">${total.toLocaleString('es-AR')}</span>
+                    </span>
                   </div>
                 </div>
 

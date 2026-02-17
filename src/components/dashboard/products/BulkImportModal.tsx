@@ -99,7 +99,7 @@ export function BulkImportModal({ onClose, onSuccess }: BulkImportModalProps) {
 
   const downloadTemplate = () => {
     const template = [
-      { name: "Ejemplo Zapatilla", description: "Descripción del producto", category: "Sneakers", base_price: 150, stock_by_size: JSON.stringify({ "40": 10, "42": 5 }), image_url: "https://example.com/image.jpg" }
+      { name: "Ejemplo Zapatilla", description: "Descripción del producto", category: "Sneakers", base_price: 150, stock_by_size: JSON.stringify({ "28": 5, "35": 10, "40": 10, "47": 5 }), image_url: "https://example.com/image.jpg" }
     ];
     const ws = XLSX.utils.json_to_sheet(template);
     const wb = XLSX.utils.book_new();

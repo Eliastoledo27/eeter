@@ -422,3 +422,19 @@ export async function deleteProduct(id: string) {
     revalidatePath('/dashboard/products');
     return { success: true };
 }
+
+export async function getCategories() {
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('productos')
+        .select('category')
+        .not('category', 'is', null);
+
+    if (error) {
+        console.error('Error fetching categories:', error);
+        return [];
+    }
+
+    const uniqueCategories = Array.from(new Set(data.map(item => item.category)));
+    return uniqueCategories.sort();
+}

@@ -29,7 +29,11 @@ export function BulkStockModal({ isOpen, onClose, selectedProducts, onSuccess }:
     const [isSaving, setIsSaving] = useState(false);
     const [hasUsedAI, setHasUsedAI] = useState(false);
 
-    const allSizes = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
+    const allSizes = [
+        '28', '29', '30', '31', '32', '33', '34', '35',
+        '36', '37', '38', '39', '40', '41', '42', '43',
+        '44', '45', '46', '47'
+    ];
 
     const handleStockChange = (productId: string, size: string, value: string) => {
         const numValue = parseInt(value);
@@ -59,7 +63,7 @@ export function BulkStockModal({ isOpen, onClose, selectedProducts, onSuccess }:
             REGLAS CRÍTICAS:
             1. Si dice "del 38 al 42", incluí 38, 39, 40, 41 y 42.
             2. Si dice "hay 10", asigná 10 a cada talle mencionado.
-            3. Si el texto es general ("10 de cada una"), aplicá 10 a todos los talles del 36 al 45.
+            3. Si el texto es general ("10 de cada una"), aplicá 10 a todos los talles del 28 al 47.
             
             Ejemplo de respuesta: {"38": 10, "39": 10, "40": 10}
             Responder solo el JSON limpio.`;
@@ -208,7 +212,7 @@ export function BulkStockModal({ isOpen, onClose, selectedProducts, onSuccess }:
 
                         <div className="flex flex-wrap items-center gap-6 px-1">
                             <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Atajos rápidos:</span>
-                            <button onClick={() => setAiInput("Hay 10 de cada una del 37 al 44")} className="text-[10px] text-gray-400 hover:text-[#C88A04] transition-colors border-b border-gray-800 hover:border-[#C88A04] pb-1 cursor-pointer">"10 cada una del 37-44"</button>
+                            <button onClick={() => setAiInput("Hay 10 de cada una del 28 al 45")} className="text-[10px] text-gray-400 hover:text-[#C88A04] transition-colors border-b border-gray-800 hover:border-[#C88A04] pb-1 cursor-pointer">"10 cada una del 28-45"</button>
                             <button onClick={() => setAiInput("Llegaron 5 solo del talle 40")} className="text-[10px] text-gray-400 hover:text-[#C88A04] transition-colors border-b border-gray-800 hover:border-[#C88A04] pb-1 cursor-pointer">"5 solo del talle 40"</button>
                             <button onClick={() => setAiInput("Poner 0 de stock en todos")} className="text-[10px] text-gray-400 hover:text-red-500 transition-colors border-b border-gray-800 hover:border-red-500 pb-1 cursor-pointer">"Vaciar todo el stock"</button>
                         </div>
@@ -235,7 +239,7 @@ export function BulkStockModal({ isOpen, onClose, selectedProducts, onSuccess }:
                             )}
                         </div>
 
-                        <div className="grid grid-cols-[1fr,repeat(10,60px)] gap-4 pb-4 border-b border-white/5 opacity-50">
+                        <div className="grid grid-cols-[1fr,repeat(20,60px)] gap-4 pb-4 border-b border-white/5 opacity-50">
                             <div className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em]">Modelo / Diseñado en Brasil</div>
                             {allSizes.map(size => (
                                 <div key={size} className="text-[9px] font-black text-center text-[#C88A04] uppercase tracking-[0.3em]">T{size}</div>
@@ -247,7 +251,7 @@ export function BulkStockModal({ isOpen, onClose, selectedProducts, onSuccess }:
                         {selectedProducts.map((product) => (
                             <div
                                 key={product.id}
-                                className={`group grid grid-cols-[1fr,repeat(10,60px)] gap-4 items-center p-4 rounded-2xl border transition-all duration-700 ${hasUsedAI ? 'bg-[#C88A04]/5 border-[#C88A04]/20' : 'bg-white/[0.02] border-white/5 hover:border-white/10'}`}
+                                className={`group grid grid-cols-[1fr,repeat(20,60px)] gap-4 items-center p-4 rounded-2xl border transition-all duration-700 ${hasUsedAI ? 'bg-[#C88A04]/5 border-[#C88A04]/20' : 'bg-white/[0.02] border-white/5 hover:border-white/10'}`}
                             >
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-xl overflow-hidden bg-black border border-white/10 relative group-hover:scale-110 transition-transform">

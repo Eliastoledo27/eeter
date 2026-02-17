@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { validateCoupon } from './coupons';
 
 // Schema for validating cart checkout
 const cartItemSchema = z.object({
@@ -27,7 +28,8 @@ const checkoutSchema = z.object({
     postalCode: z.string().optional(),
     deliveryDate: z.string().optional(),
     paymentMethod: z.enum(['efectivo', 'transferencia', 'mercado_pago', 'tarjeta']),
-    notes: z.string().optional()
+    notes: z.string().optional(),
+    couponCode: z.string().optional()
 });
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
@@ -79,14 +81,46 @@ export async function createOrderFromCart(input: CheckoutInput) {
         };
     }
 
-    const { items, customerName, customerEmail, customerPhone, deliveryAddress, postalCode, deliveryDate, paymentMethod, notes, resellerName } = validated.data;
+    const {
+        items,
+        customerName,
+        customerEmail,
+        customerPhone,
+        deliveryAddress,
+        postalCode,
+        deliveryDate,
+        paymentMethod,
+        notes,
+        resellerName,
+        couponCode
+    } = validated.data;
 
     // Default values for fixed location
     const city = 'Mar del Plata';
     const province = 'Buenos Aires';
 
     // Calculate totals
-    const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    let discountAmount = 0;
+    let appliedCouponId = null;
+
+    // Server-side Coupon Validation
+    if (couponCode) {
+        const validation = await validateCoupon(couponCode, subtotal, customerEmail);
+
+        if (validation.success && validation.coupon) {
+            const coupon = validation.coupon;
+            appliedCouponId = coupon.id;
+
+            if (coupon.discount_type === 'percentage') {
+                discountAmount = (subtotal * coupon.discount_value) / 100;
+            } else {
+                discountAmount = coupon.discount_value;
+            }
+        }
+    }
+
+    const totalAmount = Math.max(0, subtotal - discountAmount);
 
     // Get authenticated user if available
     const { data: { user } } = await supabase.auth.getUser();
@@ -105,6 +139,8 @@ export async function createOrderFromCart(input: CheckoutInput) {
         // delivery_date: deliveryDate || null, // Field removed from schema
         // payment_method: paymentMethod || null, // Field removed from schema
         total_amount: totalAmount,
+        discount_amount: discountAmount,
+        applied_coupon_id: appliedCouponId,
         status: 'pendiente',
         // notes: notes || null, // Field removed from schema
         items: {
@@ -174,6 +210,14 @@ export async function createOrderFromCart(input: CheckoutInput) {
                 success: false,
                 message: `Error al guardar el pedido: ${insertError.message || 'Error de base de datos'}`
             };
+        }
+
+        // Increment coupon usage if applied
+        if (appliedCouponId) {
+            const { error: rpcError } = await supabaseClient.rpc('increment_coupon_usage', { coupon_id: appliedCouponId });
+            if (rpcError) {
+                console.error('Error incrementing coupon usage:', rpcError);
+            }
         }
 
         // Generate reference code

@@ -31,7 +31,11 @@ export const ProductForm = ({ product, onSuccess, onCancel }: ProductFormProps) 
     const [stock, setStock] = useState<Record<string, number>>(product?.stock_by_size || {});
 
     // Helper for stock inputs
-    const sizes = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
+    const sizes = [
+        '28', '29', '30', '31', '32', '33', '34', '35',
+        '36', '37', '38', '39', '40', '41', '42', '43',
+        '44', '45', '46', '47'
+    ];
 
     const { geminiApiKey } = useSettingsStore();
 

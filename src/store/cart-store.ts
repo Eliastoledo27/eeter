@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Product } from '@/types';
+import { Coupon } from '@/app/actions/coupons';
 
 interface CartItem extends Product {
   quantity: number;
@@ -10,12 +11,17 @@ interface CartItem extends Product {
 interface CartStore {
   items: CartItem[];
   isOpen: boolean;
+  appliedCoupon: Coupon | null;
   addItem: (product: Product, size: string, quantity?: number) => void;
   removeItem: (productId: string, size: string) => void;
   updateQuantity: (productId: string, size: string, quantity: number) => void;
   clearCart: () => void;
   toggleCart: () => void;
+  getSubtotal: () => number;
+  getDiscountAmount: () => number;
   getTotal: () => number;
+  applyCoupon: (coupon: Coupon) => void;
+  removeCoupon: () => void;
   resellerWhatsApp: string | null;
   setResellerWhatsApp: (num: string | null) => void;
 }
@@ -25,6 +31,7 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       isOpen: false,
+      appliedCoupon: null,
       resellerWhatsApp: null,
 
       setResellerWhatsApp: (num) => set({ resellerWhatsApp: num }),
@@ -71,19 +78,48 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], appliedCoupon: null }),
 
       toggleCart: () => set({ isOpen: !get().isOpen }),
 
-      getTotal: () => {
+      getSubtotal: () => {
         return get().items.reduce(
           (total, item) => total + (item.basePrice || 0) * item.quantity,
           0
         );
       },
+
+      getDiscountAmount: () => {
+        const subtotal = get().getSubtotal();
+        const coupon = get().appliedCoupon;
+
+        if (!coupon) return 0;
+
+        // Validation of minimum purchase amount
+        if (subtotal < (coupon.min_purchase_amount || 0)) {
+          return 0;
+        }
+
+        if (coupon.discount_type === 'percentage') {
+          return (subtotal * coupon.discount_value) / 100;
+        } else {
+          return coupon.discount_value;
+        }
+      },
+
+      getTotal: () => {
+        const subtotal = get().getSubtotal();
+        const discount = get().getDiscountAmount();
+        return Math.max(0, subtotal - discount);
+      },
+
+      applyCoupon: (coupon) => set({ appliedCoupon: coupon }),
+
+      removeCoupon: () => set({ appliedCoupon: null }),
     }),
     {
       name: 'eter-cart-storage',
     }
   )
 );
+
