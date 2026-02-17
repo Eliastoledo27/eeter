@@ -24,6 +24,8 @@ export function CartSidebar() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [referenceCode, setReferenceCode] = useState<string | null>(null);
+  const [orderedItems, setOrderedItems] = useState<any[]>([]);
+  const [orderedTotal, setOrderedTotal] = useState(0);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -75,6 +77,9 @@ export function CartSidebar() {
       });
 
       if (result.success) {
+        // Capture data for success screen before clearing cart
+        setOrderedItems([...items]);
+        setOrderedTotal(total);
         setOrderId(result.orderId!);
         setReferenceCode(result.referenceCode!);
         setStep('success');
@@ -97,8 +102,15 @@ export function CartSidebar() {
 
         // Redirect after small delay
         const waNumber = resellerWhatsApp || '5492235025196';
+
+        // Clear cart after a delay to allow success screen transition
         setTimeout(() => {
-          window.open(`https://wa.me/${waNumber}?text=${message}`, '_blank');
+          // Attempt to open WhatsApp, but handle potential block
+          try {
+            window.open(`https://wa.me/${waNumber}?text=${message}`, '_blank');
+          } catch (e) {
+            console.error("WhatsApp redirect blocked:", e);
+          }
           clearCart();
         }, 1500);
 
@@ -323,6 +335,16 @@ export function CartSidebar() {
                         </div>
                       </div>
 
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Notas Adicionales</label>
+                        <textarea
+                          placeholder="Indicaciones para el envío, referencias, etc."
+                          className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 px-4 text-sm text-white focus:outline-none focus:border-[#C88A04] transition-all min-h-[100px] resize-none"
+                          value={formData.notes}
+                          onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                        />
+                      </div>
+
                       <div className="grid grid-cols-2 gap-4">
                         <div
                           onClick={() => setFormData({ ...formData, paymentMethod: 'transferencia' })}
@@ -395,7 +417,7 @@ export function CartSidebar() {
                     </div>
 
                     <div className="space-y-4 mb-8 border-y border-white/5 py-8">
-                      {items.map(item => (
+                      {orderedItems.map(item => (
                         <div key={`${item.id}-${item.selectedSize}`} className="flex justify-between text-xs font-bold uppercase tracking-tight">
                           <span className="text-gray-400">{item.quantity}x {item.name} <span className="text-[9px] text-[#C88A04]/60 ml-2">{item.selectedSize}</span></span>
                           <span className="text-white">${(item.basePrice * item.quantity).toLocaleString('es-AR')}</span>
@@ -405,7 +427,7 @@ export function CartSidebar() {
 
                     <div className="flex justify-between items-center mb-8">
                       <span className="text-[10px] font-black text-[#C88A04] tracking-widest uppercase">TOTAL DEL PEDIDO</span>
-                      <span className="text-3xl font-black text-white">${total.toLocaleString('es-AR')}</span>
+                      <span className="text-3xl font-black text-white">${orderedTotal.toLocaleString('es-AR')}</span>
                     </div>
 
                     <div className="bg-white/5 rounded-2xl p-6 space-y-4 mb-8">
@@ -446,9 +468,9 @@ export function CartSidebar() {
                           `*Dirección:* ${formData.deliveryAddress}%0A` +
                           `---------------------------%0A` +
                           `*PRODUCTOS:*%0A` +
-                          items.map(item => `- ${item.quantity}x ${item.name} (${item.selectedSize}) - $${(item.basePrice * item.quantity).toLocaleString('es-AR')}`).join('%0A') +
+                          orderedItems.map(item => `- ${item.quantity}x ${item.name} (${item.selectedSize}) - $${(item.basePrice * item.quantity).toLocaleString('es-AR')}`).join('%0A') +
                           `%0A---------------------------%0A` +
-                          `*TOTAL: $${total.toLocaleString('es-AR')}*%0A` +
+                          `*TOTAL: $${orderedTotal.toLocaleString('es-AR')}*%0A` +
                           `*Método:* ${formData.paymentMethod === 'transferencia' ? 'Transferencia' : 'Efectivo'}%0A` +
                           (formData.notes ? `*Notas:* ${formData.notes}%0A` : '');
 

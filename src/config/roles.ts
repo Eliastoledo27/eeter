@@ -1,6 +1,7 @@
 import {
   Home, ShoppingBag, BookOpen, Trophy, Users, Package,
   MessageSquare, BarChart2, ClipboardList, Settings, LayoutDashboard,
+  Megaphone,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -24,12 +25,12 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     'view_ranking', 'manage_users', 'manage_products', 'view_crm',
     'manage_messages', 'manage_purchases', 'manage_orders', 'manage_settings',
     'view_messages', 'view_orders', 'view_profiles', 'manage_reseller_shop',
-    'view_inventory', 'manage_inventory', 'view_notifications',
+    'view_inventory', 'manage_inventory', 'view_notifications', 'manage_announcements',
   ],
   support: [
     'view_dashboard', 'view_catalog', 'view_academy', 'manage_users',
     'view_crm', 'manage_orders', 'view_messages', 'view_orders',
-    'view_profiles', 'view_inventory', 'view_notifications',
+    'view_profiles', 'view_inventory', 'view_notifications', 'manage_announcements',
   ],
   reseller: [
     'view_dashboard', 'view_catalog', 'view_academy', 'view_ranking',
@@ -57,6 +58,7 @@ export const ROUTE_PERMISSIONS: Record<string, string> = {
   '/dashboard/ranking': 'view_ranking',
   '/dashboard/myshop': 'manage_reseller_shop',
   '/dashboard/panel': 'view_dashboard',
+  '/dashboard/announcements': 'manage_announcements',
   '/dashboard': 'view_dashboard',
   '/academy': 'view_academy',
 }
@@ -74,6 +76,7 @@ export const ROUTE_ROLES: Record<string, UserRole[]> = {
   '/dashboard/inventory': ['admin', 'support'],
   '/dashboard/ranking': ['admin', 'reseller'],
   '/dashboard/myshop': ['admin', 'reseller'],
+  '/dashboard/announcements': ['admin', 'support'],
   '/dashboard/panel': ['admin', 'support', 'reseller', 'user'],
   '/dashboard': ['admin', 'support', 'reseller', 'user'],
   '/academy': ['admin', 'support', 'reseller', 'user'],
@@ -92,6 +95,7 @@ export const DASHBOARD_MODULES: NavItem[] = [
   { id: 'users', label: 'Usuarios', icon: Users, href: '/dashboard/profiles', requiredPermission: 'manage_users' },
   { id: 'inventory', label: 'Inventario', icon: Package, href: '/dashboard/inventory', requiredPermission: 'view_inventory' },
   { id: 'messages', label: 'Mensajes', icon: MessageSquare, href: '/dashboard/messages', requiredPermission: 'view_messages' },
+  { id: 'announcements', label: 'Anuncios', icon: Megaphone, href: '/dashboard/announcements', requiredPermission: 'manage_announcements' },
   { id: 'settings', label: 'Configuración', icon: Settings, href: '/dashboard/settings', requiredPermission: 'manage_settings' },
 ]
 

@@ -29,28 +29,33 @@ export function ProductInfo({ product, hideOutboundLinks }: ProductInfoProps) {
 
     const handleAddToCart = () => {
         if (!selectedSize) {
-            toast.error('Por favor seleccioná un talle')
-            return
+            toast.error('Por favor seleccioná un talle');
+            return;
         }
 
-        addItem({
-            productId: Number(product.id),
+        // Convert ProductType back to Product entity for the store
+        const productToCart: any = {
+            id: product.id,
             name: product.name,
-            brand: product.category || 'Premium',
-            image: product.images[0] || '',
-            size: Number(selectedSize),
-            color: 'Standard',
-            price: product.base_price,
-            quantity
-        })
+            description: product.description || '',
+            category: product.category || 'General',
+            basePrice: product.base_price,
+            images: product.images,
+            stockBySize: product.stock_by_size,
+            totalStock: totalStock,
+            status: 'active',
+            createdAt: new Date(),
+        };
+
+        addItem(productToCart, selectedSize, quantity);
 
         toast.success('¡Producto agregado al carrito!', {
             action: {
                 label: 'Ver carrito',
                 onClick: () => openCart()
             }
-        })
-    }
+        });
+    };
 
     const handleBuyNow = () => {
         handleAddToCart()

@@ -16,22 +16,29 @@ export interface LegacyCartItem {
 export function useCart() {
     const store = useCartStore();
 
-    const addItem = (item: LegacyCartItem) => {
-        // Map legacy item to Product type expected by store
+    const addItem = (item: LegacyCartItem | Product, size?: string, quantity: number = 1) => {
+        if ('id' in item && size) {
+            // Modern usage: full product object
+            store.addItem(item as Product, size, quantity);
+            return;
+        }
+
+        // Legacy usage: LegacyCartItem
+        const legacyItem = item as LegacyCartItem;
         const product: Product = {
-            id: String(item.productId),
-            name: item.name,
+            id: String(legacyItem.productId),
+            name: legacyItem.name,
             description: '', // Fallback
-            category: item.brand || 'General',
-            basePrice: item.price,
-            images: [item.image],
+            category: legacyItem.brand || 'General',
+            basePrice: legacyItem.price,
+            images: [legacyItem.image],
             stockBySize: {}, // Not needed for adding to cart
             totalStock: 0,
             status: 'active',
             createdAt: new Date(),
         };
 
-        store.addItem(product, String(item.size));
+        store.addItem(product, String(size || legacyItem.size), quantity || legacyItem.quantity);
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

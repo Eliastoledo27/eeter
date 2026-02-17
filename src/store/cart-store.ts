@@ -10,7 +10,7 @@ interface CartItem extends Product {
 interface CartStore {
   items: CartItem[];
   isOpen: boolean;
-  addItem: (product: Product, size: string) => void;
+  addItem: (product: Product, size: string, quantity?: number) => void;
   removeItem: (productId: string, size: string) => void;
   updateQuantity: (productId: string, size: string, quantity: number) => void;
   clearCart: () => void;
@@ -29,7 +29,7 @@ export const useCartStore = create<CartStore>()(
 
       setResellerWhatsApp: (num) => set({ resellerWhatsApp: num }),
 
-      addItem: (product, size) => {
+      addItem: (product, size, quantity = 1) => {
         const { items } = get();
         const existingItem = items.find(
           (item) => item.id === product.id && item.selectedSize === size
@@ -39,14 +39,14 @@ export const useCartStore = create<CartStore>()(
           set({
             items: items.map((item) =>
               item.id === product.id && item.selectedSize === size
-                ? { ...item, quantity: item.quantity + 1 }
+                ? { ...item, quantity: item.quantity + quantity }
                 : item
             ),
             isOpen: true,
           });
         } else {
           set({
-            items: [...items, { ...product, selectedSize: size, quantity: 1 }],
+            items: [...items, { ...product, selectedSize: size, quantity }],
             isOpen: true,
           });
         }
@@ -72,7 +72,7 @@ export const useCartStore = create<CartStore>()(
       },
 
       clearCart: () => set({ items: [] }),
-      
+
       toggleCart: () => set({ isOpen: !get().isOpen }),
 
       getTotal: () => {

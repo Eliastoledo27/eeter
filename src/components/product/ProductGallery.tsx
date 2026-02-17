@@ -12,35 +12,37 @@ interface ProductGalleryProps {
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
     const [selectedImage, setSelectedImage] = useState(0)
 
-    // Si hay solo una imagen, duplicarla para mostrar thumbnails
-    const displayImages = images.length === 1 ? [images[0], images[0], images[0], images[0]] : images
+    // Aseguramos que solo mostramos imágenes únicas y evitamos duplicados innecesarios
+    const displayImages = Array.from(new Set(images))
 
     return (
         <div className="flex flex-col-reverse lg:flex-row gap-8">
             {/* Thumbnails Sidebar */}
-            <div className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible no-scrollbar">
-                {displayImages.slice(0, 4).map((img, idx) => (
-                    <button
-                        key={idx}
-                        onClick={() => setSelectedImage(idx)}
-                        className={`w-24 h-24 shrink-0 rounded-3xl overflow-hidden backdrop-blur-3xl bg-white/[0.03] border-2 transition-all duration-700 relative group ${selectedImage === idx
-                            ? 'border-[#CA8A04] scale-105 shadow-[0_0_20px_rgba(202,138,4,0.2)]'
-                            : 'border-white/5 hover:border-white/20'
-                            }`}
-                    >
-                        <Image
-                            src={img}
-                            fill
-                            className="object-contain p-3 group-hover:scale-110 transition-transform duration-700"
-                            alt={`Thumbnail ${idx + 1}`}
-                        />
-                        {/* Selected Indicator Dot */}
-                        {selectedImage === idx && (
-                            <div className="absolute top-2 right-2 w-2 h-2 bg-[#CA8A04] rounded-full" />
-                        )}
-                    </button>
-                ))}
-            </div>
+            {displayImages.length > 1 && (
+                <div className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible no-scrollbar">
+                    {displayImages.slice(0, 4).map((img, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => setSelectedImage(idx)}
+                            className={`w-24 h-24 shrink-0 rounded-3xl overflow-hidden backdrop-blur-3xl bg-white/[0.03] border-2 transition-all duration-700 relative group ${selectedImage === idx
+                                ? 'border-[#CA8A04] scale-105 shadow-[0_0_20px_rgba(202,138,4,0.2)]'
+                                : 'border-white/5 hover:border-white/20'
+                                }`}
+                        >
+                            <Image
+                                src={img}
+                                fill
+                                className="object-contain p-3 group-hover:scale-110 transition-transform duration-700"
+                                alt={`Thumbnail ${idx + 1}`}
+                            />
+                            {/* Selected Indicator Dot */}
+                            {selectedImage === idx && (
+                                <div className="absolute top-2 right-2 w-2 h-2 bg-[#CA8A04] rounded-full" />
+                            )}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             {/* Main Stage */}
             <div className="flex-1">

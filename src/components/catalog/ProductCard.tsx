@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { useState, useMemo } from 'react';
 
-export function ProductCard({ product, href }: { product: Product; href?: string }) {
+export function ProductCard({ product, href, onQuickView }: { product: Product; href?: string; onQuickView?: () => void }) {
   const { addItem } = useCartStore();
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [isHovered, setIsHovered] = useState(false);
@@ -60,7 +60,7 @@ export function ProductCard({ product, href }: { product: Product; href?: string
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -10 }}
+      whileHover={{ y: -15 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => {
@@ -70,7 +70,7 @@ export function ProductCard({ product, href }: { product: Product; href?: string
           window.location.href = `/catalog/${product.id}`;
         }
       }}
-      className="group relative bg-[#0A0A0A] rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden border border-white/5 hover:border-[#C88A04]/40 transition-all duration-700 ease-[0.19,1,0.22,1] cursor-pointer shadow-2xl h-full flex flex-col"
+      className="group relative bg-gradient-to-b from-[#0F0F0F] to-[#050505] rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-white/5 hover:border-[#C88A04]/50 transition-all duration-1000 ease-[0.19,1,0.22,1] cursor-pointer shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] h-full flex flex-col group/card"
     >
       {/* Premium Tech Frame (Only visible on hover) */}
       <div className="absolute inset-0 pointer-events-none z-30 transition-opacity duration-700 opacity-0 group-hover:opacity-100">
@@ -129,6 +129,21 @@ export function ProductCard({ product, href }: { product: Product; href?: string
             {product.status === 'active' ? 'Stock' : 'Agotado'}
           </span>
         </div>
+
+        {/* Quick View Button (Desktop) */}
+        {onQuickView && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-30 hidden md:flex">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onQuickView();
+              }}
+              className="px-6 py-2.5 bg-black/40 backdrop-blur-xl border border-white/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transform translate-y-4 group-hover:translate-y-0 transition-all duration-700 hover:bg-[#C88A04] hover:text-black hover:border-[#C88A04]"
+            >
+              Vista Rápida
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Info Section */}
@@ -143,7 +158,7 @@ export function ProductCard({ product, href }: { product: Product; href?: string
           </span>
         </div>
 
-        <h3 className="text-sm md:text-2xl font-black text-white tracking-tighter group-hover:text-[#C88A04] transition-colors duration-500 uppercase leading-none mb-4 md:mb-6 line-clamp-2">
+        <h3 className="text-xs md:text-2xl font-black text-white tracking-tighter group-hover:text-[#C88A04] transition-colors duration-500 uppercase leading-tight mb-3 md:mb-6 line-clamp-2">
           {product.name}
         </h3>
 
@@ -151,8 +166,8 @@ export function ProductCard({ product, href }: { product: Product; href?: string
           <div className="flex items-end justify-between">
             <div className="flex flex-col">
               <span className="text-[8px] md:text-[10px] text-gray-500 font-mono uppercase tracking-widest mb-1">Inversión</span>
-              <span className="text-xl md:text-4xl font-light text-white tracking-tighter leading-none">
-                <span className="text-xs md:text-xl mr-0.5 opacity-50">$</span>
+              <span className="text-lg md:text-4xl font-light text-white tracking-tighter leading-none">
+                <span className="text-[10px] md:text-xl mr-0.5 opacity-50">$</span>
                 {product.basePrice.toLocaleString('es-AR')}
               </span>
             </div>
@@ -162,9 +177,9 @@ export function ProductCard({ product, href }: { product: Product; href?: string
             </div>
           </div>
 
-          {/* Size Selector - Hidden on mobile cards for aesthetics */}
-          <div className="pt-4 border-t border-white/5 hidden md:block" onClick={(e) => e.stopPropagation()}>
-            <div className="flex flex-wrap gap-2">
+          {/* Size Selector - Now visible on all devices */}
+          <div className="pt-4 border-t border-white/5" onClick={(e) => e.stopPropagation()}>
+            <div className="flex flex-wrap gap-1.5 md:gap-2">
               {availableSizes.length > 0 && availableSizes[0] !== 'Unique' ? (
                 availableSizes.slice(0, 6).map(size => (
                   <button
@@ -175,7 +190,7 @@ export function ProductCard({ product, href }: { product: Product; href?: string
                       setSelectedSize(size);
                     }}
                     className={`
-                      h-10 min-w-[40px] px-3 rounded-xl text-[10px] font-mono font-black border transition-all duration-500
+                      h-8 md:h-10 min-w-[32px] md:min-w-[40px] px-2 md:px-3 rounded-lg md:rounded-xl text-[8px] md:text-[10px] font-mono font-black border transition-all duration-500
                       ${selectedSize === size
                         ? 'bg-[#C88A04] border-[#C88A04] text-black shadow-[0_0_20px_rgba(200,138,4,0.4)]'
                         : 'bg-white/5 border-white/10 text-gray-400 hover:border-[#C88A04]/40 hover:text-white'}

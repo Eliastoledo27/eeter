@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { ArrowUpRight } from 'lucide-react';
 
 export function CatalogHero() {
     const heroRef = useRef<HTMLDivElement>(null);
@@ -68,10 +69,10 @@ export function CatalogHero() {
 
                     {/* Main Title */}
                     <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-display font-black text-white leading-[0.9] tracking-tighter mb-6">
-                        COLECCIÓN
+                        CATÁLOGO
                         <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ffd900] via-amber-400 to-[#c88a04]">
-                            EXCLUSIVA
+                            EXCLUSIVO
                         </span>
                         <br />
                         <span className="text-white/30">2026</span>
@@ -108,8 +109,11 @@ export function CatalogHero() {
                             href="https://wa.me/542235025196"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center min-h-[56px] px-12 bg-white/5 border border-white/15 backdrop-blur-sm text-white font-display font-bold rounded-full uppercase tracking-widest text-sm hover:bg-white/10 hover:border-white/30 transition-all duration-500"
+                            className="inline-flex items-center justify-center gap-2 min-h-[56px] px-12 bg-white/5 border border-white/15 backdrop-blur-sm text-white font-display font-bold rounded-full uppercase tracking-widest text-sm hover:bg-white/10 hover:border-white/30 transition-all duration-500 group"
                         >
+                            <div className="w-8 h-8 md:w-12 md:h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:border-[#C88A04] group-hover:bg-[#C88A04] group-hover:text-black transition-all duration-700">
+                                <ArrowUpRight size={14} className="md:w-[22px]" />
+                            </div>
                             Contactar
                         </a>
                     </motion.div>
