@@ -29,195 +29,167 @@ export function FilterSidebar({
     onSortChange,
     onReset
 }: FilterSidebarProps) {
-    const [expandedSections, setExpandedSections] = useState<string[]>(['categories', 'price', 'sizes', 'sort']);
-
     const sizes = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
 
-    const toggleSection = (section: string) => {
-        setExpandedSections(prev =>
-            prev.includes(section) ? prev.filter(s => s !== section) : [...prev, section]
-        );
+    const toggleSize = (size: string) => {
+        const newSizes = selectedSizes.includes(size)
+            ? selectedSizes.filter(s => s !== size)
+            : [...selectedSizes, size];
+        onSizesChange(newSizes);
     };
 
-    const toggleSize = (size: string) => {
-        if (selectedSizes.includes(size)) {
-            onSizesChange(selectedSizes.filter(s => s !== size));
-        } else {
-            onSizesChange([...selectedSizes, size]);
-        }
-    };
+    const hasFilters = activeCategory !== 'Todos' || selectedSizes.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000000;
 
     return (
-        <aside className="w-full space-y-10">
-            {/* Categories */}
-            <div className="space-y-4">
-                <button
-                    onClick={() => toggleSection('categories')}
-                    className="flex items-center justify-between w-full group"
-                >
-                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 group-hover:text-[#C88A04] transition-colors">Categorías</span>
-                    <ChevronDown size={14} className={`text-gray-500 transition-transform duration-500 ${expandedSections.includes('categories') ? '' : '-rotate-90'}`} />
-                </button>
-
-                <AnimatePresence>
-                    {expandedSections.includes('categories') && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="space-y-1 overflow-hidden"
+        <aside className="w-full space-y-12 pb-20">
+            {/* Header / Reset */}
+            <div className="flex flex-col gap-4 pb-8 border-b border-white/10">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-black uppercase tracking-widest text-white">Filtrar Por:</h2>
+                    {hasFilters && (
+                        <button
+                            onClick={onReset}
+                            className="text-xs font-bold text-[#C88A04] hover:text-white transition-colors flex items-center gap-2 bg-[#C88A04]/10 px-3 py-1.5 rounded-full"
                         >
-                            {categories.map((category) => (
-                                <button
-                                    key={category}
-                                    onClick={() => onCategoryChange(category)}
-                                    className={`w-full text-left px-4 py-2.5 rounded-xl text-[10px] font-bold transition-all duration-300 ${activeCategory === category
-                                        ? 'text-[#C88A04] bg-[#C88A04]/10'
-                                        : 'text-gray-500 hover:text-white hover:bg-white/5'
-                                        }`}
-                                >
-                                    {category.toUpperCase()}
-                                </button>
-                            ))}
-                        </motion.div>
+                            <RotateCcw size={12} />
+                            LIMPIAR TODO
+                        </button>
                     )}
-                </AnimatePresence>
+                </div>
+                {!hasFilters && (
+                    <p className="text-sm text-gray-500 font-medium italic">Selecciona opciones para refinar tu búsqueda.</p>
+                )}
+            </div>
+
+            {/* Categories */}
+            <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 bg-[#C88A04] rounded-full" />
+                    <span className="text-sm font-black uppercase tracking-widest text-gray-300">Colecciones</span>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <button
+                        onClick={() => onCategoryChange('Todos')}
+                        className={`text-left px-5 py-3.5 rounded-xl text-sm font-bold transition-all duration-300 border-2 ${activeCategory === 'Todos'
+                            ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.1)]'
+                            : 'text-gray-400 border-white/5 bg-white/5 hover:bg-white/10 hover:text-white'
+                            }`}
+                    >
+                        VER TODO EL CATÁLOGO
+                    </button>
+                    {categories.map((category) => (
+                        <button
+                            key={category}
+                            onClick={() => onCategoryChange(category)}
+                            className={`text-left px-5 py-3.5 rounded-xl text-sm font-bold transition-all duration-300 border-2 ${activeCategory === category
+                                ? 'bg-[#C88A04] text-black border-[#C88A04] shadow-[0_0_20px_rgba(200,138,4,0.2)]'
+                                : 'text-gray-500 border-white/5 bg-white/5 hover:bg-white/10 hover:text-white'
+                                }`}
+                        >
+                            {category.toUpperCase()}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Price Range */}
-            <div className="space-y-4">
-                <button
-                    onClick={() => toggleSection('price')}
-                    className="flex items-center justify-between w-full group"
-                >
-                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 group-hover:text-[#C88A04] transition-colors">Rango de Precio</span>
-                    <ChevronDown size={14} className={`text-gray-500 transition-transform duration-500 ${expandedSections.includes('price') ? '' : '-rotate-90'}`} />
-                </button>
+            <div className="space-y-6 pt-6 border-t border-white/10">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <span className="w-2 h-2 bg-[#C88A04] rounded-full" />
+                        <span className="text-sm font-black uppercase tracking-widest text-gray-300">Rango de Precio</span>
+                    </div>
+                </div>
 
-                <AnimatePresence>
-                    {expandedSections.includes('price') && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="pt-2 overflow-hidden"
+                <div className="flex flex-col gap-4 pt-2">
+                    <div className="flex items-center gap-3">
+                        <div className="relative flex-1">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
+                            <input
+                                type="number"
+                                placeholder="Mínimo"
+                                value={priceRange[0] || ''}
+                                onChange={(e) => onPriceChange([Math.max(0, Number(e.target.value)), priceRange[1]])}
+                                className="w-full bg-[#111] border-2 border-white/10 rounded-xl py-3.5 pl-8 pr-4 text-base font-bold text-white focus:outline-none focus:border-[#C88A04] transition-colors placeholder:text-gray-700"
+                            />
+                        </div>
+                        <div className="text-gray-600 font-bold">—</div>
+                        <div className="relative flex-1">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
+                            <input
+                                type="number"
+                                placeholder="Máximo"
+                                value={priceRange[1] === 1000000 ? '' : priceRange[1]}
+                                onChange={(e) => onPriceChange([priceRange[0], e.target.value ? Number(e.target.value) : 1000000])}
+                                className="w-full bg-[#111] border-2 border-white/10 rounded-xl py-3.5 pl-8 pr-4 text-base font-bold text-white focus:outline-none focus:border-[#C88A04] transition-colors placeholder:text-gray-700"
+                            />
+                        </div>
+                    </div>
+                    {(priceRange[0] > 0 || priceRange[1] < 1000000) && (
+                        <button
+                            onClick={() => onPriceChange([0, 1000000])}
+                            className="text-xs text-[#C88A04] underline underline-offset-4 font-bold uppercase hover:text-white transition-colors text-center"
                         >
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-2">
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] text-gray-600">$</span>
-                                        <input
-                                            type="number"
-                                            placeholder="MIN"
-                                            value={priceRange[0] || ''}
-                                            onChange={(e) => onPriceChange([Number(e.target.value), priceRange[1]])}
-                                            className="w-full bg-white/[0.02] border border-white/5 rounded-xl py-2.5 pl-7 pr-3 text-[10px] font-mono focus:outline-none focus:border-[#C88A04]/30 transition-colors uppercase placeholder:text-gray-800"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] text-gray-600">$</span>
-                                        <input
-                                            type="number"
-                                            placeholder="MAX"
-                                            value={priceRange[1] || ''}
-                                            onChange={(e) => onPriceChange([priceRange[0], Number(e.target.value)])}
-                                            className="w-full bg-white/[0.02] border border-white/5 rounded-xl py-2.5 pl-7 pr-3 text-[10px] font-mono focus:outline-none focus:border-[#C88A04]/30 transition-colors uppercase placeholder:text-gray-800"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
+                            Restablecer límites de precio
+                        </button>
                     )}
-                </AnimatePresence>
+                </div>
             </div>
 
             {/* Sizes */}
-            <div className="space-y-4">
-                <button
-                    onClick={() => toggleSection('sizes')}
-                    className="flex items-center justify-between w-full group"
-                >
-                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 group-hover:text-[#C88A04] transition-colors">Talles</span>
-                    <ChevronDown size={14} className={`text-gray-500 transition-transform duration-500 ${expandedSections.includes('sizes') ? '' : '-rotate-90'}`} />
-                </button>
-
-                <AnimatePresence>
-                    {expandedSections.includes('sizes') && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="pt-2 overflow-hidden"
-                        >
-                            <div className="grid grid-cols-4 gap-2">
-                                {sizes.map((size) => (
-                                    <button
-                                        key={size}
-                                        onClick={() => toggleSize(size)}
-                                        className={`h-10 rounded-xl text-[9px] font-mono font-bold transition-all duration-300 border ${selectedSizes.includes(size)
-                                            ? 'bg-[#C88A04] text-black border-[#C88A04] shadow-[0_0_15px_rgba(200,138,4,0.3)]'
-                                            : 'bg-white/[0.02] border-white/5 text-gray-500 hover:border-white/20 hover:text-white'
-                                            }`}
-                                    >
-                                        {size}
-                                    </button>
-                                ))}
-                            </div>
-                        </motion.div>
+            <div className="space-y-6 pt-6 border-t border-white/10">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <span className="w-2 h-2 bg-[#C88A04] rounded-full" />
+                        <span className="text-sm font-black uppercase tracking-widest text-gray-300">Talles Disponibles</span>
+                    </div>
+                    {selectedSizes.length > 0 && (
+                        <button onClick={() => onSizesChange([])} className="text-xs text-[#C88A04] uppercase font-bold bg-[#C88A04]/10 px-3 py-1 rounded-lg">Borrar</button>
                     )}
-                </AnimatePresence>
+                </div>
+
+                <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-4 gap-3 pt-2">
+                    {sizes.map((size) => (
+                        <button
+                            key={size}
+                            onClick={() => toggleSize(size)}
+                            className={`h-16 lg:h-14 rounded-xl text-xl lg:text-lg font-black transition-all duration-300 border-2 flex items-center justify-center ${selectedSizes.includes(size)
+                                ? 'bg-white text-black border-white shadow-[0_5px_15px_rgba(255,255,255,0.2)]'
+                                : 'bg-[#111] border-white/10 text-white hover:border-[#C88A04]'
+                                }`}
+                        >
+                            {size}
+                        </button>
+                    ))}
+                </div>
+                <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest text-center">Puedes seleccionar varios talles</p>
             </div>
 
             {/* Sort */}
-            <div className="space-y-4">
-                <button
-                    onClick={() => toggleSection('sort')}
-                    className="flex items-center justify-between w-full group"
-                >
-                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 group-hover:text-[#C88A04] transition-colors">Ordenar</span>
-                    <ChevronDown size={14} className={`text-gray-500 transition-transform duration-500 ${expandedSections.includes('sort') ? '' : '-rotate-90'}`} />
-                </button>
-
-                <AnimatePresence>
-                    {expandedSections.includes('sort') && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="space-y-1 overflow-hidden"
+            <div className="space-y-6 pt-6 border-t border-white/10">
+                <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 bg-[#C88A04] rounded-full" />
+                    <span className="text-sm font-black uppercase tracking-widest text-gray-300">Ordenar Por</span>
+                </div>
+                <div className="grid grid-cols-1 gap-2 pt-2">
+                    {[
+                        { label: 'LO MÁS NUEVO', value: 'newest' },
+                        { label: 'PRECIO: MENOR A MAYOR', value: 'price-asc' },
+                        { label: 'PRECIO: MAYOR A MENOR', value: 'price-desc' }
+                    ].map((option) => (
+                        <button
+                            key={option.value}
+                            onClick={() => onSortChange(option.value)}
+                            className={`w-full text-left px-5 py-4 rounded-xl text-xs font-black transition-all duration-300 border-2 ${sortBy === option.value
+                                ? 'text-white border-[#C88A04] bg-[#C88A04]/20'
+                                : 'text-gray-500 border-white/5 bg-white/5 hover:border-white/20 hover:text-white'
+                                }`}
                         >
-                            {[
-                                { label: 'Más Recientes', value: 'newest' },
-                                { label: 'Precio: Menor', value: 'price-asc' },
-                                { label: 'Precio: Mayor', value: 'price-desc' }
-                            ].map((option) => (
-                                <button
-                                    key={option.value}
-                                    onClick={() => onSortChange(option.value)}
-                                    className={`w-full text-left px-4 py-2.5 rounded-xl text-[9px] font-bold transition-all duration-300 ${sortBy === option.value
-                                        ? 'text-white bg-white/10'
-                                        : 'text-gray-500 hover:text-white hover:bg-white/5'
-                                        }`}
-                                >
-                                    {option.label.toUpperCase()}
-                                </button>
-                            ))}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-
-            {/* Reset Button (Sutil) */}
-            <div className="pt-8 border-t border-white/5">
-                <button
-                    onClick={onReset}
-                    className="flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 hover:text-[#C88A04] transition-colors group"
-                >
-                    <RotateCcw size={14} className="group-hover:rotate-[-180deg] transition-transform duration-700" />
-                    Reiniciar Filtros
-                </button>
+                            {option.label}
+                        </button>
+                    ))}
+                </div>
             </div>
         </aside>
     );

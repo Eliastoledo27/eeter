@@ -105,17 +105,20 @@ export default function LoginForm() {
     // Social login handlers
     const handleGoogleLogin = async () => {
         const supabase = createClient()
+        // Force normalization of accented domains to Punycode for consistency
+        const origin = window.location.origin.normalize('NFC')
         await supabase.auth.signInWithOAuth({
             provider: 'google',
-            options: { redirectTo: `${window.location.origin}/auth/callback` },
+            options: { redirectTo: `${origin}/auth/callback` },
         })
     }
 
     const handleFacebookLogin = async () => {
         const supabase = createClient()
+        const origin = window.location.origin.normalize('NFC')
         await supabase.auth.signInWithOAuth({
             provider: 'facebook',
-            options: { redirectTo: `${window.location.origin}/auth/callback` },
+            options: { redirectTo: `${origin}/auth/callback` },
         })
     }
 

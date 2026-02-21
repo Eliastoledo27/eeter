@@ -22,7 +22,6 @@ export default function CatalogPage() {
     const [sortBy, setSortBy] = useState('newest');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [selectedQuickView, setSelectedQuickView] = useState<any>(null);
-    const [visibleCount, setVisibleCount] = useState(20);
 
     const filteredProducts = useMemo(() => {
         if (!products) return [];
@@ -49,8 +48,11 @@ export default function CatalogPage() {
 
         if (selectedSizes.length > 0) {
             result = result.filter(p => {
-                const productSizes = p.stockBySize ? Object.keys(p.stockBySize) : [];
-                return selectedSizes.some(size => productSizes.includes(size));
+                if (!p.stockBySize) return false;
+                const availableSizes = Object.entries(p.stockBySize)
+                    .filter(([, qty]) => Number(qty) > 0)
+                    .map(([size]) => size);
+                return selectedSizes.some(size => availableSizes.includes(size));
             });
         }
 
@@ -70,28 +72,6 @@ export default function CatalogPage() {
         return result;
     }, [products, searchQuery, activeCategory, priceRange, selectedSizes, sortBy]);
 
-    // Progressive Loading (Virtual Scroll Simulation)
-    const displayedProducts = useMemo(() => {
-        return filteredProducts.slice(0, visibleCount);
-    }, [filteredProducts, visibleCount]);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 1000) {
-                if (visibleCount < filteredProducts.length) {
-                    setVisibleCount(prev => prev + 20);
-                }
-            }
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [visibleCount, filteredProducts.length]);
-
-    // Reset visibility on filter change
-    useEffect(() => {
-        setVisibleCount(20);
-    }, [searchQuery, activeCategory, priceRange, selectedSizes, sortBy]);
-
     const resetFilters = () => {
         setActiveCategory('Todos');
         setSearchQuery('');
@@ -102,18 +82,10 @@ export default function CatalogPage() {
 
     return (
         <div className="min-h-screen bg-[#050505] font-sans text-white selection:bg-[#C88A04] selection:text-black overflow-x-hidden">
-            {/* Background Ambience & Grid */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-[#C88A04]/10 rounded-full blur-[150px] animate-pulse-slow" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#C88A04]/5 rounded-full blur-[120px]" />
-
-                {/* Visual Grid */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(200,138,4,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,138,4,0.03)_1px,transparent_1px)] bg-[size:100px_100px] opacity-40" />
-
-                {/* Noise Texture */}
-                <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay" style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-                }} />
+            {/* Simple Background */}
+            <div className="fixed inset-0 z-0 bg-[#050505] pointer-events-none">
+                <div className="absolute top-0 right-0 w-[40vw] h-[40vw] bg-[#C88A04]/5 rounded-full blur-[120px]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(200,138,4,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
             </div>
 
             <Navbar />
@@ -136,35 +108,22 @@ export default function CatalogPage() {
                             </h1>
                         </div>
 
-                        <div className="flex items-center gap-4 bg-white/5 border border-white/10 p-4 rounded-3xl backdrop-blur-xl">
-                            <div className="px-6 text-center border-r border-white/10">
-                                <span className="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1">Archivos</span>
-                                <span className="text-2xl font-black text-white">{products.length}</span>
-                            </div>
-                            <div className="px-6 text-center">
-                                <span className="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1">Estatus</span>
-                                <span className="text-2xl font-black text-emerald-500">SYNC</span>
-                            </div>
-                        </div>
+
                     </motion.div>
                 </div>
 
-                {/* Controls Bar: Search & Filter Toggle */}
-                <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-6 pb-12 border-b border-white/5">
+                <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-6 pb-6 border-b border-white/5">
                     <div className="flex items-center gap-4 w-full md:w-auto">
                         <button
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                            className={`flex items-center gap-3 h-12 px-8 rounded-full border transition-all duration-500 uppercase text-[10px] font-bold tracking-widest ${isSidebarOpen
-                                ? 'bg-[#C88A04] text-black border-[#C88A04] shadow-[0_0_20px_rgba(200,138,4,0.3)]'
-                                : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/30 hover:text-white'
-                                }`}
+                            className="lg:hidden flex items-center gap-3 h-10 px-6 rounded-full border border-white/10 bg-white/5 text-[10px] font-bold uppercase tracking-widest"
                         >
                             <Filter size={14} />
-                            {isSidebarOpen ? 'Cerrar Filtros' : 'Filtros'}
-                            {(searchQuery || selectedSizes.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000000) && (
-                                <span className="w-1.5 h-1.5 bg-current rounded-full ml-1" />
-                            )}
+                            Filtros
                         </button>
+                        <div className="hidden lg:flex items-center gap-3 text-white text-xs font-bold uppercase tracking-widest opacity-60">
+                            Filtros de búsqueda
+                        </div>
                     </div>
 
                     <div className="relative group w-full md:w-96">
@@ -184,20 +143,20 @@ export default function CatalogPage() {
                     <div className="flex items-center gap-3 min-w-max pb-2">
                         <button
                             onClick={() => setActiveCategory('Todos')}
-                            className={`h-10 px-6 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-500 border ${activeCategory === 'Todos'
+                            className={`h-10 px-6 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 border ${activeCategory === 'Todos'
                                 ? 'bg-white text-black border-white'
-                                : 'bg-white/5 border-white/10 text-gray-500 hover:border-white/30 hover:text-white'
+                                : 'bg-white/5 border-white/10 text-gray-400'
                                 }`}
                         >
                             Todos
                         </button>
-                        {categories.map((cat) => (
+                        {categories.filter(cat => cat !== 'Todos').map((cat) => (
                             <button
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
-                                className={`h-10 px-6 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-500 border ${activeCategory === cat
-                                    ? 'bg-[#C88A04] text-black border-[#C88A04] shadow-[0_0_20px_rgba(200,138,4,0.2)]'
-                                    : 'bg-white/5 border-white/10 text-gray-500 hover:border-white/30 hover:text-white'
+                                className={`h-10 px-6 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 border ${activeCategory === cat
+                                    ? 'bg-[#C88A04] text-black border-[#C88A04]'
+                                    : 'bg-white/5 border-white/10 text-gray-500'
                                     }`}
                             >
                                 {cat}
@@ -209,33 +168,23 @@ export default function CatalogPage() {
                 {/* Main Content Layout */}
                 <div className="relative flex flex-col lg:flex-row gap-12">
 
-                    {/* Retractable Sidebar */}
-                    <AnimatePresence initial={false}>
-                        {isSidebarOpen && (
-                            <motion.div
-                                initial={{ opacity: 0, width: 0, marginRight: 0 }}
-                                animate={{ opacity: 1, width: '320px', marginRight: 0 }}
-                                exit={{ opacity: 0, width: 0, marginRight: 0 }}
-                                transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-                                className="overflow-hidden sticky top-32 h-fit hidden lg:block"
-                            >
-                                <div className="w-[320px] pr-12">
-                                    <FilterSidebar
-                                        categories={categories}
-                                        activeCategory={activeCategory}
-                                        onCategoryChange={setActiveCategory}
-                                        priceRange={priceRange}
-                                        onPriceChange={setPriceRange}
-                                        selectedSizes={selectedSizes}
-                                        onSizesChange={setSelectedSizes}
-                                        sortBy={sortBy}
-                                        onSortChange={setSortBy}
-                                        onReset={resetFilters}
-                                    />
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                    {/* Fixed Sidebar for Desktop */}
+                    <div className="hidden lg:block w-[280px] shrink-0 sticky top-32 h-fit mb-10">
+                        <div className="pr-6">
+                            <FilterSidebar
+                                categories={categories.filter(cat => cat !== 'Todos')}
+                                activeCategory={activeCategory}
+                                onCategoryChange={setActiveCategory}
+                                priceRange={priceRange}
+                                onPriceChange={setPriceRange}
+                                selectedSizes={selectedSizes}
+                                onSizesChange={setSelectedSizes}
+                                sortBy={sortBy}
+                                onSortChange={setSortBy}
+                                onReset={resetFilters}
+                            />
+                        </div>
+                    </div>
 
                     {/* Mobile Sidebar - Full Screen Overlay */}
                     <AnimatePresence>
@@ -244,35 +193,57 @@ export default function CatalogPage() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="fixed inset-0 bg-black/80 backdrop-blur-md z-[120] lg:hidden"
+                                className="fixed inset-0 bg-black/90 backdrop-blur-md z-[120] lg:hidden"
                                 onClick={() => setIsSidebarOpen(false)}
                             >
                                 <motion.div
-                                    initial={{ x: '-100%' }}
-                                    animate={{ x: 0 }}
-                                    exit={{ x: '-100%' }}
-                                    transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-                                    className="absolute inset-y-0 left-0 w-4/5 bg-[#0A0A0A] p-8 border-r border-white/10 overflow-y-auto"
+                                    initial={{ y: '100%' }}
+                                    animate={{ y: 0 }}
+                                    exit={{ y: '100%' }}
+                                    transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+                                    className="absolute inset-x-0 bottom-0 h-[92vh] bg-[#0A0A0A] rounded-t-[2.5rem] border-t border-white/10 flex flex-col"
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    <div className="flex justify-between items-center mb-10">
-                                        <h2 className="text-2xl font-black uppercase tracking-tighter">Filtros</h2>
-                                        <button onClick={() => setIsSidebarOpen(false)} className="p-2">
-                                            <X size={24} />
+                                    {/* Handle bar for drawer feel */}
+                                    <div className="w-12 h-1.5 bg-white/10 rounded-full mx-auto mt-4 mb-2 shrink-0" />
+
+                                    <div className="flex justify-between items-center px-8 py-6 border-b border-white/5 shrink-0">
+                                        <div>
+                                            <h2 className="text-2xl font-black uppercase tracking-tighter text-white">Filtros</h2>
+                                            <p className="text-[10px] text-[#C88A04] font-bold uppercase tracking-widest mt-1">Refina tu búsqueda</p>
+                                        </div>
+                                        <button
+                                            onClick={() => setIsSidebarOpen(false)}
+                                            className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center text-white"
+                                        >
+                                            <X size={20} />
                                         </button>
                                     </div>
-                                    <FilterSidebar
-                                        categories={categories}
-                                        activeCategory={activeCategory}
-                                        onCategoryChange={setActiveCategory}
-                                        priceRange={priceRange}
-                                        onPriceChange={setPriceRange}
-                                        selectedSizes={selectedSizes}
-                                        onSizesChange={setSelectedSizes}
-                                        sortBy={sortBy}
-                                        onSortChange={setSortBy}
-                                        onReset={resetFilters}
-                                    />
+
+                                    <div className="flex-1 overflow-y-auto px-8 py-6">
+                                        <FilterSidebar
+                                            categories={categories.filter(cat => cat !== 'Todos')}
+                                            activeCategory={activeCategory}
+                                            onCategoryChange={setActiveCategory}
+                                            priceRange={priceRange}
+                                            onPriceChange={setPriceRange}
+                                            selectedSizes={selectedSizes}
+                                            onSizesChange={setSelectedSizes}
+                                            sortBy={sortBy}
+                                            onSortChange={setSortBy}
+                                            onReset={resetFilters}
+                                        />
+                                    </div>
+
+                                    {/* Fixed Action Button for Mobile */}
+                                    <div className="p-6 bg-gradient-to-t from-black to-transparent border-t border-white/5 shrink-0">
+                                        <button
+                                            onClick={() => setIsSidebarOpen(false)}
+                                            className="w-full bg-[#C88A04] text-black h-16 rounded-2xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(200,138,4,0.3)]"
+                                        >
+                                            Mostrar {filteredProducts.length} Resultados
+                                        </button>
+                                    </div>
                                 </motion.div>
                             </motion.div>
                         )}
@@ -313,42 +284,18 @@ export default function CatalogPage() {
                             <CatalogSkeleton />
                         ) : filteredProducts.length > 0 ? (
                             <>
-                                <motion.div
-                                    layout
-                                    className={`grid grid-cols-2 sm:grid-cols-2 ${isSidebarOpen ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} gap-x-4 md:gap-x-8 gap-y-8 md:gap-y-16 transition-all duration-700 ease-[0.19,1,0.22,1]`}
+                                <div
+                                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
                                 >
-                                    <AnimatePresence mode="popLayout" initial={false}>
-                                        {displayedProducts.map((product, idx) => (
-                                            <motion.div
-                                                key={product.id}
-                                                layout
-                                                initial={{ opacity: 0, scale: 0.9 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                                                transition={{
-                                                    duration: 0.5,
-                                                    delay: (idx % 20) * 0.02,
-                                                    ease: [0.19, 1, 0.22, 1]
-                                                }}
-                                            >
-                                                <ProductCard
-                                                    product={product}
-                                                    onQuickView={() => setSelectedQuickView(product)}
-                                                />
-                                            </motion.div>
-                                        ))}
-                                    </AnimatePresence>
-                                </motion.div>
+                                    {filteredProducts.map((product) => (
+                                        <ProductCard
+                                            key={product.id}
+                                            product={product}
+                                        />
+                                    ))}
+                                </div>
 
-                                {visibleCount < filteredProducts.length && (
-                                    <div className="mt-20 py-12 flex flex-col items-center gap-6 border-t border-white/5">
-                                        <div className="relative">
-                                            <div className="w-12 h-12 border-2 border-[#C88A04]/20 rounded-full" />
-                                            <div className="w-12 h-12 border-t-2 border-[#C88A04] rounded-full animate-spin absolute inset-0" />
-                                        </div>
-                                        <span className="text-[10px] font-mono text-gray-500 uppercase tracking-[0.4em] animate-pulse">Sincronizando más modelos...</span>
-                                    </div>
-                                )}
+
                             </>
                         ) : (
                             <div className="min-h-[500px] flex flex-col items-center justify-center text-center p-20 border border-white/5 rounded-[4rem] bg-white/[0.02] backdrop-blur-3xl">

@@ -107,9 +107,10 @@ export function AuthModal() {
 
   const handleSocial = async (provider: 'google' | 'facebook') => {
     const supabase = createClient()
+    const origin = window.location.origin.normalize('NFC')
     await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: `${origin}/auth/callback` },
     })
   }
 

@@ -22,11 +22,11 @@ export const metadata: Metadata = {
   },
   description: "Accede al catálogo de sneakers más exclusivo, gestiona tu stock digital y escala tu negocio de dropshipping con Éter Store.",
   keywords: ["sneakers", "dropshipping", "reseller", "zapatillas", "logística", "emprendimiento", "calzado de lujo"],
-  metadataBase: new URL('https://eter-store.com'),
+  metadataBase: new URL('https://www.xn--ter-9la.store'),
   openGraph: {
     title: 'Éter Store | Tu Imperio de Sneakers',
     description: 'Vende sneakers exclusivos sin invertir en stock. Nosotros nos encargamos de la logística.',
-    url: 'https://eter-store.com',
+    url: 'https://www.xn--ter-9la.store',
     siteName: 'Éter Store',
     locale: 'es_AR',
     type: 'website',

@@ -55,6 +55,7 @@ export function BrandMarquee() {
         }
         .animate-marquee {
           animation: marquee 30s linear infinite;
+          will-change: transform;
         }
       `}</style>
     </div>
