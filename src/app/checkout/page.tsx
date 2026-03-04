@@ -65,16 +65,31 @@ function CheckoutHandler() {
                 const requestedItems: { fullId: string, realId: string, size: string, qty: number }[] = []
 
                 productEntries.forEach(entry => {
+                    if (!entry) return;
                     const [fullId, qtyStr] = entry.split(':')
                     const qty = parseInt(qtyStr) || 1
 
                     let realId = fullId
                     let size = 'U'
 
-                    if (fullId.includes('-')) {
-                        const parts = fullId.split('-')
-                        size = parts.pop() || 'U'
-                        realId = parts.join('-')
+                    // Meta often uses _ for size, or - at the end of a non-UUID string
+                    if (fullId.includes('_')) {
+                        const lastUnderscore = fullId.lastIndexOf('_');
+                        realId = fullId.substring(0, lastUnderscore);
+                        size = fullId.substring(lastUnderscore + 1);
+                    } else if (fullId.includes('-')) {
+                        // Check if it looks like a UUID (8-4-4-4-12)
+                        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                        if (!uuidRegex.test(fullId)) {
+                            // If it's not a UUID, the last part after dash is probably the size
+                            const parts = fullId.split('-')
+                            size = parts.pop() || 'U'
+                            realId = parts.join('-')
+                        } else {
+                            // It is a pure UUID, no size provided
+                            realId = fullId
+                            size = 'U'
+                        }
                     }
 
                     requestedItems.push({ fullId, realId, size, qty })
@@ -238,8 +253,9 @@ function CheckoutHandler() {
 export default function CheckoutPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-black flex items-center justify-center text-yellow-500 font-mono tracking-widest uppercase">
-                Iniciando Protocolo...
+            <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center text-yellow-500 font-mono tracking-widest uppercase gap-4">
+                <Loader2 className="animate-spin text-yellow-500" size={48} />
+                <div className="animate-pulse">Iniciando Protocolo Éter...</div>
             </div>
         }>
             <CheckoutHandler />
