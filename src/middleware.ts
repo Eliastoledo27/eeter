@@ -32,6 +32,25 @@ function getRoleForRoute(pathname: string): string[] | null {
 
 // ─── Middleware ─────────────────────────────────────────────────────
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // EXPLICIT EARLY EXIT FOR OFFICIAL ROUTES
+  // This prevents any reseller redirect or role-based check from interfering
+  const reserved = [
+    'privacy', 'about', 'support', 'catalog', 'login', 'register',
+    'dashboard', 'authenticity', 'shipping', 'returns', 'size-guide',
+    'checkout', 'cart', 'collection', 'press', 'careers',
+    'sustainability', 'order-confirmation', 'gift-cards', 'logout',
+    'resellers', 'api', 'admin', 'profile'
+  ];
+
+  const pathParts = pathname.split('/').filter(Boolean);
+  const firstSlug = pathParts[0]?.toLowerCase();
+
+  if (reserved.includes(firstSlug)) {
+    return NextResponse.next();
+  }
+
   // 1. Create a basic response
   let response = NextResponse.next({
     request: {
@@ -68,28 +87,11 @@ export async function middleware(request: NextRequest) {
   // 3. Refresh session if expired
   const { data: { user } } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname;
-
   // 3.5. Legacy Reseller Redirect: /slug -> /c/slug (only for top-level non-reserved paths)
-  const pathParts = pathname.split('/').filter(Boolean);
-
-  if (pathParts.length === 1) {
-    const slug = pathParts[0].toLowerCase();
-
-    // STRICT RESERVED LIST: These must NEVER be redirected to /c/
-    const reserved = [
-      'privacy', 'about', 'support', 'catalog', 'login', 'register',
-      'dashboard', 'authenticity', 'shipping', 'returns', 'size-guide',
-      'checkout', 'cart', 'collection', 'press', 'careers',
-      'sustainability', 'order-confirmation', 'gift-cards', 'logout',
-      'resellers', 'api', 'admin', 'profile'
-    ];
-
-    if (!reserved.includes(slug)) {
-      const url = request.nextUrl.clone();
-      url.pathname = `/c/${pathParts[0]}`;
-      return NextResponse.redirect(url);
-    }
+  if (pathParts.length === 1 && !reserved.includes(firstSlug)) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/c/${pathParts[0]}`;
+    return NextResponse.redirect(url);
   }
 
   // 4. Protected Routes: require authentication
