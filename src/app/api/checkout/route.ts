@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
                 success: true,
                 transaction_type: "credit_purchase",
                 credits_amount: amount,
-                credits_image: "https://eter.store/images/credit-token.png",
+                credits_image: "https://eter.store/images/eter-coin.png",
                 gateway_id: "meta",
                 meta_pay_config: metaPayConfig,
                 preparation_status: "ready",

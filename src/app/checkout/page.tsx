@@ -39,7 +39,7 @@ function CheckoutHandler() {
                         description: 'Carga de saldo preventivo para futuras adquisiciones en el ecosistema Éter. Protocolo de Sincronización Meta Pay activado.',
                         category: 'Credits',
                         basePrice: parseInt(searchParams.get('credits') || '50000'), // Customizable pack price
-                        images: ['/images/credit-token.png'],
+                        images: ['/images/eter-coin.png'],
                         stockBySize: { 'U': 999 },
                         totalStock: 999,
                         status: 'active',
@@ -182,7 +182,7 @@ function CheckoutHandler() {
                                             initial={{ rotateY: 0 }}
                                             animate={{ rotateY: 360 }}
                                             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                                            src="/images/credit-token.png"
+                                            src="/images/eter-coin.png"
                                             alt="Éter Protocol Coin"
                                             className="w-20 h-20 object-contain drop-shadow-[0_0_20px_rgba(200,138,4,0.5)]"
                                         />
