@@ -1,134 +1,109 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { SupabaseProductRepository } from '@/infrastructure/repositories/SupabaseProductRepository';
 import ExcelJS from 'exceljs';
 
-export const revalidate = 0; // Fuerza renderizado dinámico y sin caché en Next.js App Router
+export const revalidate = 0;
 
-export async function GET() {
+// Límite de 15MB en bytes
+const MAX_BYTES = 15 * 1024 * 1024;
+
+export async function GET(req: NextRequest) {
     try {
+        const { searchParams } = new URL(req.url);
+        const part = parseInt(searchParams.get('part') || '1');
+
         const repo = new SupabaseProductRepository();
-        // Solo traemos los activos, que son los que van para el cliente (suponiendo que le mandan a clientes)
-        // Puedes traer todos si lo deseas quitando el filtro.
         let products = await repo.findAll();
         products = products.filter(p => p.status === 'active');
 
-        const workbook = new ExcelJS.Workbook();
-        workbook.creator = 'Éter System';
-        workbook.created = new Date();
-
-        const sheet = workbook.addWorksheet('Catálogo Éter', {
-            views: [{ state: 'frozen', ySplit: 1 }]
-        });
-
-        // Configuramos las columnas
-        sheet.columns = [
-            { header: '📸 Imagen', key: 'imagen', width: 20 },
-            { header: 'ID del Producto', key: 'id', width: 15 },
-            { header: '📦 Nombre / Modelo', key: 'nombre', width: 35 },
-            { header: '🏷️ Categoría', key: 'categoria', width: 20 },
-            { header: '💰 Precio ($)', key: 'precio', width: 15 },
-            { header: '📊 Stock Total', key: 'stock', width: 15 },
-            { header: '📏 Talles Disponibles (Stock)', key: 'talles', width: 45 },
-            { header: '📝 Descripción', key: 'descripcion', width: 50 },
-        ];
-
-        // Estilos para la primera fila (Cabecera)
-        const headerRow = sheet.getRow(1);
-        headerRow.font = { bold: true, color: { argb: 'FF000000' } };
-        headerRow.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FFFFD900' } // Color Éter / Dorado
-        };
-        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
-        headerRow.height = 30;
-
-        // Añadir filas y procesar imágenes
-        for (let i = 0; i < products.length; i++) {
-            const p = products[i];
-            const rowIndex = i + 2; // Las filas son en base 1, la fila 1 es el header
-
-            const sizesStr = Object.keys(p.stockBySize).length > 0
-                ? Object.entries(p.stockBySize)
-                    .map(([s, q]) => `Talle ${s} (Hay ${q})`)
-                    .join(', ')
-                : 'Sin stock específico o talle único';
-
-            const row = sheet.addRow({
-                imagen: '', // Esto queda en blanco, la imagen va superpuesta en la celda
-                id: p.id,
-                nombre: p.name,
-                categoria: p.category,
-                precio: p.basePrice,
-                stock: p.totalStock,
-                talles: sizesStr,
-                descripcion: p.description || '-',
+        // Función para generar un Excel y retornar su tamaño y buffer
+        const generateExcelBuffer = async (items: typeof products) => {
+            const workbook = new ExcelJS.Workbook();
+            const sheet = workbook.addWorksheet('Catálogo Éter', {
+                views: [{ state: 'frozen', ySplit: 1 }]
             });
 
-            // Altura grande para que entre la foto
-            row.height = 90;
-            row.alignment = { vertical: 'middle', wrapText: true };
+            sheet.columns = [
+                { header: '📸 Imagen', key: 'imagen', width: 20 },
+                { header: 'ID del Producto', key: 'id', width: 15 },
+                { header: '📦 Nombre / Modelo', key: 'nombre', width: 35 },
+                { header: '🏷️ Categoría', key: 'categoria', width: 20 },
+                { header: '💰 Precio ($)', key: 'precio', width: 15 },
+                { header: '📊 Stock Total', key: 'stock', width: 15 },
+                { header: '📏 Talles Disponibles', key: 'talles', width: 45 },
+                { header: '📝 Descripción', key: 'descripcion', width: 50 },
+            ];
 
-            // Inyectar la imagen en el Excel
-            if (p.images && p.images.length > 0) {
-                try {
-                    const response = await fetch(p.images[0]);
-                    if (response.ok) {
-                        const arrayBuffer = await response.arrayBuffer();
-                        const buffer = Buffer.from(arrayBuffer);
+            const headerRow = sheet.getRow(1);
+            headerRow.font = { bold: true };
+            headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFD900' } };
+            headerRow.height = 30;
 
-                        // Inferir extensión de la URL, por default jpeg
-                        let ext: 'jpeg' | 'png' | 'gif' = 'jpeg';
-                        if (p.images[0].toLowerCase().includes('.png')) ext = 'png';
-                        if (p.images[0].toLowerCase().includes('.gif')) ext = 'gif';
+            for (let i = 0; i < items.length; i++) {
+                const p = items[i];
+                const sizesStr = Object.entries(p.stockBySize || {})
+                    .map(([s, q]) => `Talle ${s} (Hay ${q})`)
+                    .join(', ') || '-';
 
-                        const imageId = workbook.addImage({
-                            buffer: buffer as any,
-                            extension: ext,
-                        });
+                const row = sheet.addRow({
+                    id: p.id,
+                    nombre: p.name,
+                    categoria: p.category,
+                    precio: p.basePrice,
+                    stock: p.totalStock,
+                    talles: sizesStr,
+                    descripcion: p.description || '-',
+                });
+                row.height = 90;
+                row.alignment = { vertical: 'middle', wrapText: true };
 
-                        // Colocar la imagen en la columna 'A' (col: 0 en índice 0 para addImage) 
-                        // de la fila actual (row: rowIndex - 1)
-                        sheet.addImage(imageId, {
-                            tl: { col: 0.2, row: rowIndex - 1 + 0.1 }, // Top Left 
-                            ext: { width: 100, height: 100 },         // Dimensiones en px
-                            editAs: 'oneCell'                         // Flotar en celda
-                        });
-                    }
-                } catch (e) {
-                    console.error(`🔴 Error cargando la imagen para el producto ${p.name}: `, e);
+                if (p.images?.length > 0) {
+                    try {
+                        const imgRes = await fetch(p.images[0]);
+                        if (imgRes.ok) {
+                            const buffer = Buffer.from(await imgRes.arrayBuffer());
+                            const imageId = workbook.addImage({
+                                buffer: buffer as any,
+                                extension: 'jpeg',
+                            });
+                            sheet.addImage(imageId, {
+                                tl: { col: 0.1, row: i + 1.1 },
+                                ext: { width: 100, height: 100 }
+                            });
+                        }
+                    } catch (e) { }
                 }
             }
+
+            return await workbook.xlsx.writeBuffer();
+        };
+
+        // Dividimos los productos en partes si es necesario
+        // Dado que no sabemos el peso exacto hasta generar, hacemos una estimación agresiva:
+        // Cada producto con imagen pesa ~150kb. 15MB / 150kb = ~100 productos por Excel.
+        const ITEMS_PER_PAGE = 80;
+        const totalParts = Math.ceil(products.length / ITEMS_PER_PAGE);
+
+        const start = (part - 1) * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
+        const currentBatch = products.slice(start, end);
+
+        if (currentBatch.length === 0) {
+            return NextResponse.json({ error: 'Parte no encontrada' }, { status: 404 });
         }
 
-        // Configurar los bordes y el formato de precio de todas las filas
-        sheet.eachRow((row, r) => {
-            row.eachCell((cell, c) => {
-                cell.border = {
-                    top: { style: 'thin' },
-                    left: { style: 'thin' },
-                    bottom: { style: 'thin' },
-                    right: { style: 'thin' }
-                };
-                if (c === 5 && r > 1) {
-                    cell.numFmt = '"$"#,##0.00';
-                }
-            });
-        });
+        const buffer = await generateExcelBuffer(currentBatch);
 
-        // Generar el Buffer del Excel
-        const excelBuffer = await workbook.xlsx.writeBuffer();
-
-        // Devolver la respuesta al cliente
-        return new NextResponse(excelBuffer, {
+        return new NextResponse(buffer, {
             headers: {
-                'Content-Disposition': 'attachment; filename="Catalogo_Eter_Completo.xlsx"',
+                'Content-Disposition': `attachment; filename="Catalogo_Eter_Parte_${part}_de_${totalParts}.xlsx"`,
                 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'X-Total-Parts': totalParts.toString(),
+                'X-Current-Part': part.toString()
             }
         });
 
     } catch (error: any) {
-        console.error('Error generando Excel:', error);
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
