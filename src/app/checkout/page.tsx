@@ -35,10 +35,10 @@ function CheckoutHandler() {
                     const creditProduct: any = {
                         id: 'eter-credit-pack',
                         name: 'ÉTER PROTOCOL / CRÉDITO DIGITAL',
-                        description: 'Carga de saldo preventivo para futuras adquisiciones en el ecosistema Éter.',
+                        description: 'Carga de saldo preventivo para futuras adquisiciones en el ecosistema Éter. Protocolo de Sincronización Meta Pay activado.',
                         category: 'Credits',
-                        basePrice: 50000, // Default pack price
-                        images: ['/images/credit-token.png'], // We assume some graphic exists or will exist
+                        basePrice: parseInt(searchParams.get('credits') || '50000'), // Customizable pack price
+                        images: ['/images/credit-token.png'],
                         stockBySize: { 'U': 999 },
                         totalStock: 999,
                         status: 'active',
