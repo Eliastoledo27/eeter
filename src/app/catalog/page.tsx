@@ -5,7 +5,7 @@ import { Footer } from '@/components/layout/Footer';
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { Filter, Search, Loader2, X } from 'lucide-react';
 import { useCatalog } from '@/hooks/useCatalog';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useDeferredValue } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FilterSidebar } from '@/components/catalog/FilterSidebar';
 import { ProductQuickView } from '@/components/catalog/ProductQuickView';
@@ -22,6 +22,7 @@ export default function CatalogPage() {
     const [sortBy, setSortBy] = useState('newest');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [selectedQuickView, setSelectedQuickView] = useState<any>(null);
+    const deferredSearchQuery = useDeferredValue(searchQuery);
 
     const filteredProducts = useMemo(() => {
         if (!products) return [];
@@ -29,8 +30,8 @@ export default function CatalogPage() {
         let result = [...products];
 
         // Optimized Search Matcher
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase();
+        if (deferredSearchQuery) {
+            const q = deferredSearchQuery.toLowerCase();
             result = result.filter(p =>
                 p.name.toLowerCase().includes(q) ||
                 (p.category && p.category.toLowerCase().includes(q))
@@ -70,7 +71,7 @@ export default function CatalogPage() {
         }
 
         return result;
-    }, [products, searchQuery, activeCategory, priceRange, selectedSizes, sortBy]);
+    }, [products, deferredSearchQuery, activeCategory, priceRange, selectedSizes, sortBy]);
 
     const resetFilters = () => {
         setActiveCategory('Todos');
@@ -250,10 +251,7 @@ export default function CatalogPage() {
                     </AnimatePresence>
 
                     {/* Products Grid */}
-                    <motion.div
-                        layout
-                        className="flex-1"
-                    >
+                    <div className="flex-1">
                         <div className="flex justify-between items-center mb-10 px-2 pb-6 border-b border-white/5">
                             <div className="flex flex-col gap-1">
                                 <span className="text-[10px] font-mono text-gray-500 uppercase tracking-[0.3em]">
@@ -312,7 +310,7 @@ export default function CatalogPage() {
                                 </button>
                             </div>
                         )}
-                    </motion.div>
+                    </div>
                 </div>
             </div>
 

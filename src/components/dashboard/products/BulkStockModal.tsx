@@ -81,7 +81,7 @@ export function BulkStockModal({ isOpen, onClose, selectedProducts, onSuccess }:
             const data = await response.json();
             const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-            const jsonMatch = textResponse.match(/\{.*\}/s);
+            const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
             if (!jsonMatch) throw new Error('La IA no pudo interpretar el formato');
 
             const parsedStock = JSON.parse(jsonMatch[0]);
