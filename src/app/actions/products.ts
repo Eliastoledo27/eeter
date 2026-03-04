@@ -438,3 +438,29 @@ export async function getCategories() {
     const uniqueCategories = Array.from(new Set(data.map(item => item.category)));
     return uniqueCategories.sort();
 }
+export async function getProductsByIds(ids: string[]) {
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('productos')
+        .select('*')
+        .in('id', ids);
+
+    if (error) {
+        console.error('Error fetching products by ids:', error);
+        return [];
+    }
+
+    const mappedData = data.map((p: SupabaseProduct) => ({
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        category: p.category,
+        base_price: p.price,
+        images: p.images || [],
+        stock_by_size: p.stock_by_size || {},
+        is_active: p.status === 'activo',
+        created_at: p.created_at
+    }));
+
+    return mappedData as ProductType[];
+}

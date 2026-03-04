@@ -59,6 +59,16 @@ export class SupabaseProductRepository implements ProductRepository {
     return this.mapToEntity(data);
   }
 
+  async findByIds(ids: string[]): Promise<Product[]> {
+    const { data, error } = await this.supabase
+      .from('productos')
+      .select('*')
+      .in('id', ids);
+
+    if (error || !data) return [];
+    return data.map((row: any) => this.mapToEntity(row));
+  }
+
   async create(product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> {
     const { data, error } = await this.supabase
       .from('productos')
