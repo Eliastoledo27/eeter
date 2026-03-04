@@ -15,6 +15,7 @@ function CheckoutHandler() {
     const [status, setStatus] = useState('Sincronizando con Meta...')
     const [error, setError] = useState<string | null>(null)
     const [processed, setProcessed] = useState(false)
+    const isCreditPurchase = !searchParams.get('products')
 
     useEffect(() => {
         // Only run once
@@ -174,9 +175,20 @@ function CheckoutHandler() {
                                     key="loading"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    className="p-6 bg-yellow-500/10 rounded-3xl mb-8 relative"
+                                    className="p-6 bg-yellow-500/10 rounded-3xl mb-8 relative flex items-center justify-center overflow-hidden"
                                 >
-                                    <ShoppingBag size={64} className="text-yellow-500" />
+                                    {isCreditPurchase ? (
+                                        <motion.img
+                                            initial={{ rotateY: 0 }}
+                                            animate={{ rotateY: 360 }}
+                                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                            src="/images/credit-token.png"
+                                            alt="Éter Protocol Coin"
+                                            className="w-20 h-20 object-contain drop-shadow-[0_0_20px_rgba(200,138,4,0.5)]"
+                                        />
+                                    ) : (
+                                        <ShoppingBag size={64} className="text-yellow-500" />
+                                    )}
                                     <div className="absolute inset-0 border-2 border-yellow-500/30 rounded-3xl animate-[ping_2s_infinite]" />
                                 </motion.div>
                             )}
