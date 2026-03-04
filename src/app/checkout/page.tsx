@@ -195,10 +195,10 @@ function CheckoutHandler() {
                         </AnimatePresence>
 
                         <h1 className="text-4xl font-black mb-2 tracking-tighter uppercase italic">
-                            Éter <span className="text-yellow-500">Checkout</span>
+                            Éter <span className="text-yellow-500">{isCreditPurchase ? 'PROTOCOL' : 'Checkout'}</span>
                         </h1>
-                        <p className="text-gray-500 text-xs font-mono tracking-[0.3em] uppercase mb-8">
-                            Protocolo de Sincronización Meta
+                        <p className="text-gray-500 text-[10px] font-mono tracking-[0.4em] uppercase mb-8">
+                            {isCreditPurchase ? 'ADQUISICIÓN DE SALDO PREVENTIVO' : 'Protocolo de Sincronización Meta'}
                         </p>
 
                         <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden mb-6">
