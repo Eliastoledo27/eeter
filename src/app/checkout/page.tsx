@@ -24,17 +24,42 @@ function CheckoutHandler() {
             const productsParam = searchParams.get('products')
             const couponParam = searchParams.get('coupon')
 
-            if (!productsParam) {
-                setStatus('Redirigiendo al catálogo...')
-                setTimeout(() => router.push('/catalog'), 1000)
-                return
-            }
-
             try {
+                // CLEAR PREVIOUS ATTEMPTS TO ENSURE CLEAN STATE
+                clearCart()
+
+                if (!productsParam) {
+                    setStatus('Configurando compra de CRÉDITOS ÉTER...')
+
+                    // VIRTUAL PRODUCT FOR CREDITS
+                    const creditProduct: any = {
+                        id: 'eter-credit-pack',
+                        name: 'ÉTER PROTOCOL / CRÉDITO DIGITAL',
+                        description: 'Carga de saldo preventivo para futuras adquisiciones en el ecosistema Éter.',
+                        category: 'Credits',
+                        basePrice: 50000, // Default pack price
+                        images: ['/images/credit-token.png'], // We assume some graphic exists or will exist
+                        stockBySize: { 'U': 999 },
+                        totalStock: 999,
+                        status: 'active',
+                        createdAt: new Date()
+                    }
+
+                    setStatus('Sincronizando saldo preventivo...')
+                    addItem(creditProduct, 'U', 1)
+
+                    setStatus('¡Sincronización de créditos lista!')
+                    setProcessed(true)
+
+                    setTimeout(() => {
+                        router.push('/cart')
+                    }, 1500)
+                    return
+                }
+
                 setStatus('Analizando productos...')
 
                 // Format: ID:QTY,ID:QTY
-                // Supporting ID-SIZE format as well
                 const productEntries = productsParam.split(',')
                 const requestedItems: { fullId: string, realId: string, size: string, qty: number }[] = []
 
@@ -43,7 +68,7 @@ function CheckoutHandler() {
                     const qty = parseInt(qtyStr) || 1
 
                     let realId = fullId
-                    let size = 'U' // Default Universal size
+                    let size = 'U'
 
                     if (fullId.includes('-')) {
                         const parts = fullId.split('-')
@@ -63,17 +88,11 @@ function CheckoutHandler() {
                     throw new Error('No se encontraron los productos solicitados.')
                 }
 
-                // Clear existing cart for a clean checkout from Meta
-                clearCart()
-
                 // Add items to cart
                 requestedItems.forEach(req => {
                     const product = productsData.find(p => p.id === req.realId)
                     if (product) {
-                        // Validate size availability
                         let selectedSize = req.size
-
-                        // If requested size is not available or 'U', pick first available if needed
                         const availableSizes = Object.keys(product.stockBySize).filter(s => product.stockBySize[s] > 0)
 
                         if (!product.stockBySize[selectedSize] || product.stockBySize[selectedSize] <= 0) {
@@ -99,7 +118,6 @@ function CheckoutHandler() {
                 setStatus('¡Sincronización completa!')
                 setProcessed(true)
 
-                // Small delay for UX
                 setTimeout(() => {
                     router.push('/cart')
                 }, 1000)
