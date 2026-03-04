@@ -70,6 +70,25 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
+  // 3.5. Legacy Reseller Redirect: /slug -> /c/slug (only for top-level non-reserved paths)
+  const pathParts = pathname.split('/').filter(Boolean);
+  if (pathParts.length === 1) {
+    const slug = pathParts[0];
+    const reserved = [
+      'privacy', 'about', 'support', 'catalog', 'login', 'register',
+      'dashboard', 'authenticity', 'shipping', 'returns', 'size-guide',
+      'checkout', 'cart', 'collection', 'press', 'careers',
+      'sustainability', 'order-confirmation', 'gift-cards', 'logout',
+      'resellers', 'api', 'admin', 'profile'
+    ];
+
+    if (!reserved.includes(slug.toLowerCase())) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/c/${slug}`;
+      return NextResponse.redirect(url);
+    }
+  }
+
   // 4. Protected Routes: require authentication
   const isProtectedRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/academy');
 
