@@ -87,6 +87,8 @@ export function ResellerFooter({ resellerSlug, resellerName }: ResellerFooterPro
                 <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] font-black uppercase tracking-[0.2em] text-gray-700">
                     <p>© {currentYear} ÉTER STORE x {resellerName}.</p>
                     <div className="flex gap-8">
+                        <Link href="/privacy" className="hover:text-white transition-colors">Privacidad</Link>
+                        <Link href="/support" className="hover:text-white transition-colors">Soporte</Link>
                         <span className="cursor-default">Partner Certificado</span>
                         <span className="cursor-default">Logística Internacional</span>
                     </div>
