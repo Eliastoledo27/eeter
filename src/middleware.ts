@@ -72,8 +72,11 @@ export async function middleware(request: NextRequest) {
 
   // 3.5. Legacy Reseller Redirect: /slug -> /c/slug (only for top-level non-reserved paths)
   const pathParts = pathname.split('/').filter(Boolean);
+
   if (pathParts.length === 1) {
-    const slug = pathParts[0];
+    const slug = pathParts[0].toLowerCase();
+
+    // STRICT RESERVED LIST: These must NEVER be redirected to /c/
     const reserved = [
       'privacy', 'about', 'support', 'catalog', 'login', 'register',
       'dashboard', 'authenticity', 'shipping', 'returns', 'size-guide',
@@ -82,9 +85,9 @@ export async function middleware(request: NextRequest) {
       'resellers', 'api', 'admin', 'profile'
     ];
 
-    if (!reserved.includes(slug.toLowerCase())) {
+    if (!reserved.includes(slug)) {
       const url = request.nextUrl.clone();
-      url.pathname = `/c/${slug}`;
+      url.pathname = `/c/${pathParts[0]}`;
       return NextResponse.redirect(url);
     }
   }
