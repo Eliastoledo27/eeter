@@ -15,21 +15,42 @@ function CheckoutHandler() {
     const [status, setStatus] = useState('Sincronizando con Meta...')
     const [error, setError] = useState<string | null>(null)
     const [processed, setProcessed] = useState(false)
-    const isCreditPurchase = !searchParams.get('products')
+
+    const productsParam = searchParams.get('products')
+    const creditsParam = searchParams.get('credits')
+    const isCreditPurchase = !productsParam && creditsParam
+    const isMetaSync = !!productsParam
 
     useEffect(() => {
         // Only run once
         if (processed) return;
 
         const syncWithMeta = async () => {
-            const productsParam = searchParams.get('products')
+            if (!productsParam && !creditsParam) {
+                // If no sync params, check if we have items in cart. 
+                // If we do, we might just be in the general checkout flow.
+                const currentItems = useCartStore.getState().items;
+                if (currentItems.length > 0) {
+                    setStatus('Cargando resumen de pedido...')
+                    setProcessed(true)
+                    // If we have items but no sync params, we should probably just show the checkout form.
+                    // For now, let's redirect to /cart where the checkout form lives in the sidebar.
+                    router.push('/cart')
+                    return
+                }
+
+                // If totally empty and no params, go back to catalog
+                router.push('/catalog')
+                return
+            }
+
             const couponParam = searchParams.get('coupon')
 
             try {
-                // CLEAR PREVIOUS ATTEMPTS TO ENSURE CLEAN STATE
+                // ONLY CLEAR IF WE ARE REPLACING WITH SYNCED PRODUCTS OR CREDITS
                 clearCart()
 
-                if (!productsParam) {
+                if (isCreditPurchase) {
                     setStatus('Configurando compra de CRÉDITOS ÉTER...')
 
                     // VIRTUAL PRODUCT FOR CREDITS
@@ -38,7 +59,7 @@ function CheckoutHandler() {
                         name: 'ÉTER PROTOCOL / CRÉDITO DIGITAL',
                         description: 'Carga de saldo preventivo para futuras adquisiciones en el ecosistema Éter. Protocolo de Sincronización Meta Pay activado.',
                         category: 'Credits',
-                        basePrice: parseInt(searchParams.get('credits') || '50000'), // Customizable pack price
+                        basePrice: parseInt(creditsParam || '50000'),
                         images: ['/images/eter-coin.png'],
                         stockBySize: { 'U': 999 },
                         totalStock: 999,
@@ -61,7 +82,7 @@ function CheckoutHandler() {
                 setStatus('Analizando productos...')
 
                 // Format: ID:QTY,ID:QTY
-                const productEntries = productsParam.split(',')
+                const productEntries = productsParam ? productsParam.split(',') : [];
                 const requestedItems: { fullId: string, realId: string, size: string, qty: number }[] = []
 
                 productEntries.forEach(entry => {
@@ -105,21 +126,23 @@ function CheckoutHandler() {
                 }
 
                 // Add items to cart
-                requestedItems.forEach(req => {
-                    const product = productsData.find(p => p.id === req.realId)
-                    if (product) {
-                        let selectedSize = req.size
-                        const availableSizes = Object.keys(product.stockBySize).filter(s => product.stockBySize[s] > 0)
+                if (productsParam) {
+                    requestedItems.forEach(req => {
+                        const product = productsData.find(p => p.id === req.realId)
+                        if (product) {
+                            let selectedSize = req.size
+                            const availableSizes = Object.keys(product.stockBySize).filter(s => product.stockBySize[s] > 0)
 
-                        if (!product.stockBySize[selectedSize] || product.stockBySize[selectedSize] <= 0) {
-                            if (availableSizes.length > 0) {
-                                selectedSize = availableSizes[0]
+                            if (!product.stockBySize[selectedSize] || product.stockBySize[selectedSize] <= 0) {
+                                if (availableSizes.length > 0) {
+                                    selectedSize = availableSizes[0]
+                                }
                             }
-                        }
 
-                        addItem(product, selectedSize, req.qty)
-                    }
-                })
+                            addItem(product, selectedSize, req.qty)
+                        }
+                    })
+                }
 
                 // Apply coupon if present
                 if (couponParam) {
@@ -201,6 +224,14 @@ function CheckoutHandler() {
                                             alt="Éter Protocol Coin"
                                             className="w-20 h-20 object-contain drop-shadow-[0_0_20px_rgba(200,138,4,0.5)]"
                                         />
+                                    ) : isMetaSync ? (
+                                        <div className="relative">
+                                            <ShoppingBag size={64} className="text-yellow-500" />
+                                            <motion.div
+                                                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                                                transition={{ duration: 2, repeat: Infinity }}
+                                                className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-black" />
+                                        </div>
                                     ) : (
                                         <ShoppingBag size={64} className="text-yellow-500" />
                                     )}
@@ -210,10 +241,10 @@ function CheckoutHandler() {
                         </AnimatePresence>
 
                         <h1 className="text-4xl font-black mb-2 tracking-tighter uppercase italic">
-                            Éter <span className="text-yellow-500">{isCreditPurchase ? 'PROTOCOL' : 'Checkout'}</span>
+                            Éter <span className="text-yellow-500">{isCreditPurchase ? 'PROTOCOL' : isMetaSync ? 'Meta Sync' : 'Checkout'}</span>
                         </h1>
                         <p className="text-gray-500 text-[10px] font-mono tracking-[0.4em] uppercase mb-8">
-                            {isCreditPurchase ? 'ADQUISICIÓN DE SALDO PREVENTIVO' : 'Protocolo de Sincronización Meta'}
+                            {isCreditPurchase ? 'ADQUISICIÓN DE SALDO PREVENTIVO' : isMetaSync ? 'Protocolo de Sincronización Meta' : 'Procesando Pedido...'}
                         </p>
 
                         <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden mb-6">

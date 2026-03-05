@@ -270,13 +270,16 @@ export default function CartPage() {
                                     </div>
 
                                     {/* CTA */}
-                                    <Link
-                                        href="/checkout"
+                                    <button
+                                        onClick={() => {
+                                            useCartStore.getState().setIsOpen(true);
+                                            useCartStore.getState().setCartStep('checkout');
+                                        }}
                                         className="w-full py-6 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-black text-lg rounded-2xl hover:scale-105 transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.3)] flex items-center justify-center gap-3"
                                     >
                                         <CreditCard size={24} />
                                         FINALIZAR COMPRA
-                                    </Link>
+                                    </button>
 
                                     <p className="text-center text-xs text-gray-400">
                                         Al continuar, aceptás nuestros <Link href="/terms" className="text-yellow-500 hover:underline">Términos y Condiciones</Link>
