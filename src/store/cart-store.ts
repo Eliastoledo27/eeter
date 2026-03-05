@@ -2,6 +2,18 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Product } from '@/types';
 import { Coupon } from '@/app/actions/coupons';
+import { useAuthStore } from '@/store/auth-store';
+import { SupabaseCartRepository } from '@/infrastructure/repositories/SupabaseCartRepository';
+import { toast } from 'sonner';
+
+const repo = new SupabaseCartRepository();
+
+const syncWithDB = (items: CartItem[]) => {
+  const user = useAuthStore.getState().user;
+  if (user) {
+    repo.syncCart(user.id, items).catch(console.error);
+  }
+};
 
 interface CartItem extends Product {
   quantity: number;
@@ -27,6 +39,8 @@ interface CartStore {
   setResellerWhatsApp: (num: string | null) => void;
   cartStep: 'items' | 'checkout' | 'success';
   setCartStep: (step: 'items' | 'checkout' | 'success') => void;
+  stockAlerts: Record<string, string>;
+  initRealtimeSubscription: () => void;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -37,6 +51,24 @@ export const useCartStore = create<CartStore>()(
       appliedCoupon: null,
       resellerWhatsApp: null,
       cartStep: 'items',
+      stockAlerts: {},
+
+      initRealtimeSubscription: () => {
+        const { items } = get();
+        if (items.length === 0) return;
+        const productIds = items.map(i => i.id);
+
+        repo.subscribeToStockChanges(productIds, (payload) => {
+          const updatedProduct = payload.new;
+          if (updatedProduct) {
+            const cartItem = get().items.find(i => i.id === updatedProduct.id);
+            if (cartItem && updatedProduct.total_stock < 5) {
+              toast.warning(`¡Atención! Quedan pocas unidades de ${cartItem.name}`);
+              set((state) => ({ stockAlerts: { ...state.stockAlerts, [cartItem.id]: 'low_stock' } }));
+            }
+          }
+        });
+      },
 
       setResellerWhatsApp: (num) => set({ resellerWhatsApp: num }),
       setCartStep: (step) => set({ cartStep: step }),
@@ -47,41 +79,44 @@ export const useCartStore = create<CartStore>()(
           (item) => item.id === product.id && item.selectedSize === size
         );
 
+        let newItems;
         if (existingItem) {
-          set({
-            items: items.map((item) =>
-              item.id === product.id && item.selectedSize === size
-                ? { ...item, quantity: item.quantity + quantity }
-                : item
-            ),
-          });
+          newItems = items.map((item) =>
+            item.id === product.id && item.selectedSize === size
+              ? { ...item, quantity: item.quantity + quantity }
+              : item
+          );
         } else {
-          set({
-            items: [...items, { ...product, selectedSize: size, quantity }],
-          });
+          newItems = [...items, { ...product, selectedSize: size, quantity }];
         }
+
+        set({ items: newItems });
+        syncWithDB(newItems);
       },
 
       removeItem: (productId, size) => {
-        set({
-          items: get().items.filter(
-            (item) => !(item.id === productId && item.selectedSize === size)
-          ),
-        });
+        const newItems = get().items.filter(
+          (item) => !(item.id === productId && item.selectedSize === size)
+        );
+        set({ items: newItems });
+        syncWithDB(newItems);
       },
 
       updateQuantity: (productId, size, quantity) => {
         if (quantity < 1) return;
-        set({
-          items: get().items.map((item) =>
-            item.id === productId && item.selectedSize === size
-              ? { ...item, quantity }
-              : item
-          ),
-        });
+        const newItems = get().items.map((item) =>
+          item.id === productId && item.selectedSize === size
+            ? { ...item, quantity }
+            : item
+        );
+        set({ items: newItems });
+        syncWithDB(newItems);
       },
 
-      clearCart: () => set({ items: [], appliedCoupon: null }),
+      clearCart: () => {
+        set({ items: [], appliedCoupon: null });
+        syncWithDB([]);
+      },
 
       toggleCart: () => set({ isOpen: !get().isOpen }),
       setIsOpen: (open) => set({ isOpen: open }),

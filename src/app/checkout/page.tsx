@@ -7,11 +7,12 @@ import { SupabaseProductRepository } from '@/infrastructure/repositories/Supabas
 import { validateCoupon } from '@/app/actions/coupons'
 import { Loader2, ShoppingBag, CheckCircle2, AlertCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { OneStepCheckout } from '@/components/checkout/OneStepCheckout'
 
 function CheckoutHandler() {
     const searchParams = useSearchParams()
     const router = useRouter()
-    const { addItem, clearCart, applyCoupon, getSubtotal } = useCartStore()
+    const { addItem, clearCart, applyCoupon, getSubtotal, items } = useCartStore()
     const [status, setStatus] = useState('Sincronizando con Meta...')
     const [error, setError] = useState<string | null>(null)
     const [processed, setProcessed] = useState(false)
@@ -32,10 +33,7 @@ function CheckoutHandler() {
                 const currentItems = useCartStore.getState().items;
                 if (currentItems.length > 0) {
                     setStatus('Cargando resumen de pedido...')
-                    setProcessed(true)
-                    // If we have items but no sync params, we should probably just show the checkout form.
-                    // For now, let's redirect to /cart where the checkout form lives in the sidebar.
-                    router.push('/cart')
+                    setTimeout(() => setProcessed(true), 500)
                     return
                 }
 
@@ -71,11 +69,7 @@ function CheckoutHandler() {
                     addItem(creditProduct, 'U', 1)
 
                     setStatus('¡Sincronización de créditos lista!')
-                    setProcessed(true)
-
-                    setTimeout(() => {
-                        router.push('/cart')
-                    }, 1500)
+                    setTimeout(() => setProcessed(true), 1000)
                     return
                 }
 
@@ -155,11 +149,7 @@ function CheckoutHandler() {
                 }
 
                 setStatus('¡Sincronización completa!')
-                setProcessed(true)
-
-                setTimeout(() => {
-                    router.push('/cart')
-                }, 1000)
+                setTimeout(() => setProcessed(true), 1500)
 
             } catch (err: any) {
                 console.error('Checkout sync error:', err)
@@ -170,6 +160,10 @@ function CheckoutHandler() {
 
         syncWithMeta()
     }, [searchParams, router, addItem, clearCart, applyCoupon, getSubtotal, processed])
+
+    if (processed && !error && items.length > 0) {
+        return <OneStepCheckout />
+    }
 
     return (
         <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-6 selection:bg-yellow-500 selection:text-black">
@@ -198,15 +192,6 @@ function CheckoutHandler() {
                                     className="p-6 bg-red-500/10 rounded-3xl mb-8"
                                 >
                                     <AlertCircle size={64} className="text-red-500" />
-                                </motion.div>
-                            ) : processed ? (
-                                <motion.div
-                                    key="success"
-                                    initial={{ opacity: 0, scale: 0.5 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    className="p-6 bg-green-500/10 rounded-3xl mb-8"
-                                >
-                                    <CheckCircle2 size={64} className="text-green-500" />
                                 </motion.div>
                             ) : (
                                 <motion.div
