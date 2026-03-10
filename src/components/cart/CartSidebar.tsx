@@ -100,7 +100,13 @@ export function CartSidebar() {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                items: items.map(i => ({ id: i.id, size: i.selectedSize, quantity: i.quantity })),
+                items: items.map(i => ({
+                  id: i.id,
+                  name: i.name,
+                  price: i.basePrice,
+                  size: i.selectedSize,
+                  quantity: i.quantity
+                })),
                 payer: {
                   firstName: formData.customerName,
                   phone: fullCustomerPhone,
