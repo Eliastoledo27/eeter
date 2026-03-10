@@ -27,7 +27,7 @@ const checkoutSchema = z.object({
     // province: z.string().optional(), // Fixed to Buenos Aires
     postalCode: z.string().optional(),
     deliveryDate: z.string().optional(),
-    paymentMethod: z.enum(['efectivo', 'transferencia', 'mercado_pago', 'tarjeta']),
+    paymentMethod: z.enum(['nave_galicia']),
     notes: z.string().optional(),
     couponCode: z.string().optional()
 });
@@ -187,11 +187,7 @@ export async function createOrderFromCart(input: CheckoutInput) {
 
         // If user is not logged in and no service key, we can't bypass RLS for guest checkout
         if (!user) {
-            console.error('❌ Intento de Guest Checkout sin SUPABASE_SERVICE_ROLE_KEY. Fallará por RLS.');
-            return {
-                success: false,
-                message: 'Para realizar el pedido como invitado, el sistema requiere configuración adicional. Por favor, inicia sesión para continuar o contacta al soporte.'
-            };
+            console.warn('⚠️ Intento de Guest Checkout sin SUPABASE_SERVICE_ROLE_KEY. Puede fallar por RLS.');
         }
 
         supabaseClient = createClient();

@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import {
     CreditCard, Truck, MapPin, User, Mail, ShieldCheck,
-    Lock, ArrowRight, CheckCircle2, Building2, Smartphone
+    Lock, ArrowRight, CheckCircle2, Building2, Smartphone, Wallet
 } from 'lucide-react'
 import { useCartStore } from '@/store/cart-store'
 import Image from 'next/image'
@@ -21,8 +21,7 @@ const checkoutSchema = z.object({
     city: z.string().min(2, 'Ciudad inválida'),
     postalCode: z.string().min(4, 'Código postal inválido'),
     province: z.string().min(2, 'Provincia requerida'),
-    paymentMethod: z.enum(['card', 'transfer', 'paypal', 'apple_pay', 'google_pay']),
-    // Card details (mocked validation for UI)
+    paymentMethod: z.enum(['nave_galicia']),
     cardNumber: z.string().optional(),
     cardName: z.string().optional(),
     cardExpiry: z.string().optional(),
@@ -39,7 +38,7 @@ export function OneStepCheckout() {
     const { register, handleSubmit, watch, formState: { errors }, setValue } = useForm<CheckoutFormData>({
         resolver: zodResolver(checkoutSchema),
         defaultValues: {
-            paymentMethod: 'card'
+            paymentMethod: 'nave_galicia'
         }
     })
 
@@ -49,10 +48,34 @@ export function OneStepCheckout() {
     const onSubmit = async (data: CheckoutFormData) => {
         setIsProcessing(true)
 
-        // Simulate API Call / Processing
-        await new Promise(resolve => setTimeout(resolve, 2500))
+        if (data.paymentMethod === 'nave_galicia') {
+            try {
+                const response = await fetch('/api/checkout/nave', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        items: items.map(i => ({ id: i.id, size: i.selectedSize, quantity: i.quantity })),
+                        payer: data,
+                        integration_id: 'P-69AF-88A4-X'
+                    })
+                });
 
-        // In a real scenario, here we interact with Stripe / PayPal APIs
+                const result = await response.json();
+
+                if (result.success && result.init_point) {
+                    window.location.href = result.init_point;
+                    return;
+                } else {
+                    console.error("Payment error:", result.error);
+                    alert("Hubo un error al iniciar el pago con Nave Galicia: " + result.error);
+                }
+            } catch (error) {
+                console.error("Payment error:", error);
+                alert("Error de red al intentar contactar a Nave Galicia.");
+            }
+            setIsProcessing(false);
+            return;
+        }
 
         setIsProcessing(false)
         setSuccess(true)
@@ -235,108 +258,26 @@ export function OneStepCheckout() {
                                     Método de Pago
                                 </h2>
 
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                                <div className="grid grid-cols-1 gap-4 mb-8">
                                     <button
                                         type="button"
-                                        onClick={() => setValue('paymentMethod', 'card')}
-                                        className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${paymentMethod === 'card' ? 'border-yellow-500 bg-yellow-500/10 text-yellow-500' : 'border-white/10 text-gray-400 hover:border-white/20'}`}
+                                        onClick={() => setValue('paymentMethod', 'nave_galicia')}
+                                        className="p-6 rounded-2xl border-2 border-[#FFD200] bg-[#FFD200]/10 text-[#FFD200] flex flex-col items-center gap-3 transition-all"
                                     >
-                                        <CreditCard size={24} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-center mt-2">Tarjeta</span>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setValue('paymentMethod', 'transfer')}
-                                        className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${paymentMethod === 'transfer' ? 'border-yellow-500 bg-yellow-500/10 text-yellow-500' : 'border-white/10 text-gray-400 hover:border-white/20'}`}
-                                    >
-                                        <Building2 size={24} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-center mt-2">CVU / CBU</span>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setValue('paymentMethod', 'paypal')}
-                                        className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${paymentMethod === 'paypal' ? 'border-[#0070BA] bg-[#0070BA]/10 text-[#0070BA]' : 'border-white/10 text-gray-400 hover:border-white/20'}`}
-                                    >
-                                        <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 6.007 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106a.64.64 0 0 1-.632.53z" /></svg>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-center mt-2">PayPal</span>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setValue('paymentMethod', 'apple_pay')}
-                                        className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${paymentMethod === 'apple_pay' ? 'border-white bg-white/10 text-white' : 'border-white/10 text-gray-400 hover:border-white/20'}`}
-                                    >
-                                        <svg className="w-6 h-6 fill-current" viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" /></svg>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-center mt-2">Pay</span>
+                                        <Building2 size={32} />
+                                        <span className="text-xs font-black uppercase tracking-widest text-center">Nave Galicia</span>
                                     </button>
                                 </div>
 
                                 <AnimatePresence mode="wait">
-                                    {paymentMethod === 'card' && (
-                                        <motion.div
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                            className="space-y-6"
-                                        >
-                                            <div className="bg-black border border-white/10 p-6 rounded-2xl relative overflow-hidden">
-                                                <div className="absolute top-0 right-0 p-4 opacity-10">
-                                                    <CreditCard size={100} />
-                                                </div>
-                                                <div className="relative space-y-4">
-                                                    <div className="space-y-2">
-                                                        <label className="text-[10px] uppercase font-black tracking-widest text-gray-400">Número de Tarjeta</label>
-                                                        <input
-                                                            {...register('cardNumber')}
-                                                            type="text"
-                                                            placeholder="0000 0000 0000 0000"
-                                                            className="w-full bg-transparent border-b border-white/20 pb-2 text-xl tracking-widest font-mono focus:border-yellow-500 transition-colors outline-none"
-                                                        />
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-6">
-                                                        <div className="space-y-2">
-                                                            <label className="text-[10px] uppercase font-black tracking-widest text-gray-400">Vencimiento</label>
-                                                            <input
-                                                                {...register('cardExpiry')}
-                                                                type="text"
-                                                                placeholder="MM/YY"
-                                                                className="w-full bg-transparent border-b border-white/20 pb-2 text-lg tracking-widest font-mono focus:border-yellow-500 transition-colors outline-none"
-                                                            />
-                                                        </div>
-                                                        <div className="space-y-2">
-                                                            <label className="text-[10px] uppercase font-black tracking-widest text-gray-400">CVC</label>
-                                                            <input
-                                                                {...register('cardCvc')}
-                                                                type="text"
-                                                                placeholder="123"
-                                                                className="w-full bg-transparent border-b border-white/20 pb-2 text-lg tracking-widest font-mono focus:border-yellow-500 transition-colors outline-none"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <label className="text-[10px] uppercase font-black tracking-widest text-gray-400">Nombre en Tarjeta</label>
-                                                        <input
-                                                            {...register('cardName')}
-                                                            type="text"
-                                                            placeholder="JUAN PEREZ"
-                                                            className="w-full bg-transparent border-b border-white/20 pb-2 text-lg tracking-widest font-mono uppercase focus:border-yellow-500 transition-colors outline-none"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    )}
-
-                                    {paymentMethod === 'transfer' && (
-                                        <motion.div
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                            className="bg-yellow-500/10 border border-yellow-500/20 p-6 rounded-2xl text-yellow-500"
-                                        >
-                                            <h4 className="font-black uppercase tracking-tight mb-2">Transferencia Bancaria (Descuento extra)</h4>
-                                            <p className="text-sm">Al confirmar tu pedido, te mostraremos los datos bancarios para realizar la transferencia. Tu pedido se procesará una vez verificado el pago.</p>
-                                        </motion.div>
-                                    )}
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        className="bg-[#FFD200]/10 border border-[#FFD200]/20 p-6 rounded-2xl text-[#FFD200]"
+                                    >
+                                        <h4 className="font-black uppercase tracking-tight mb-2 italic">Integración Nave Galicia Protegida</h4>
+                                        <p className="text-sm text-gray-300">Estás por pagar de forma exclusiva a través de Nave de Banco Galicia. Código de comercio validado: <b>P-69AF-88A4-X</b>.</p>
+                                    </motion.div>
                                 </AnimatePresence>
 
                             </section>
