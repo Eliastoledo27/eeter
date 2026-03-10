@@ -36,6 +36,13 @@ export const metadata: Metadata = {
       { url: '/icon.svg', type: 'image/svg+xml' },
     ],
   },
+  verification: {
+    other: {
+      'nave-verification': 'P-69AF-88A4-X',
+      'nave-domain-verification': 'P-69AF-88A4-X',
+      'nave': 'P-69AF-88A4-X'
+    }
+  }
 };
 
 export default async function RootLayout({

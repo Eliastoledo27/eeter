@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import {
     CreditCard, Truck, MapPin, User, Mail, ShieldCheck,
-    Lock, ArrowRight, CheckCircle2, Building2, Smartphone, Wallet
+    Lock, ArrowRight, CheckCircle2, Building2, Smartphone, Wallet, ShoppingBag
 } from 'lucide-react'
 import { useCartStore } from '@/store/cart-store'
 import Image from 'next/image'
@@ -21,7 +21,7 @@ const checkoutSchema = z.object({
     city: z.string().min(2, 'Ciudad inválida'),
     postalCode: z.string().min(4, 'Código postal inválido'),
     province: z.string().min(2, 'Provincia requerida'),
-    paymentMethod: z.enum(['nave_galicia']),
+    paymentMethod: z.enum(['nave_galicia', 'billowshop']),
     cardNumber: z.string().optional(),
     cardName: z.string().optional(),
     cardExpiry: z.string().optional(),
@@ -48,15 +48,16 @@ export function OneStepCheckout() {
     const onSubmit = async (data: CheckoutFormData) => {
         setIsProcessing(true)
 
-        if (data.paymentMethod === 'nave_galicia') {
+        if (data.paymentMethod === 'nave_galicia' || data.paymentMethod === 'billowshop') {
             try {
+                const integration_code = data.paymentMethod === 'billowshop' ? 'R-69AF-8D1F-M' : 'P-69AF-88A4-X';
                 const response = await fetch('/api/checkout/nave', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         items: items.map(i => ({ id: i.id, size: i.selectedSize, quantity: i.quantity })),
                         payer: data,
-                        integration_id: 'P-69AF-88A4-X'
+                        integration_id: integration_code
                     })
                 });
 
@@ -67,11 +68,11 @@ export function OneStepCheckout() {
                     return;
                 } else {
                     console.error("Payment error:", result.error);
-                    alert("Hubo un error al iniciar el pago con Nave Galicia: " + result.error);
+                    alert(`Hubo un error al iniciar el pago con ${data.paymentMethod === 'billowshop' ? 'Billowshop' : 'Nave Galicia'}: ` + result.error);
                 }
             } catch (error) {
                 console.error("Payment error:", error);
-                alert("Error de red al intentar contactar a Nave Galicia.");
+                alert("Error de red al intentar contactar a la pasarela.");
             }
             setIsProcessing(false);
             return;
@@ -258,26 +259,51 @@ export function OneStepCheckout() {
                                     Método de Pago
                                 </h2>
 
-                                <div className="grid grid-cols-1 gap-4 mb-8">
+                                <div className="grid grid-cols-2 gap-4 mb-8">
                                     <button
                                         type="button"
                                         onClick={() => setValue('paymentMethod', 'nave_galicia')}
-                                        className="p-6 rounded-2xl border-2 border-[#FFD200] bg-[#FFD200]/10 text-[#FFD200] flex flex-col items-center gap-3 transition-all"
+                                        className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all ${paymentMethod === 'nave_galicia' ? 'border-[#FFD200] bg-[#FFD200]/10 text-[#FFD200]' : 'border-white/10 text-gray-400 hover:border-white/20'}`}
                                     >
                                         <Building2 size={32} />
                                         <span className="text-xs font-black uppercase tracking-widest text-center">Nave Galicia</span>
                                     </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setValue('paymentMethod', 'billowshop')}
+                                        className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all ${paymentMethod === 'billowshop' ? 'border-[#FFD200] bg-[#FFD200]/10 text-[#FFD200]' : 'border-white/10 text-gray-400 hover:border-white/20'}`}
+                                    >
+                                        <ShoppingBag size={32} />
+                                        <span className="text-xs font-black uppercase tracking-widest text-center">Billowshop</span>
+                                    </button>
                                 </div>
 
                                 <AnimatePresence mode="wait">
-                                    <motion.div
-                                        initial={{ opacity: 0, height: 0 }}
-                                        animate={{ opacity: 1, height: 'auto' }}
-                                        className="bg-[#FFD200]/10 border border-[#FFD200]/20 p-6 rounded-2xl text-[#FFD200]"
-                                    >
-                                        <h4 className="font-black uppercase tracking-tight mb-2 italic">Integración Nave Galicia Protegida</h4>
-                                        <p className="text-sm text-gray-300">Estás por pagar de forma exclusiva a través de Nave de Banco Galicia. Código de comercio validado: <b>P-69AF-88A4-X</b>.</p>
-                                    </motion.div>
+                                    {paymentMethod === 'nave_galicia' && (
+                                        <motion.div
+                                            key="nave"
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            className="bg-[#FFD200]/10 border border-[#FFD200]/20 p-6 rounded-2xl text-[#FFD200]"
+                                        >
+                                            <h4 className="font-black uppercase tracking-tight mb-2 italic">Integración Nave Galicia Protegida</h4>
+                                            <p className="text-sm text-gray-300">Estás por pagar de forma exclusiva a través de Nave de Banco Galicia. Código de comercio validado: <b>P-69AF-88A4-X</b>.</p>
+                                        </motion.div>
+                                    )}
+                                    {paymentMethod === 'billowshop' && (
+                                        <motion.div
+                                            key="billow"
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            className="bg-[#FFD200]/10 border border-[#FFD200]/20 p-6 rounded-2xl text-[#FFD200]"
+                                        >
+                                            <h4 className="font-black uppercase tracking-tight mb-2 italic">Pagar vía Billowshop</h4>
+                                            <p className="text-sm text-gray-300">Estás por ser redirigido a la pasarela de pagos de Billowshop conectada a Nave Galicia. Código de vinculación validado: <b>R-69AF-8D1F-M</b></p>
+                                        </motion.div>
+                                    )}
                                 </AnimatePresence>
 
                             </section>

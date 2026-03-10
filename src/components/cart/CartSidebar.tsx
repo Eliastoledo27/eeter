@@ -38,7 +38,7 @@ export function CartSidebar() {
     customerPhone: '',
     resellerName: user?.name || '',
     deliveryAddress: '',
-    paymentMethod: 'nave_galicia' as 'nave_galicia',
+    paymentMethod: 'nave_galicia' as 'nave_galicia' | 'billowshop',
     notes: ''
   });
   const [naveInitPoint, setNaveInitPoint] = useState<string | null>(null);
@@ -93,8 +93,9 @@ export function CartSidebar() {
         setReferenceCode(result.referenceCode!);
         setCartStep('success');
 
-        if (formData.paymentMethod === 'nave_galicia') {
+        if (formData.paymentMethod === 'nave_galicia' || formData.paymentMethod === 'billowshop') {
           try {
+            const integration_code = formData.paymentMethod === 'billowshop' ? 'R-69AF-8D1F-M' : 'P-69AF-88A4-X';
             const response = await fetch('/api/checkout/nave', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -105,7 +106,7 @@ export function CartSidebar() {
                   phone: fullCustomerPhone,
                   address: formData.deliveryAddress,
                 },
-                integration_id: 'P-69AF-88A4-X'
+                integration_id: integration_code
               })
             });
             const resultNave = await response.json();
@@ -113,11 +114,11 @@ export function CartSidebar() {
               setNaveInitPoint(resultNave.init_point);
             } else {
               console.error("Nave Integration Error:", resultNave.error);
-              toast.error(`Nave Galicia: ${resultNave.error || "Error al iniciar el pago"}`);
+              toast.error(`${formData.paymentMethod === 'billowshop' ? 'Billowshop' : 'Nave Galicia'}: ${resultNave.error || "Error al iniciar el pago"}`);
             }
           } catch (error) {
-            console.error("Network Error Nave:", error);
-            toast.error("Error de red al conectar con Nave Galicia");
+            console.error("Network Error:", error);
+            toast.error("Error de red al conectar pasarela de pago");
           }
         }
 
@@ -341,14 +342,29 @@ export function CartSidebar() {
                           />
                         </div>
 
-                        <div className="grid grid-cols-1 gap-4">
+                        <div className="grid grid-cols-2 gap-4">
                           <div
                             onClick={() => setFormData({ ...formData, paymentMethod: 'nave_galicia' })}
-                            className="p-4 rounded-2xl border-2 border-[#FFD200] bg-[#FFD200]/10 text-[#FFD200] cursor-pointer transition-all flex flex-col items-center justify-center min-h-[80px]"
+                            className={cn(
+                              "p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-center min-h-[80px]",
+                              formData.paymentMethod === 'nave_galicia' ? "border-[#FFD200] bg-[#FFD200]/10 text-[#FFD200]" : "border-white/10 text-gray-400 hover:border-white/20"
+                            )}
                           >
                             <Building2 size={24} className="mb-2" />
                             <span className="text-xs font-black uppercase leading-tight text-center">Nave Galicia</span>
-                            <span className="text-[8px] font-bold mt-1 opacity-60">P-69AF-88A4-X</span>
+                            <span className="text-[8px] font-bold mt-1 opacity-60">P-69...A4-X</span>
+                          </div>
+
+                          <div
+                            onClick={() => setFormData({ ...formData, paymentMethod: 'billowshop' })}
+                            className={cn(
+                              "p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-center min-h-[80px]",
+                              formData.paymentMethod === 'billowshop' ? "border-[#FFD200] bg-[#FFD200]/10 text-[#FFD200]" : "border-white/10 text-gray-400 hover:border-white/20"
+                            )}
+                          >
+                            <ShoppingBag size={24} className="mb-2" />
+                            <span className="text-xs font-black uppercase leading-tight text-center">Billowshop</span>
+                            <span className="text-[8px] font-bold mt-1 opacity-60">R-69...1F-M</span>
                           </div>
                         </div>
                       </div>
@@ -444,8 +460,8 @@ export function CartSidebar() {
                             window.location.href = naveInitPoint;
                           }}
                         >
-                          <Building2 size={24} />
-                          Pagar con Nave Galicia
+                          {formData.paymentMethod === 'billowshop' ? <ShoppingBag size={24} /> : <Building2 size={24} />}
+                          Pagar con {formData.paymentMethod === 'billowshop' ? 'Billowshop' : 'Nave Galicia'}
                         </motion.button>
                       ) : (
                         <button disabled className="w-full bg-gray-800 text-gray-400 h-16 rounded-2xl flex items-center justify-center gap-3 font-black text-xs tracking-widest uppercase">
