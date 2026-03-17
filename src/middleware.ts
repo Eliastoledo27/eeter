@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
     'dashboard', 'authenticity', 'shipping', 'returns', 'size-guide',
     'checkout', 'cart', 'collection', 'press', 'careers',
     'sustainability', 'order-confirmation', 'gift-cards', 'logout',
-    'resellers', 'api', 'admin', 'profile'
+    'resellers', 'api', 'admin', 'profile', 'ai-knowledge-base-d7f9e2a4c6b8'
   ];
 
   const pathParts = pathname.split('/').filter(Boolean);

@@ -8,6 +8,7 @@ import {
     Wallet,
     Truck,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -75,64 +76,82 @@ const HeroSection = ({ products }: { products: Product[] }) => {
         return [...products].sort((a, b) => b.basePrice - a.basePrice)[0];
     }, [products]);
 
-    const primaryHeroImage = heroProduct?.images?.[0] || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=90&w=2400&auto=format&fit=crop";
+    // Usaremos un video de respaldo de alta calidad (estilo calzado/lujo)
+    const videoUrl = "https://cdn.pixabay.com/video/2021/04/12/70860-537446548_large.mp4"; // Ejemplo de video de zapatos/movimiento
 
     return (
-        <section className="relative h-screen min-h-[600px] w-full flex items-center justify-center overflow-hidden">
-            <div className="absolute inset-0 -z-10">
-                <Image
-                    src={primaryHeroImage}
-                    alt="Background"
-                    fill
-                    priority
-                    quality={90}
-                    className="object-cover"
-                    sizes="100vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/40 via-[#0A0A0A]/60 to-[#0A0A0A]" />
-            </div>
-
-            <div className="relative z-10 text-center px-4 max-w-5xl mx-auto mt-20">
-                <span
-                    className="inline-block px-4 py-1 bg-[#C88A04]/20 border border-[#C88A04]/30 text-[#C88A04] text-xs font-bold tracking-[0.3em] uppercase rounded-full mb-6 backdrop-blur-md"
-                >
-                    Tu Negocio Digital
-                </span>
-
-                <h1
-                    className="text-[18vw] md:text-[12rem] font-bold tracking-tighter text-white mb-4 leading-[0.85] select-none"
-                >
-                    ÉTER
-                </h1>
-
-                <p
-                    className="text-gray-300 text-base md:text-xl max-w-2xl mx-auto mb-10 font-light tracking-wide"
-                >
-                    Vende calzado premium brasilero desde tu casa y genera ingresos reales. Nosotros manejamos la logística. Vos enfocate en vender.
-                </p>
-
-                <div
-                    className="flex flex-col sm:flex-row items-center justify-center gap-4"
-                >
-                    <Link href="/catalog" className="w-full sm:w-auto">
-                        <Button className="w-full sm:w-auto h-16 px-10 bg-[#C88A04] hover:bg-[#ECA413] text-black font-bold tracking-widest uppercase rounded-full transition-all transform transform-gpu hover:scale-105 text-sm">
-                            Ver Catálogo
-                        </Button>
-                    </Link>
-                    <Link href="/register" className="w-full sm:w-auto">
-                        <Button variant="outline" className="w-full sm:w-auto h-16 px-10 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white border-white/20 font-bold tracking-widest uppercase rounded-full transition-all text-sm">
-                            Comenzar Ahora
-                        </Button>
-                    </Link>
-                </div>
-            </div>
-
-            <div
-                className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        <section className="relative h-[110vh] w-full flex items-center justify-center overflow-hidden">
+            {/* Parallax Background Layer */}
+            <motion.div
+                initial={{ scale: 1.1 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 2, ease: "easeOut" }}
+                className="absolute inset-0 -z-10"
             >
-                <span className="text-[10px] tracking-[0.5em] uppercase text-gray-500">Scroll</span>
-                <div className="w-px h-12 bg-gradient-to-b from-[#C88A04] to-transparent" />
+                <video
+                    src={videoUrl}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover opacity-60"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black" />
+                <div className="absolute inset-0 bg-black/40" />
+            </motion.div>
+
+            <div className="relative z-10 text-center px-4 max-w-7xl mx-auto">
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    viewport={{ once: true }}
+                >
+                    <span
+                        className="inline-block px-6 py-2 bg-primary/10 border border-primary/30 text-primary text-[10px] font-black tracking-[0.4em] uppercase rounded-full mb-8 backdrop-blur-xl"
+                    >
+                        Gold Edition 2.0 — Luxury Architecture
+                    </span>
+
+                    <h1
+                        className="text-[22vw] md:text-[16rem] font-black tracking-tighter text-white mb-6 leading-[0.75] select-none"
+                    >
+                        ÉTER<span className="text-primary italic">.</span>
+                    </h1>
+
+                    <p
+                        className="text-gray-400 text-lg md:text-2xl max-w-3xl mx-auto mb-12 font-light tracking-wide leading-relaxed"
+                    >
+                        La ingeniería de precisión se encuentra con la <span className="text-white font-medium">estética del diseño premium</span>. Vende calzado brasilero con logística total incluida.
+                    </p>
+
+                    <div
+                        className="flex flex-col sm:flex-row items-center justify-center gap-6"
+                    >
+                        <Link href="/catalog" className="w-full sm:w-auto">
+                            <button className="btn-gold-liquid w-full sm:w-auto">
+                                Explorar la Selección
+                            </button>
+                        </Link>
+                        <Link href="/register" className="w-full sm:w-auto">
+                            <Button variant="outline" className="w-full sm:w-auto h-20 px-12 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white border-white/10 font-black tracking-[0.2em] uppercase rounded-none transition-all text-sm">
+                                Comenzar Ahora
+                            </Button>
+                        </Link>
+                    </div>
+                </motion.div>
             </div>
+
+            {/* Scroll Indicator with Parallax line */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.5 }}
+                className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4"
+            >
+                <span className="text-[10px] tracking-[0.8em] uppercase text-primary font-black animate-pulse">Deslizar</span>
+                <div className="w-[2px] h-24 bg-gradient-to-b from-primary via-primary/20 to-transparent" />
+            </motion.div>
         </section >
     );
 };
@@ -144,49 +163,74 @@ const ProductShowcase = ({ products, loading }: { products: Product[], loading: 
     }, [products]);
 
     if (loading) return (
-        <section className="py-24 bg-[#0A0A0A]">
-            <div className="container mx-auto px-6 h-[400px] bg-white/[0.02] rounded-3xl animate-pulse" />
+        <section className="py-24 bg-black">
+            <div className="container mx-auto px-6 h-[400px] bg-white/[0.02] rounded-none animate-pulse" />
         </section>
     );
 
     return (
-        <section className="py-24 bg-[#050505] overflow-hidden border-t border-white/5">
-            <div className="max-w-[1440px] mx-auto px-6 lg:px-12 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                    <h2 className="text-4xl font-bold tracking-tighter text-white uppercase">Trending Now</h2>
-                    <p className="text-gray-500 tracking-widest uppercase text-xs mt-2">Drops Limitados</p>
-                </div>
+        <section className="py-32 bg-black overflow-hidden relative">
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+
+            <div className="max-w-[1440px] mx-auto px-6 lg:px-12 mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8">
+                <motion.div
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8 }}
+                    viewport={{ once: true }}
+                >
+                    <span className="text-primary tracking-[0.5em] uppercase text-xs font-black mb-4 block">Selection 2026</span>
+                    <h2 className="text-6xl font-black tracking-tighter text-white uppercase leading-none">The Addictive<br />Flow.</h2>
+                </motion.div>
                 <div className="flex gap-4">
-                    <Link href="/catalog" className="h-12 px-6 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors text-xs font-bold uppercase tracking-widest text-white">
-                        Ver Todos
+                    <Link href="/catalog" className="group h-16 px-10 bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary hover:text-black transition-all duration-500 text-[10px] font-black uppercase tracking-[0.3em] text-white">
+                        Ver Colección Completa
                     </Link>
                 </div>
             </div>
-            <div className="flex gap-6 overflow-x-auto no-scrollbar px-6 lg:px-12 pb-8">
-                {showcaseProducts.map((product) => (
-                    <Link href="/catalog" key={product.id} className="min-w-[300px] md:min-w-[360px] group cursor-pointer block">
-                        <div className="relative aspect-[3/4] bg-[#111] rounded-2xl overflow-hidden mb-6 border border-white/5 group-hover:border-[#C88A04]/30 transition-colors">
-                            <Image
-                                src={product.images?.[0] || 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?q=80'}
-                                alt={product.name}
-                                fill
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                className="object-cover transition-transform duration-700 group-hover:scale-110 will-change-transform transform-gpu"
-                            />
-                            <div className="absolute top-4 left-4">
-                                <span className="bg-[#C88A04] text-black text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter shadow-lg">
-                                    {product.category}
-                                </span>
+
+            <div className="flex gap-8 overflow-x-auto no-scrollbar px-6 lg:px-12 pb-12 snap-x snap-mandatory">
+                {showcaseProducts.map((product, idx) => (
+                    <motion.div
+                        key={product.id}
+                        initial={{ opacity: 0, y: 50 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: idx * 0.1 }}
+                        viewport={{ once: true }}
+                        className="min-w-[320px] md:min-w-[450px] snap-start group"
+                    >
+                        <Link href="/catalog">
+                            <div className="relative aspect-[4/5] bg-matte-black overflow-hidden mb-8 border border-white/5 group-hover:border-primary/40 transition-all duration-700">
+                                <Image
+                                    src={product.images?.[0] || 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?q=80'}
+                                    alt={product.name}
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+                                <div className="absolute bottom-8 left-8 right-8 translate-y-8 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-700">
+                                    <button className="w-full py-4 bg-white text-black text-[10px] font-black uppercase tracking-widest">
+                                        Quick View
+                                    </button>
+                                </div>
+
+                                <div className="absolute top-6 right-6">
+                                    <span className="bg-primary px-4 py-1 text-black text-[9px] font-black uppercase tracking-tighter shadow-2xl">
+                                        {product.category}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex justify-between items-start">
-                            <div className="pr-4">
-                                <h3 className="text-xl font-bold tracking-tight text-white line-clamp-1">{product.name}</h3>
-                                <p className="text-gray-500 text-xs uppercase tracking-widest mt-1 line-clamp-1">{product.description}</p>
+                            <div className="flex justify-between items-end">
+                                <div>
+                                    <h3 className="text-2xl font-black tracking-tighter text-white uppercase group-hover:text-primary transition-colors">{product.name}</h3>
+                                    <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] mt-2 italic">Selección Élite</p>
+                                </div>
+                                <span className="text-xl font-black text-white">${product.basePrice.toLocaleString('es-AR')}</span>
                             </div>
-                            <span className="text-lg font-bold text-[#C88A04] whitespace-nowrap">${product.basePrice.toLocaleString('es-AR')}</span>
-                        </div>
-                    </Link>
+                        </Link>
+                    </motion.div>
                 ))}
             </div>
         </section>
@@ -200,7 +244,7 @@ const PhilosophySection = () => {
                 <div
                     className="mb-12"
                 >
-                    <span className="text-[#C88A04] font-bold tracking-widest text-sm uppercase mb-4 block">Nuestros Pilares</span>
+                    <span className="text-[#D4AF37] font-bold tracking-widest text-sm uppercase mb-4 block">Nuestros Pilares</span>
                     <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase">
                         Tu Éxito Es <br /> Nuestro Éxito.
                     </h2>
@@ -238,13 +282,13 @@ const PhilosophySection = () => {
                             Nos encargamos del stock, envíos y atención al cliente. Vos solo vendés.
                         </div>
                         <div className="absolute bottom-12 right-8">
-                            <div className="size-12 rounded-full bg-[#C88A04] flex items-center justify-center text-black">
+                            <div className="size-12 rounded-full bg-[#D4AF37] flex items-center justify-center text-black">
                                 <Truck size={20} />
                             </div>
                         </div>
                     </div>
 
-                    <div className="md:col-span-12 md:row-span-1 relative group overflow-hidden rounded-3xl bg-[#C88A04]">
+                    <div className="md:col-span-12 md:row-span-1 relative group overflow-hidden rounded-3xl bg-[#D4AF37]">
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                             <span className="text-8xl md:text-9xl font-black text-black/10 select-none">PROFIT</span>
                         </div>
@@ -264,13 +308,13 @@ const PhilosophySection = () => {
 
 const TechSection = () => {
     return (
-        <section id="how-it-works" className="py-32 bg-[#050505] relative overflow-hidden border-t border-white/5">
-            <div className="absolute top-0 right-0 w-1/2 h-full bg-[#C88A04]/5 -skew-x-12 translate-x-1/4 pointer-events-none" />
+        <section id="how-it-works" className="py-32 bg-[#000000] relative overflow-hidden border-t border-white/5">
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-[#D4AF37]/5 -skew-x-12 translate-x-1/4 pointer-events-none" />
             <div className="max-w-[1440px] mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                 <div className="relative z-10">
                     <div className="absolute -top-10 -left-10 text-[8rem] md:text-[12rem] font-black text-white/[0.02] leading-none pointer-events-none">SYSTEM</div>
                     <h2 className="text-5xl md:text-6xl font-bold tracking-tighter text-white mb-10 leading-[0.9] uppercase">
-                        VENDER <br /> NUNCA FUE <br /> <span className="text-[#C88A04]">TAN SIMPLE.</span>
+                        VENDER <br /> NUNCA FUE <br /> <span className="text-[#D4AF37]">TAN SIMPLE.</span>
                     </h2>
                     <div className="space-y-10">
                         {[
@@ -291,7 +335,7 @@ const TechSection = () => {
                             }
                         ].map((spec, idx) => (
                             <div key={idx} className="flex gap-6">
-                                <div className="shrink-0 size-14 rounded-full border border-[#C88A04]/50 flex items-center justify-center text-[#C88A04]">
+                                <div className="shrink-0 size-14 rounded-full border border-[#D4AF37]/50 flex items-center justify-center text-[#D4AF37]">
                                     <spec.icon size={24} />
                                 </div>
                                 <div>
@@ -303,7 +347,7 @@ const TechSection = () => {
                     </div>
                 </div>
                 <div className="relative group z-10">
-                    <div className="absolute inset-0 bg-[#C88A04]/10 blur-[100px] rounded-full scale-75 transform-gpu pointer-events-none" />
+                    <div className="absolute inset-0 bg-[#D4AF37]/10 blur-[100px] rounded-full scale-75 transform-gpu pointer-events-none" />
                     <Image
                         src="https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80"
                         alt="Ecosistema Logístico"
@@ -312,8 +356,8 @@ const TechSection = () => {
                         sizes="(max-width: 1024px) 100vw, 50vw"
                         className="relative z-10 w-full rounded-2xl grayscale hover:grayscale-0 transition-all duration-700 object-cover aspect-square will-change-transform"
                     />
-                    <div className="absolute -top-4 -right-4 z-20 size-32 border-t-2 border-r-2 border-[#C88A04]" />
-                    <div className="absolute -bottom-4 -left-4 z-20 size-32 border-b-2 border-l-2 border-[#C88A04]" />
+                    <div className="absolute -top-4 -right-4 z-20 size-32 border-t-2 border-r-2 border-[#D4AF37]" />
+                    <div className="absolute -bottom-4 -left-4 z-20 size-32 border-b-2 border-l-2 border-[#D4AF37]" />
                 </div>
             </div>
         </section>
@@ -330,7 +374,7 @@ export default function LandingPage() {
     }, [dbProducts]);
 
     return (
-        <main className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#C88A04] selection:text-black overflow-x-hidden">
+        <main className="min-h-screen bg-[#000000] text-white selection:bg-[#D4AF37] selection:text-black overflow-x-hidden">
             <Navbar />
 
             <HeroSection products={products} />

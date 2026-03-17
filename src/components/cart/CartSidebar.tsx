@@ -38,10 +38,10 @@ export function CartSidebar() {
     customerPhone: '',
     resellerName: user?.name || '',
     deliveryAddress: '',
-    paymentMethod: 'nave_galicia' as 'nave_galicia' | 'billowshop',
+    paymentMethod: 'stripe' as 'stripe',
     notes: ''
   });
-  const [naveInitPoint, setNaveInitPoint] = useState<string | null>(null);
+  const [stripeInitPoint, setStripeInitPoint] = useState<string | null>(null);
 
   // Coupon State
   const [couponCode, setCouponCode] = useState('');
@@ -93,10 +93,9 @@ export function CartSidebar() {
         setReferenceCode(result.referenceCode!);
         setCartStep('success');
 
-        if (formData.paymentMethod === 'nave_galicia' || formData.paymentMethod === 'billowshop') {
+        if (formData.paymentMethod === 'stripe') {
           try {
-            const integration_code = formData.paymentMethod === 'billowshop' ? 'R-69AF-8D1F-M' : 'P-69AF-88A4-X';
-            const response = await fetch('/api/checkout/nave', {
+            const response = await fetch('/api/checkout/stripe', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -105,22 +104,27 @@ export function CartSidebar() {
                   name: i.name,
                   price: i.basePrice,
                   size: i.selectedSize,
-                  quantity: i.quantity
+                  quantity: i.quantity,
+                  images: i.images
                 })),
                 payer: {
                   firstName: formData.customerName,
+                  lastName: '',
+                  email: '',
                   phone: fullCustomerPhone,
                   address: formData.deliveryAddress,
-                },
-                integration_id: integration_code
+                  city: '',
+                  postalCode: '',
+                  province: ''
+                }
               })
             });
-            const resultNave = await response.json();
-            if (resultNave.success && resultNave.init_point) {
-              setNaveInitPoint(resultNave.init_point);
+            const resultStripe = await response.json();
+            if (resultStripe.success && resultStripe.init_point) {
+              setStripeInitPoint(resultStripe.init_point);
             } else {
-              console.error("Nave Integration Error:", resultNave.error);
-              toast.error(`${formData.paymentMethod === 'billowshop' ? 'Billowshop' : 'Nave Galicia'}: ${resultNave.error || "Error al iniciar el pago"}`);
+              console.error("Stripe Integration Error:", resultStripe.error);
+              toast.error(`Stripe: ${resultStripe.error || "Error al iniciar el pago"}`);
             }
           } catch (error) {
             console.error("Network Error:", error);
@@ -348,29 +352,17 @@ export function CartSidebar() {
                           />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4">
                           <div
-                            onClick={() => setFormData({ ...formData, paymentMethod: 'nave_galicia' })}
+                            onClick={() => setFormData({ ...formData, paymentMethod: 'stripe' })}
                             className={cn(
                               "p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-center min-h-[80px]",
-                              formData.paymentMethod === 'nave_galicia' ? "border-[#FFD200] bg-[#FFD200]/10 text-[#FFD200]" : "border-white/10 text-gray-400 hover:border-white/20"
+                              formData.paymentMethod === 'stripe' ? "border-[#FFD200] bg-[#FFD200]/10 text-[#FFD200]" : "border-white/10 text-gray-400 hover:border-white/20"
                             )}
                           >
-                            <Building2 size={24} className="mb-2" />
-                            <span className="text-xs font-black uppercase leading-tight text-center">Nave Galicia</span>
-                            <span className="text-[8px] font-bold mt-1 opacity-60">P-69...A4-X</span>
-                          </div>
-
-                          <div
-                            onClick={() => setFormData({ ...formData, paymentMethod: 'billowshop' })}
-                            className={cn(
-                              "p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-center min-h-[80px]",
-                              formData.paymentMethod === 'billowshop' ? "border-[#FFD200] bg-[#FFD200]/10 text-[#FFD200]" : "border-white/10 text-gray-400 hover:border-white/20"
-                            )}
-                          >
-                            <ShoppingBag size={24} className="mb-2" />
-                            <span className="text-xs font-black uppercase leading-tight text-center">Billowshop</span>
-                            <span className="text-[8px] font-bold mt-1 opacity-60">R-69...1F-M</span>
+                            <Wallet size={24} className="mb-2" />
+                            <span className="text-xs font-black uppercase leading-tight text-center">Stripe Checkout</span>
+                            <span className="text-[8px] font-bold mt-1 opacity-60">Pago Seguro</span>
                           </div>
                         </div>
                       </div>
@@ -456,23 +448,23 @@ export function CartSidebar() {
                     </div>
 
                     <div className="mt-12 w-full space-y-4">
-                      {naveInitPoint ? (
+                      {stripeInitPoint ? (
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           className="w-full bg-[#FFD200] text-black h-16 rounded-2xl flex items-center justify-center gap-3 font-black text-xs tracking-widest uppercase shadow-[0_10px_30px_rgba(255,210,0,0.3)]"
                           onClick={() => {
                             clearCart();
-                            window.location.href = naveInitPoint;
+                            window.location.href = stripeInitPoint;
                           }}
                         >
-                          {formData.paymentMethod === 'billowshop' ? <ShoppingBag size={24} /> : <Building2 size={24} />}
-                          Pagar con {formData.paymentMethod === 'billowshop' ? 'Billowshop' : 'Nave Galicia'}
+                          <Wallet size={24} />
+                          Pagar Seguro con Stripe
                         </motion.button>
                       ) : (
                         <button disabled className="w-full bg-gray-800 text-gray-400 h-16 rounded-2xl flex items-center justify-center gap-3 font-black text-xs tracking-widest uppercase">
                           <Loader2 className="animate-spin" size={20} />
-                          Generando link de Nave...
+                          Generando link de Stripe...
                         </button>
                       )}
                       <button

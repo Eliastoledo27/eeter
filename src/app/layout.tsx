@@ -7,6 +7,7 @@ import { Toaster } from "sonner";
 import { AuthInitializer } from '@/components/auth/AuthInitializer';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { CartSidebar } from '@/components/cart/CartSidebar';
+import { AiConcierge } from '@/components/ai/AiConcierge';
 
 
 const manrope = Manrope({
@@ -63,6 +64,7 @@ export default async function RootLayout({
             {children}
             <AuthModal />
             <CartSidebar />
+            <AiConcierge />
           </AuthInitializer>
           <Toaster position="top-center" theme="dark" richColors />
         </NextIntlClientProvider>
