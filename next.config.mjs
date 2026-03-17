@@ -46,6 +46,9 @@ const nextConfig = {
       { source: '/catalog.json', destination: '/api/catalog' },
       { source: '/api/catalog.json', destination: '/api/catalog' },
       { source: '/c/catalog.json', destination: '/api/catalog' },
+      { source: '/catalog-chatfuel.json', destination: '/catalog-chatfuel.json' },
+      { source: '/api/catalog-chatfuel.json', destination: '/api/catalog-chatfuel.json' },
+      { source: '/c/catalog-chatfuel.json', destination: '/c/catalog-chatfuel.json' },
     ];
   },
 };
