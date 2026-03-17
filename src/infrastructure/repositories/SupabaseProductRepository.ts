@@ -35,7 +35,7 @@ export class SupabaseProductRepository implements ProductRepository {
 
     if (error) throw new Error(error.message);
 
-    let products = data.map(this.mapToEntity);
+    let products = data.map(row => this.mapToEntity(row));
 
     if (filter?.query) {
       const q = filter.query.toLowerCase();
@@ -66,7 +66,7 @@ export class SupabaseProductRepository implements ProductRepository {
       .in('id', ids);
 
     if (error || !data) return [];
-    return data.map((row: any) => this.mapToEntity(row));
+    return data.map(row => this.mapToEntity(row));
   }
 
   async create(product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> {
