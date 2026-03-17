@@ -10,12 +10,16 @@ export const metadata: Metadata = {
 
 export const revalidate = 0; // Fresh stock for bots
 
-export default async function CatalogPage() {
+export default async function CatalogPage({
+    searchParams
+}: {
+    searchParams: { format?: string };
+}) {
     const headersList = headers();
     const userAgent = headersList.get('user-agent') || '';
 
     // Detect typical bot agents or explicit text request
-    const isBot = /Chatfuel|ManyChat|curl|bot|googlebot|crawler/i.test(userAgent);
+    const isBot = /Chatfuel|ManyChat|curl|bot|googlebot|crawler/i.test(userAgent) || searchParams.format === 'text';
 
     // If it's a bot, we serve the "Green Letters" text version directly for better indexing/parsing
     if (isBot) {
