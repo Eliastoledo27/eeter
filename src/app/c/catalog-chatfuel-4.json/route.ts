@@ -6,7 +6,7 @@ export const revalidate = 0;
 
 export async function GET() {
     try {
-        const catalog = await getChatfuelCatalog();
+        const catalog = await getChatfuelCatalog(4, 30);
         return new NextResponse(JSON.stringify(catalog), {
             status: 200,
             headers: {
