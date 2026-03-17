@@ -41,6 +41,13 @@ const nextConfig = {
   },
   output: 'standalone',
   poweredByHeader: false,
+  async rewrites() {
+    return [
+      { source: '/catalog.json', destination: '/api/catalog' },
+      { source: '/api/catalog.json', destination: '/api/catalog' },
+      { source: '/c/catalog.json', destination: '/api/catalog' },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);
