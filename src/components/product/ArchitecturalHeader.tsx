@@ -10,6 +10,10 @@ interface HeaderProps {
 }
 
 export function ArchitecturalHeader({ productName, productCategory }: HeaderProps) {
+    const words = productName.split(' ')
+    // Keep title compact: first word cyan, rest white, all inline
+    const wordCount = words.length
+
     return (
         <section className="relative w-full pt-20 lg:pt-24 pb-2 px-6 overflow-hidden">
             {/* MASSIVE Background Text (flyer-style) */}
@@ -39,40 +43,46 @@ export function ArchitecturalHeader({ productName, productCategory }: HeaderProp
                     )}
                 </motion.div>
 
-                {/* BRUTAL Title */}
+                {/* Compact Responsive Title */}
                 <motion.div
-                    initial={{ opacity: 0, y: 40 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative"
+                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                    className="relative flex items-start gap-4"
                 >
-                    {/* Diagonal accent slash behind title */}
-                    <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-2 h-[120%] bg-[#00E5FF] -skew-x-12 rounded-sm shadow-[0_0_15px_#00E5FF80]" />
+                    {/* Accent bar */}
+                    <div className="w-1.5 shrink-0 self-stretch bg-[#00E5FF] -skew-x-12 rounded-sm shadow-[0_0_15px_#00E5FF80] mt-1" />
                     
-                    <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[6rem] font-black uppercase leading-[0.85] tracking-tighter text-white pl-6 drop-shadow-[0_0_20px_rgba(0,229,255,0.15)]">
-                        {productName.split(' ').map((word, i) => (
-                            <span key={i} className="block">
-                                {i === 0 ? (
-                                    <span className="text-[#00E5FF] drop-shadow-[0_0_10px_#00E5FF60]">{word}</span>
-                                ) : (
-                                    word
-                                )}
-                            </span>
-                        ))}
-                    </h1>
+                    <div>
+                        {/* Title uses clamp() for fluid scaling — single line when possible */}
+                        <h1 
+                            className="font-black uppercase tracking-tighter text-white leading-[0.9] drop-shadow-[0_0_20px_rgba(0,229,255,0.15)]"
+                            style={{ fontSize: `clamp(2rem, ${wordCount <= 2 ? '8vw' : wordCount <= 3 ? '6.5vw' : '5vw'}, 5.5rem)` }}
+                        >
+                            {words.map((word, i) => (
+                                <span key={i}>
+                                    {i === 0 ? (
+                                        <span className="text-[#00E5FF] drop-shadow-[0_0_10px_#00E5FF60]">{word} </span>
+                                    ) : (
+                                        <>{word}{i < words.length - 1 ? ' ' : ''}</>
+                                    )}
+                                </span>
+                            ))}
+                        </h1>
 
-                    {/* Category badge */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.4, duration: 0.6 }}
-                        className="mt-3 pl-6"
-                    >
-                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-[#00E5FF] text-black text-[11px] font-black uppercase tracking-widest rounded-sm shadow-[0_0_15px_#00E5FF50]">
-                            <span className="w-1.5 h-1.5 bg-black rounded-full shadow-[0_0_5px_black]" />
-                            {productCategory || 'EXCLUSIVE NEON'}
-                        </span>
-                    </motion.div>
+                        {/* Category badge */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3, duration: 0.5 }}
+                            className="mt-2.5"
+                        >
+                            <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#00E5FF] text-black text-[9px] font-black uppercase tracking-widest rounded-sm shadow-[0_0_15px_#00E5FF50]">
+                                <span className="w-1 h-1 bg-black rounded-full" />
+                                {productCategory || 'EXCLUSIVE'}
+                            </span>
+                        </motion.div>
+                    </div>
                 </motion.div>
             </div>
         </section>
