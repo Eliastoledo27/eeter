@@ -19,13 +19,12 @@ import { toast } from 'sonner';
 
 // Datos bancarios de Éter
 const BANK_DATA = {
-  titular: 'ÉTER STORE',
-  cbu: '0000003100000000000001',
-  alias: 'ETER.STORE.MP',
-  banco: 'Mercado Pago',
+  titular: 'Elias Francesco Calderon Toledo',
+  alias: 'eterstore / etershop',
+  banco: 'Naranja',
 };
 
-const WHATSAPP_NUMBER = '5492235000000'; // Número de WhatsApp de Éter
+const WHATSAPP_NUMBER = '5492236204002';
 
 export function CartSidebar() {
   const {
@@ -602,7 +601,6 @@ _Gracias por elegir ÉTER_ 🖤`;
 
                     <div className="space-y-3">
                       {[
-                        { label: 'CBU', value: BANK_DATA.cbu, key: 'cbu' },
                         { label: 'ALIAS', value: BANK_DATA.alias, key: 'alias' },
                         { label: 'TITULAR', value: BANK_DATA.titular, key: 'titular' },
                         { label: 'BANCO', value: BANK_DATA.banco, key: 'banco' },

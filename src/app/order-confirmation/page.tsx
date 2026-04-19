@@ -105,7 +105,7 @@ function OrderConfirmationContent() {
                 <div className="pt-8 border-t border-white/10 animate-in fade-in duration-700" style={{ animationDelay: '1000ms' }}>
                     <p className="text-gray-400 mb-4">¿Necesitás ayuda con tu pedido?</p>
                     <a
-                        href="https://wa.me/5492235025196"
+                        href="https://wa.me/5492236204002"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-3 px-8 py-4 bg-green-500/20 border-2 border-green-500 text-green-500 font-bold rounded-2xl hover:bg-green-500 hover:text-white transition-all"

@@ -64,7 +64,7 @@ export function FAQSection() {
                         Si tenés más dudas, nuestro equipo está disponible por WhatsApp de 9 a 21hs.
                     </p>
                     <a
-                        href="https://wa.me/5491112345678"
+                        href="https://wa.me/5492236204002"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-3 mt-6 text-[11px] font-black tracking-[0.25em] uppercase text-[#00E5FF] hover:text-white transition-colors group"

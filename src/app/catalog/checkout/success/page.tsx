@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
-const WHATSAPP_NUMBER = '5492235000000';
+const WHATSAPP_NUMBER = '5492236204002';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
