@@ -37,7 +37,7 @@ Talles: [TALLES DISPONIBLES]
 export async function POST(req: Request) {
     try {
         const { messages } = await req.json();
-        const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GOOGLE_API_KEY;
+        const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GOOGLE_API_KEY || 'AIzaSyB_bH7VwEOxBf0s--nI3A5pt1iFXqLGL2c';
 
         // Fetch real catalog from Supabase
         let catalogContext = '';
@@ -95,13 +95,17 @@ export async function POST(req: Request) {
         }
 
         // Real Gemini AI integration
-        const geminiMessages = messages.map((m: any) => ({
+        // Gemini API requiere que el primer mensaje sea del usuario, así que filtramos el saludo inicial
+        const mappedMessages = messages.map((m: any) => ({
             role: m.role === 'assistant' ? 'model' : 'user',
             parts: [{ text: m.content }]
         }));
 
+        const firstUserIndex = mappedMessages.findIndex((m: any) => m.role === 'user');
+        const geminiMessages = firstUserIndex >= 0 ? mappedMessages.slice(firstUserIndex) : mappedMessages;
+
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
