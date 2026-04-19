@@ -81,9 +81,9 @@ export async function POST(req: NextRequest) {
                     }
                 },
                 back_urls: {
-                    success: `${baseUrl}/catalog?payment=success`,
+                    success: `${baseUrl}/catalog/checkout/success`,
                     failure: `${baseUrl}/catalog?payment=failure`,
-                    pending: `${baseUrl}/catalog?payment=pending`
+                    pending: `${baseUrl}/catalog/checkout/success?status=pending`
                 },
                 auto_return: baseUrl.startsWith('https') ? 'approved' : undefined,
                 notification_url: baseUrl.startsWith('https') ? `${baseUrl}/api/webhooks/mercadopago` : undefined,

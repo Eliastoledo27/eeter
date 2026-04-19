@@ -27,7 +27,7 @@ const checkoutSchema = z.object({
     // province: z.string().optional(), // Fixed to Buenos Aires
     postalCode: z.string().optional(),
     deliveryDate: z.string().optional(),
-    paymentMethod: z.enum(['stripe', 'mercadopago']),
+    paymentMethod: z.enum(['stripe', 'mercadopago', 'transferencia']),
     notes: z.string().optional(),
     couponCode: z.string().optional()
 });

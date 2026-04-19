@@ -37,10 +37,24 @@ interface CartStore {
   removeCoupon: () => void;
   resellerWhatsApp: string | null;
   setResellerWhatsApp: (num: string | null) => void;
-  cartStep: 'items' | 'checkout' | 'success';
-  setCartStep: (step: 'items' | 'checkout' | 'success') => void;
+  cartStep: 'items' | 'checkout' | 'success' | 'transferencia';
+  setCartStep: (step: 'items' | 'checkout' | 'success' | 'transferencia') => void;
   stockAlerts: Record<string, string>;
   initRealtimeSubscription: () => void;
+  // Post-checkout order data (persisted for success page)
+  lastOrder: {
+    orderId: string;
+    referenceCode: string;
+    items: Array<{ name: string; selectedSize: string; quantity: number; basePrice: number; images: string[] }>;
+    total: number;
+    customerName: string;
+    customerPhone: string;
+    deliveryAddress: string;
+    resellerName: string;
+    paymentMethod: string;
+  } | null;
+  setLastOrder: (order: CartStore['lastOrder']) => void;
+  clearLastOrder: () => void;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -52,6 +66,10 @@ export const useCartStore = create<CartStore>()(
       resellerWhatsApp: null,
       cartStep: 'items',
       stockAlerts: {},
+      lastOrder: null,
+
+      setLastOrder: (order) => set({ lastOrder: order }),
+      clearLastOrder: () => set({ lastOrder: null }),
 
       initRealtimeSubscription: () => {
         const { items } = get();
