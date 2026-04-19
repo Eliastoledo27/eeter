@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, MessageCircle, Sparkles, Truck, CreditCard, Star, ArrowRight, ShoppingBag } from 'lucide-react';
