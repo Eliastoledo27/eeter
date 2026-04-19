@@ -96,16 +96,26 @@ export async function POST(req: Request) {
 
         // Real Gemini AI integration
         // Gemini API requiere que el primer mensaje sea del usuario, así que filtramos el saludo inicial
-        const mappedMessages = messages.map((m: any) => ({
+        let mappedMessages = messages.map((m: any) => ({
             role: m.role === 'assistant' ? 'model' : 'user',
             parts: [{ text: m.content }]
         }));
 
         const firstUserIndex = mappedMessages.findIndex((m: any) => m.role === 'user');
-        const geminiMessages = firstUserIndex >= 0 ? mappedMessages.slice(firstUserIndex) : mappedMessages;
+        mappedMessages = firstUserIndex >= 0 ? mappedMessages.slice(firstUserIndex) : mappedMessages;
+
+        // Gemini requiere roles intercalados correctamente. Consolidamos mensajes consecutivos del mismo rol.
+        const geminiMessages: any[] = [];
+        for (const m of mappedMessages) {
+            if (geminiMessages.length > 0 && geminiMessages[geminiMessages.length - 1].role === m.role) {
+                geminiMessages[geminiMessages.length - 1].parts[0].text += '\n\n' + m.parts[0].text;
+            } else {
+                geminiMessages.push(m);
+            }
+        }
 
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -116,13 +126,7 @@ export async function POST(req: Request) {
                         temperature: 0.8,
                         maxOutputTokens: 300,
                         topP: 0.9,
-                    },
-                    safetySettings: [
-                        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
-                    ]
+                    }
                 })
             }
         );
@@ -130,7 +134,8 @@ export async function POST(req: Request) {
         if (!response.ok) {
             const errorBody = await response.text();
             console.error('[Gemini] API Error:', response.status, errorBody);
-            return NextResponse.json({ text: '¡Uh! Hubo un error técnico. Intentá de nuevo en unos segundos, o escribinos por WhatsApp al 2236204002 💬' });
+            // Si hay un error, intentamos hacer un mock fallback
+            return NextResponse.json({ text: '¡Uh! Hubo un error técnico. Escribinos por WhatsApp al 2236204002 💬 y te atendemos al instante.' });
         }
 
         const data = await response.json();
