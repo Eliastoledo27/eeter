@@ -1,13 +1,16 @@
-'use client';
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, MessageCircle, Sparkles, User, ShoppingBag, Truck, CreditCard, Star, ArrowRight, Zap } from 'lucide-react';
+import { X, Send, MessageCircle, Sparkles, Truck, CreditCard, Star, ArrowRight, ShoppingBag } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+
+type ProductSummary = { id: string; name: string; price: number; image: string };
 
 type Message = {
     id: string;
     role: 'assistant' | 'user';
     content: string;
+    products?: ProductSummary[];
 };
 
 const QUICK_ACTIONS = [
@@ -39,9 +42,12 @@ export function AiConcierge() {
     }, [messages, isLoading]);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            if (!isOpen) setShowTeaser(true);
-        }, 5000);
+        let timer: NodeJS.Timeout;
+        if (!isOpen) {
+            timer = setTimeout(() => setShowTeaser(true), 5000);
+        } else {
+            setShowTeaser(false);
+        }
         return () => clearTimeout(timer);
     }, [isOpen]);
 
@@ -75,7 +81,8 @@ export function AiConcierge() {
                 setMessages(prev => [...prev, {
                     id: (Date.now() + 1).toString(),
                     role: 'assistant',
-                    content: data.text
+                    content: data.text,
+                    products: data.products
                 }]);
             }
         } catch {
@@ -103,9 +110,12 @@ export function AiConcierge() {
             if (part.startsWith('**') && part.endsWith('**')) {
                 return <strong key={i} className="text-white font-bold">{part.slice(2, -2)}</strong>;
             }
-            // Convert WhatsApp links
-            if (part.includes('wa.me')) {
-                return <span key={i}>{part}</span>;
+            // Convert plain urls
+            if (part.includes('http')) {
+                const words = part.split(' ');
+                return <span key={i}>{words.map((w, j) => 
+                    w.startsWith('http') ? <a key={j} href={w} target="_blank" rel="noreferrer" className="text-[#00E5FF] hover:underline break-all">{w} </a> : <span key={j}>{w} </span>
+                )}</span>;
             }
             return <span key={i}>{part}</span>;
         });
@@ -148,7 +158,7 @@ export function AiConcierge() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.92, y: 30 }}
                         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                        className="w-[92vw] sm:w-[400px] h-[min(85vh,620px)] flex flex-col bg-[#080808] border border-white/[0.06] rounded-[1.5rem] shadow-[0_30px_80px_-10px_rgba(0,0,0,0.95)] overflow-hidden"
+                        className="w-[92vw] sm:w-[420px] h-[min(85vh,700px)] flex flex-col bg-[#080808] border border-white/[0.06] rounded-[1.5rem] shadow-[0_30px_80px_-10px_rgba(0,0,0,0.95)] overflow-hidden"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.04] bg-[#060606]">
@@ -173,13 +183,13 @@ export function AiConcierge() {
                         </div>
 
                         {/* Messages */}
-                        <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4 scrollbar-none">
+                        <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-5 scrollbar-none">
                             {messages.map((m) => (
                                 <motion.div
                                     key={m.id}
-                                    initial={{ opacity: 0, y: 8 }}
+                                    initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.25 }}
+                                    transition={{ duration: 0.3 }}
                                     className={`flex gap-2.5 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}
                                 >
                                     {m.role === 'assistant' && (
@@ -187,14 +197,33 @@ export function AiConcierge() {
                                             <Sparkles size={12} className="text-[#00E5FF]" />
                                         </div>
                                     )}
-                                    <div
-                                        className={`max-w-[80%] px-4 py-2.5 text-[13px] leading-relaxed ${
-                                            m.role === 'user'
-                                                ? 'bg-[#00E5FF] text-black font-medium rounded-2xl rounded-br-md'
-                                                : 'bg-white/[0.04] text-white/80 rounded-2xl rounded-bl-md border border-white/[0.04]'
-                                        }`}
-                                    >
-                                        <div className="whitespace-pre-wrap">{formatContent(m.content)}</div>
+                                    <div className={`flex flex-col gap-2 max-w-[85%] ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
+                                        <div
+                                            className={`px-4 py-3 text-[13px] leading-[1.6] ${
+                                                m.role === 'user'
+                                                    ? 'bg-[#00E5FF] text-black font-medium rounded-2xl rounded-tr-sm shadow-[0_0_15px_rgba(0,229,255,0.15)]'
+                                                    : 'bg-white/[0.04] text-white/80 rounded-2xl rounded-tl-sm border border-white/[0.04]'
+                                            }`}
+                                        >
+                                            <div className="whitespace-pre-wrap">{formatContent(m.content)}</div>
+                                        </div>
+
+                                        {/* Product Carousel */}
+                                        {m.products && m.products.length > 0 && (
+                                            <div className="w-[85vw] sm:w-[350px] flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-none py-2 -ml-2 pl-2">
+                                                {m.products.map(p => (
+                                                    <Link key={p.id} href={`/catalog/${p.id}`} className="shrink-0 snap-start bg-[#0A0A0A] border border-white/5 rounded-xl overflow-hidden group hover:border-[#00E5FF]/30 transition-colors shadow-lg">
+                                                        <div className="w-[140px] h-[140px] relative bg-white/5">
+                                                            <Image src={p.image} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                        </div>
+                                                        <div className="p-3 w-[140px]">
+                                                            <h4 className="text-white text-[11px] font-bold line-clamp-1 mb-1">{p.name}</h4>
+                                                            <p className="text-[#00E5FF] text-[12px] font-black">${p.price.toLocaleString('es-AR')}</p>
+                                                        </div>
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </motion.div>
                             ))}

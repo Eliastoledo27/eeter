@@ -41,6 +41,7 @@ export async function POST(req: Request) {
 
         // Fetch real catalog from Supabase
         let catalogContext = '';
+        let fetchedProducts: any[] = [];
         try {
             const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
             const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -49,23 +50,51 @@ export async function POST(req: Request) {
                 const supabase = createClient(supabaseUrl, supabaseKey);
                 const { data: products } = await supabase
                     .from('productos')
-                    .select('name, category, price, stock_by_size')
+                    .select('id, name, category, price, stock_by_size, images')
                     .eq('status', 'activo');
 
                 if (products && products.length > 0) {
+                    fetchedProducts = products;
                     catalogContext = '\n\nCATÁLOGO ACTUAL EN STOCK (esto es lo ÚNICO que podés recomendar):\n';
                     catalogContext += products.map((p: any) => {
                         const sizes = Object.entries(p.stock_by_size || {})
                             .filter(([, stock]) => (stock as number) > 0)
                             .map(([size]) => size)
                             .sort((a, b) => Number(a) - Number(b));
-                        return `• ${p.name} | ${p.category || 'General'} | $${p.price.toLocaleString('es-AR')} | Talles: ${sizes.length > 0 ? sizes.join(', ') : 'SIN STOCK'}`;
+                        return `• ID: ${p.id} | ${p.name} | ${p.category || 'General'} | $${p.price.toLocaleString('es-AR')} | Talles: ${sizes.length > 0 ? sizes.join(', ') : 'SIN STOCK'}`;
                     }).join('\n');
                 }
             }
         } catch (e) {
             console.error('[AI Chat] Error fetching catalog:', e);
         }
+
+        const SYSTEM_PROMPT = `Sos ÉTER AI, el asesor personal de calzado de ÉTER Store — la marca de zapatillas premium de Mar del Plata, Argentina. Tu misión es ayudar a los clientes a encontrar el par perfecto según sus gustos, necesidades y presupuesto.
+
+PERSONALIDAD:
+- Sos entusiasta, cercano y directo, con onda marplatense ("¡Qué onda!", "Ese modelo vuela 🔥", "Buenísima elección 💎")
+- Hablás en español argentino rioplatense (vos, tenés, querés, etc.)
+- Sos un experto en sneakers y calzado: sabés de materiales, estilos, tendencias
+- Usás emojis con moderación para dar onda, no para saturar
+- Tus respuestas son CONCISAS: máximo 3-4 oraciones por mensaje, nunca parrafones largos
+
+REGLAS DE OPERACIÓN:
+1. SIEMPRE recomendá basándote en el catálogo real que tenés disponible. Si un producto no está en stock o no figura en la lista con un ID, no lo recomiendes.
+2. Hacé preguntas clave para filtrar: ¿Para qué ocasión? ¿Estilo? ¿Presupuesto? ¿Deporte o casual?
+3. Si el cliente pregunta por envíos en MDQ: cadetería propia, $4000-$5000 (zonas lejanas $8000), GRATIS con 2+ pares, Logística Express en 30-60 min.
+4. Si quiere verlo en persona: no hay local a la calle, se coordina por WhatsApp (2236204002) con cita previa.
+5. NUNCA inventes productos que NO están en el catálogo.
+6. Formas de pago: Mercado Pago (3 cuotas sin interés), transferencia bancaria (Naranja), efectivo en MDQ.
+
+NUEVO SUPERPODER: CARRUSEL VISUAL
+Siempre que le recomiendes 1, 2 o 3 zapatillas exactas a un cliente, tenés que mostrarle las fotos generándole un carrusel interactivo.
+Para hacerlo, simplemente tenés que escribir una etiqueta especial AL FINAL de tu respuesta, con los IDs de los productos separados por coma.
+Ejemplo: [CAROUSEL: id-del-producto-1, id-del-producto-2]
+Yo el sistema me encargaré de renderizar las fotos automáticamente si ponés esa etiqueta.
+
+FLUJO DE RECOMENDACIÓN:
+- Escuchá qué busca el cliente, revisá nuestro stock en la lista, y si encontrás coincidencias respondé algo breve y copado.
+- Al final de la respuesta, poné: [CAROUSEL: id, id, id] (solo los IDs separados por coma). No hace falta que detalles mucho texto repitiendo el nombre y precio porque las fotos ya se lo muestran al cliente en pantalla visualmente.`;
 
         const fullSystemPrompt = SYSTEM_PROMPT + catalogContext;
 
@@ -139,9 +168,26 @@ export async function POST(req: Request) {
         }
 
         const data = await response.json();
-        const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No pude generar una respuesta. ¿Podés reformular tu pregunta?';
+        let aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No pude generar una respuesta. ¿Podés reformular tu pregunta?';
 
-        return NextResponse.json({ text: aiText });
+        let productsPayload: any = undefined;
+        const carouselMatch = aiText.match(/\[CAROUSEL:\s*([^\]]+)\]/i);
+        if (carouselMatch) {
+            const rawIds = carouselMatch[1].split(',').map((id: string) => id.trim());
+            const matchedProducts = fetchedProducts.filter((p: any) => rawIds.includes(p.id)).map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                price: p.price,
+                image: p.images?.[0] || 'https://placehold.co/400'
+            }));
+            
+            if (matchedProducts.length > 0) {
+                productsPayload = matchedProducts;
+            }
+            aiText = aiText.replace(/\[CAROUSEL:\s*([^\]]+)\]/gi, '').trim();
+        }
+
+        return NextResponse.json({ text: aiText, products: productsPayload });
 
     } catch (error: any) {
         console.error('[Chat API] Error:', error);
