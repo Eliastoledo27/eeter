@@ -44,8 +44,8 @@ export function PerformanceWidget() {
                     >
                         <defs>
                             <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#c88a04" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="#c88a04" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#00E5FF" stopOpacity={0.3} />
+                                <stop offset="95%" stopColor="#00E5FF" stopOpacity={0} />
                             </linearGradient>
                         </defs>
                         <XAxis
@@ -71,7 +71,7 @@ export function PerformanceWidget() {
                         <Area
                             type="monotone"
                             dataKey="revenue"
-                            stroke="#c88a04"
+                            stroke="#00E5FF"
                             fillOpacity={1}
                             fill="url(#colorPv)"
                             strokeWidth={2}

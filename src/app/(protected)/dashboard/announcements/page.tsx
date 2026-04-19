@@ -110,7 +110,7 @@ const TEMPLATES = [
             image_url: 'https://images.unsplash.com/photo-1515955656352-a1fa3ffcd111?q=80&w=1200',
             designConfig: {
                 layout: 'classic',
-                accent_color: '#C88A04',
+                accent_color: '#00E5FF',
                 overlay_opacity: 0.5,
                 blur_amount: 4,
                 glass_intensity: 0.3,
@@ -452,9 +452,9 @@ export default function AnnouncementsAdminPage() {
     return (
         <div className="min-h-screen space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
             {/* API Key Manager Banner */}
-            <div className={`p-4 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 transition-all duration-500 ${isApiKeyValid ? 'bg-green-500/5 border border-green-500/10' : 'bg-[#C88A04]/10 border border-[#C88A04]/20'}`}>
+            <div className={`p-4 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 transition-all duration-500 ${isApiKeyValid ? 'bg-green-500/5 border border-green-500/10' : 'bg-[#00E5FF]/10 border border-[#00E5FF]/20'}`}>
                 <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isApiKeyValid ? 'bg-green-500/20 text-green-500' : 'bg-[#C88A04]/20 text-[#C88A04]'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isApiKeyValid ? 'bg-green-500/20 text-green-500' : 'bg-[#00E5FF]/20 text-[#00E5FF]'}`}>
                         <Cpu size={20} className={isAiLoading ? 'animate-spin' : ''} />
                     </div>
                     <div>
@@ -471,7 +471,7 @@ export default function AnnouncementsAdminPage() {
                     <Input
                         type="password"
                         placeholder="AIzaSy..."
-                        className="h-10 bg-black/50 border-white/5 focus:border-[#C88A04] text-xs font-mono w-full md:w-64"
+                        className="h-10 bg-black/50 border-white/5 focus:border-[#00E5FF] text-xs font-mono w-full md:w-64"
                         value={geminiApiKey}
                         onChange={(e) => {
                             setGeminiApiKey(e.target.value)
@@ -481,7 +481,7 @@ export default function AnnouncementsAdminPage() {
                     <Button
                         onClick={testConnection}
                         disabled={isAiLoading}
-                        className={`h-10 px-6 font-black text-[10px] uppercase rounded-lg transition-all ${isApiKeyValid ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-[#C88A04] hover:bg-[#D97706] text-black'}`}
+                        className={`h-10 px-6 font-black text-[10px] uppercase rounded-lg transition-all ${isApiKeyValid ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-[#00E5FF] hover:bg-[#D97706] text-black'}`}
                     >
                         {isAiLoading ? 'PROBANDO...' : isApiKeyValid ? 'RE-VERIFICAR' : 'PROBAR CONEXIÓN'}
                     </Button>
@@ -490,20 +490,20 @@ export default function AnnouncementsAdminPage() {
 
             {/* --- HERO ARSENAL SECTION --- */}
             <div className="relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-gradient-to-br from-[#111] to-[#050505] p-8 md:p-12 mb-12">
-                <div className="absolute top-0 right-0 w-[40%] h-full bg-[#C88A04]/5 blur-[120px] pointer-events-none" />
+                <div className="absolute top-0 right-0 w-[40%] h-full bg-[#00E5FF]/5 blur-[120px] pointer-events-none" />
 
                 <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                     <div className="space-y-4 max-w-2xl">
                         <div className="flex items-center gap-3">
-                            <span className="px-3 py-1 bg-[#C88A04]/10 border border-[#C88A04]/30 text-[#C88A04] text-[10px] font-black tracking-widest uppercase rounded">Marketing v2.0</span>
+                            <span className="px-3 py-1 bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF] text-[10px] font-black tracking-widest uppercase rounded">Marketing v2.0</span>
                             <div className="flex -space-x-2">
                                 {[...Array(3)].map((_, i) => (
-                                    <div key={i} className="w-6 h-6 rounded-full border-2 border-[#111] bg-[#C88A04]/20" />
+                                    <div key={i} className="w-6 h-6 rounded-full border-2 border-[#111] bg-[#00E5FF]/20" />
                                 ))}
                             </div>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white uppercase italic">
-                            Arsenal de <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C88A04] to-[#FFD900]">Ventas</span>
+                            Arsenal de <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00E5FF] to-[#00E5FF]">Ventas</span>
                         </h1>
                         <p className="text-gray-400 text-lg font-light leading-relaxed">
                             Crea anuncios que impacten. Usa nuestras herramientas de diseño y templates estratégicos para convertir cada novedad en una oportunidad de venta masiva.
@@ -512,7 +512,7 @@ export default function AnnouncementsAdminPage() {
                         <div className="flex flex-wrap gap-4 pt-4">
                             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                                 <DialogTrigger asChild>
-                                    <Button className="h-14 px-8 bg-[#C88A04] hover:bg-[#D97706] text-black font-black text-lg rounded-full shadow-2xl shadow-[#C88A04]/20 flex gap-3 transition-transform hover:scale-105 active:scale-95">
+                                    <Button className="h-14 px-8 bg-[#00E5FF] hover:bg-[#D97706] text-black font-black text-lg rounded-full shadow-2xl shadow-[#00E5FF]/20 flex gap-3 transition-transform hover:scale-105 active:scale-95">
                                         <Plus size={24} />
                                         CREAR NUEVA CAMPAÑA
                                     </Button>
@@ -528,13 +528,13 @@ export default function AnnouncementsAdminPage() {
                                     <div className="flex border-b border-white/5 mb-6">
                                         <button
                                             onClick={() => setActiveTab('content')}
-                                            className={`pb-3 px-6 text-xs font-black tracking-widest uppercase transition-all ${activeTab === 'content' ? 'text-[#C88A04] border-b-2 border-[#C88A04]' : 'text-gray-500 hover:text-white'}`}
+                                            className={`pb-3 px-6 text-xs font-black tracking-widest uppercase transition-all ${activeTab === 'content' ? 'text-[#00E5FF] border-b-2 border-[#00E5FF]' : 'text-gray-500 hover:text-white'}`}
                                         >
                                             1. Estrategia & Contenido
                                         </button>
                                         <button
                                             onClick={() => setActiveTab('design')}
-                                            className={`pb-3 px-6 text-xs font-black tracking-widest uppercase transition-all ${activeTab === 'design' ? 'text-[#C88A04] border-b-2 border-[#C88A04]' : 'text-gray-500 hover:text-white'}`}
+                                            className={`pb-3 px-6 text-xs font-black tracking-widest uppercase transition-all ${activeTab === 'design' ? 'text-[#00E5FF] border-b-2 border-[#00E5FF]' : 'text-gray-500 hover:text-white'}`}
                                         >
                                             2. Diseño Pro / Flyer
                                         </button>
@@ -545,21 +545,21 @@ export default function AnnouncementsAdminPage() {
                                         <div className="space-y-6">
                                             {activeTab === 'content' ? (
                                                 <div className="space-y-6 animate-in fade-in slide-in-from-left-4 duration-500">
-                                                    <div className="space-y-4 p-6 rounded-2xl border border-[#C88A04]/20 bg-[#C88A04]/5 relative overflow-hidden group">
-                                                        <div className="absolute top-0 right-0 w-32 h-32 bg-[#C88A04]/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                                                    <div className="space-y-4 p-6 rounded-2xl border border-[#00E5FF]/20 bg-[#00E5FF]/5 relative overflow-hidden group">
+                                                        <div className="absolute top-0 right-0 w-32 h-32 bg-[#00E5FF]/10 blur-3xl rounded-full -mr-16 -mt-16" />
                                                         <div className="flex items-center justify-between mb-4">
                                                             <div className="flex items-center gap-2">
-                                                                <Wand2 size={18} className="text-[#C88A04] animate-pulse" />
+                                                                <Wand2 size={18} className="text-[#00E5FF] animate-pulse" />
                                                                 <h4 className="text-xs font-black tracking-[0.2em] uppercase text-white">Laboratorio AI</h4>
                                                             </div>
-                                                            {isAiLoading && <div className="w-4 h-4 border-2 border-[#C88A04] border-t-transparent rounded-full animate-spin" />}
+                                                            {isAiLoading && <div className="w-4 h-4 border-2 border-[#00E5FF] border-t-transparent rounded-full animate-spin" />}
                                                         </div>
                                                         <div className="grid grid-cols-2 gap-2">
-                                                            <Button onClick={() => runAiTool('generateTitle')} disabled={isAiLoading} variant="outline" className="h-9 text-[10px] font-black border-white/5 bg-black/40 hover:border-[#C88A04]/50 justify-start gap-2">
-                                                                <Type size={14} className="text-[#C88A04]" /> TÍTULOS
+                                                            <Button onClick={() => runAiTool('generateTitle')} disabled={isAiLoading} variant="outline" className="h-9 text-[10px] font-black border-white/5 bg-black/40 hover:border-[#00E5FF]/50 justify-start gap-2">
+                                                                <Type size={14} className="text-[#00E5FF]" /> TÍTULOS
                                                             </Button>
-                                                            <Button onClick={() => runAiTool('enhanceContent')} disabled={isAiLoading} variant="outline" className="h-9 text-[10px] font-black border-white/5 bg-black/40 hover:border-[#C88A04]/50 justify-start gap-2">
-                                                                <MessageSquare size={14} className="text-[#C88A04]" /> NARRATIVA
+                                                            <Button onClick={() => runAiTool('enhanceContent')} disabled={isAiLoading} variant="outline" className="h-9 text-[10px] font-black border-white/5 bg-black/40 hover:border-[#00E5FF]/50 justify-start gap-2">
+                                                                <MessageSquare size={14} className="text-[#00E5FF]" /> NARRATIVA
                                                             </Button>
                                                         </div>
                                                     </div>
@@ -596,7 +596,7 @@ export default function AnnouncementsAdminPage() {
                                                                 <button
                                                                     key={l}
                                                                     onClick={() => setDesignConfig(prev => ({ ...prev, layout: l }))}
-                                                                    className={`h-16 rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all ${designConfig.layout === l ? 'bg-[#C88A04] text-black border-[#C88A04]' : 'bg-white/5 text-gray-500 border-white/5 hover:bg-white/10'}`}
+                                                                    className={`h-16 rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all ${designConfig.layout === l ? 'bg-[#00E5FF] text-black border-[#00E5FF]' : 'bg-white/5 text-gray-500 border-white/5 hover:bg-white/10'}`}
                                                                 >
                                                                     <div className={`w-6 h-4 border ${l === 'minimal' ? 'rounded-full' : 'rounded-sm'} ${designConfig.layout === l ? 'border-black' : 'border-gray-500'}`} />
                                                                     <span className="text-[8px] font-black uppercase">{l}</span>
@@ -609,22 +609,22 @@ export default function AnnouncementsAdminPage() {
                                                     <div className="bg-[#111] border border-white/5 rounded-[1.5rem] p-6 space-y-6">
                                                         <div className="flex items-center justify-between">
                                                             <h5 className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Laboratorio Visual</h5>
-                                                            <Badge variant="outline" className="border-[#C88A04]/20 text-[#C88A04] text-[9px]">FX PRO</Badge>
+                                                            <Badge variant="outline" className="border-[#00E5FF]/20 text-[#00E5FF] text-[9px]">FX PRO</Badge>
                                                         </div>
 
                                                         {/* Sliders Grid */}
                                                         <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                                                             <div className="space-y-2">
                                                                 <div className="flex justify-between text-[9px] font-bold uppercase text-gray-500"><span>Darkness</span><span>{Math.round(designConfig.overlay_opacity * 100)}%</span></div>
-                                                                <input type="range" min="0" max="0.95" step="0.05" value={designConfig.overlay_opacity} onChange={(e) => setDesignConfig({ ...designConfig, overlay_opacity: parseFloat(e.target.value) })} className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#C88A04]" />
+                                                                <input type="range" min="0" max="0.95" step="0.05" value={designConfig.overlay_opacity} onChange={(e) => setDesignConfig({ ...designConfig, overlay_opacity: parseFloat(e.target.value) })} className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#00E5FF]" />
                                                             </div>
                                                             <div className="space-y-2">
                                                                 <div className="flex justify-between text-[9px] font-bold uppercase text-gray-500"><span>Blur</span><span>{designConfig.blur_amount}px</span></div>
-                                                                <input type="range" min="0" max="10" step="1" value={designConfig.blur_amount} onChange={(e) => setDesignConfig({ ...designConfig, blur_amount: parseInt(e.target.value) })} className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#C88A04]" />
+                                                                <input type="range" min="0" max="10" step="1" value={designConfig.blur_amount} onChange={(e) => setDesignConfig({ ...designConfig, blur_amount: parseInt(e.target.value) })} className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#00E5FF]" />
                                                             </div>
                                                             <div className="space-y-2">
                                                                 <div className="flex justify-between text-[9px] font-bold uppercase text-gray-500"><span>Glass</span><span>{Math.round(designConfig.glass_intensity * 100)}%</span></div>
-                                                                <input type="range" min="0" max="1" step="0.1" value={designConfig.glass_intensity} onChange={(e) => setDesignConfig({ ...designConfig, glass_intensity: parseFloat(e.target.value) })} className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#C88A04]" />
+                                                                <input type="range" min="0" max="1" step="0.1" value={designConfig.glass_intensity} onChange={(e) => setDesignConfig({ ...designConfig, glass_intensity: parseFloat(e.target.value) })} className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#00E5FF]" />
                                                             </div>
                                                         </div>
 
@@ -648,7 +648,7 @@ export default function AnnouncementsAdminPage() {
                                                         <div className="space-y-2 pt-2">
                                                             <span className="text-[9px] font-bold text-gray-500 uppercase">Acento de Marca</span>
                                                             <div className="flex flex-wrap gap-3">
-                                                                {['#00F2FF', '#C88A04', '#FF0055', '#FFFFFF', '#10B981', '#8B5CF6'].map(c => (
+                                                                {['#00F2FF', '#00E5FF', '#FF0055', '#FFFFFF', '#10B981', '#8B5CF6'].map(c => (
                                                                     <button
                                                                         key={c}
                                                                         onClick={() => setDesignConfig({ ...designConfig, accent_color: c })}
@@ -684,7 +684,7 @@ export default function AnnouncementsAdminPage() {
                                                             <div className="space-y-2">
                                                                 <label className="text-[9px] font-bold text-gray-500 uppercase">Estilo Borde</label>
                                                                 <select
-                                                                    className="w-full h-8 bg-black/50 border border-white/10 rounded-lg text-[10px] text-white px-2 font-bold uppercase focus:border-[#C88A04]"
+                                                                    className="w-full h-8 bg-black/50 border border-white/10 rounded-lg text-[10px] text-white px-2 font-bold uppercase focus:border-[#00E5FF]"
                                                                     value={designConfig.border_style}
                                                                     onChange={(e) => setDesignConfig({ ...designConfig, border_style: e.target.value })}
                                                                 >
@@ -732,12 +732,12 @@ export default function AnnouncementsAdminPage() {
                                         {/* Preview Side */}
                                         <div className="space-y-6">
                                             <div className="sticky top-0 bg-[#0F0F0F] p-8 rounded-[3rem] border border-white/5 shadow-2xl">
-                                                <label className="text-xs font-black tracking-[0.4em] text-[#C88A04] uppercase mb-6 block text-center">Éter Studio Preview</label>
+                                                <label className="text-xs font-black tracking-[0.4em] text-[#00E5FF] uppercase mb-6 block text-center">Éter Studio Preview</label>
                                                 <LivePreview data={formData} design={designConfig} />
                                             </div>
 
                                             <div className="p-4 rounded-2xl border border-white/5 bg-white/[0.02] flex items-center gap-4">
-                                                <Zap className="text-[#C88A04]" size={20} />
+                                                <Zap className="text-[#00E5FF]" size={20} />
                                                 <p className="text-[10px] text-gray-400 font-bold leading-relaxed">Tip: Las imágenes con alto contraste y fondo oscuro funcionan mejor en móvil.</p>
                                             </div>
                                         </div>
@@ -747,7 +747,7 @@ export default function AnnouncementsAdminPage() {
                                         <Button variant="ghost" onClick={() => setIsCreateOpen(false)} className="rounded-full px-8 text-xs font-black">DESCARTAR</Button>
                                         <Button
                                             onClick={handleCreate}
-                                            className="bg-[#C88A04] hover:bg-[#D97706] text-black font-black rounded-full px-10 h-12 shadow-xl shadow-[#C88A04]/20"
+                                            className="bg-[#00E5FF] hover:bg-[#D97706] text-black font-black rounded-full px-10 h-12 shadow-xl shadow-[#00E5FF]/20"
                                         >
                                             PUBLICAR CAMPAÑA
                                         </Button>
@@ -763,8 +763,8 @@ export default function AnnouncementsAdminPage() {
                     </div>
 
                     <div className="hidden lg:grid grid-cols-2 gap-4">
-                        <div className="p-6 rounded-3xl border border-white/5 bg-white/[0.02] space-y-2 group hover:border-[#C88A04]/30 transition-all">
-                            <TrendingUp className="text-[#C88A04]" />
+                        <div className="p-6 rounded-3xl border border-white/5 bg-white/[0.02] space-y-2 group hover:border-[#00E5FF]/30 transition-all">
+                            <TrendingUp className="text-[#00E5FF]" />
                             <p className="text-2xl font-black text-white">{announcements.length}</p>
                             <p className="text-[10px] font-black text-gray-500 uppercase">Activos</p>
                         </div>
@@ -781,7 +781,7 @@ export default function AnnouncementsAdminPage() {
             < div className="space-y-6" >
                 <div className="flex justify-between items-end">
                     <h2 className="text-2xl font-black tracking-tighter uppercase italic flex items-center gap-2">
-                        <Layout className="text-[#C88A04]" />
+                        <Layout className="text-[#00E5FF]" />
                         Historial de Campañas
                     </h2>
                     <Badge variant="outline" className="text-[10px] border-white/10 font-bold uppercase text-gray-500">
@@ -807,7 +807,7 @@ export default function AnnouncementsAdminPage() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: idx * 0.05 }}
-                                    className="group relative flex items-center gap-6 p-4 rounded-3xl border border-white/5 bg-[#111] hover:border-[#C88A04]/20 transition-all hover:translate-x-1"
+                                    className="group relative flex items-center gap-6 p-4 rounded-3xl border border-white/5 bg-[#111] hover:border-[#00E5FF]/20 transition-all hover:translate-x-1"
                                 >
                                     <div className="relative w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-white/5">
                                         {ann.image_url ? (
@@ -827,11 +827,11 @@ export default function AnnouncementsAdminPage() {
 
                                     <div className="flex-1 min-w-0 space-y-1">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-[10px] font-black text-[#C88A04] uppercase tracking-widest">{ann.category || 'NOVEDAD'}</span>
+                                            <span className="text-[10px] font-black text-[#00E5FF] uppercase tracking-widest">{ann.category || 'NOVEDAD'}</span>
                                             <span className="text-[10px] text-gray-600">•</span>
                                             <span className="text-[10px] text-gray-500 font-bold">{new Date(ann.published_at).toLocaleDateString()}</span>
                                         </div>
-                                        <h3 className="text-xl font-black text-white uppercase tracking-tighter truncate group-hover:text-[#C88A04] transition-colors">{ann.title}</h3>
+                                        <h3 className="text-xl font-black text-white uppercase tracking-tighter truncate group-hover:text-[#00E5FF] transition-colors">{ann.title}</h3>
                                         <p className="text-xs text-gray-500 line-clamp-1 max-w-xl italic">{ann.content}</p>
                                     </div>
 
@@ -867,7 +867,7 @@ export default function AnnouncementsAdminPage() {
                                     </div>
 
                                     {/* Accent line */}
-                                    <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#C88A04] opacity-0 group-hover:opacity-100 transition-opacity rounded-full ml-[-1px]" />
+                                    <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#00E5FF] opacity-0 group-hover:opacity-100 transition-opacity rounded-full ml-[-1px]" />
                                 </motion.div>
                             ))}
                         </AnimatePresence>
@@ -884,8 +884,8 @@ export default function AnnouncementsAdminPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-4">
                         <div className="space-y-4">
                             <div className="flex border-b border-white/5 mb-4">
-                                <button onClick={() => setActiveTab('content')} className={`pb-2 px-4 text-xs font-black uppercase transition-all ${activeTab === 'content' ? 'text-[#C88A04] border-b-2 border-[#C88A04]' : 'text-gray-500'}`}>Contenido</button>
-                                <button onClick={() => setActiveTab('design')} className={`pb-2 px-4 text-xs font-black uppercase transition-all ${activeTab === 'design' ? 'text-[#C88A04] border-b-2 border-[#C88A04]' : 'text-gray-500'}`}>Diseño</button>
+                                <button onClick={() => setActiveTab('content')} className={`pb-2 px-4 text-xs font-black uppercase transition-all ${activeTab === 'content' ? 'text-[#00E5FF] border-b-2 border-[#00E5FF]' : 'text-gray-500'}`}>Contenido</button>
+                                <button onClick={() => setActiveTab('design')} className={`pb-2 px-4 text-xs font-black uppercase transition-all ${activeTab === 'design' ? 'text-[#00E5FF] border-b-2 border-[#00E5FF]' : 'text-gray-500'}`}>Diseño</button>
                             </div>
 
                             {activeTab === 'content' ? (
@@ -893,7 +893,7 @@ export default function AnnouncementsAdminPage() {
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-gray-400 uppercase">Título</label>
                                         <Input
-                                            className="bg-black/50 border-white/10 focus:border-[#C88A04] font-bold uppercase"
+                                            className="bg-black/50 border-white/10 focus:border-[#00E5FF] font-bold uppercase"
                                             value={formData.title}
                                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                         />
@@ -902,7 +902,7 @@ export default function AnnouncementsAdminPage() {
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold text-gray-400 uppercase">Categoría</label>
                                             <Input
-                                                className="bg-black/50 border-white/10 focus:border-[#C88A04]"
+                                                className="bg-black/50 border-white/10 focus:border-[#00E5FF]"
                                                 value={formData.category}
                                                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                                             />
@@ -921,7 +921,7 @@ export default function AnnouncementsAdminPage() {
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-gray-400 uppercase">URL Imagen</label>
                                         <Input
-                                            className="bg-black/50 border-white/10 focus:border-[#C88A04]"
+                                            className="bg-black/50 border-white/10 focus:border-[#00E5FF]"
                                             value={formData.image_url}
                                             onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                                         />
@@ -929,7 +929,7 @@ export default function AnnouncementsAdminPage() {
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-gray-400 uppercase">Narrativa</label>
                                         <Textarea
-                                            className="bg-black/50 border-white/10 focus:border-[#C88A04] min-h-[100px]"
+                                            className="bg-black/50 border-white/10 focus:border-[#00E5FF] min-h-[100px]"
                                             value={formData.content}
                                             onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                                         />
@@ -942,26 +942,26 @@ export default function AnnouncementsAdminPage() {
                                             <button
                                                 key={l}
                                                 onClick={() => setDesignConfig(prev => ({ ...prev, layout: l }))}
-                                                className={`py-2 text-[10px] font-black uppercase rounded-lg border transition-all ${designConfig.layout === l ? 'bg-[#C88A04] text-black' : 'bg-white/5 text-gray-500'}`}
+                                                className={`py-2 text-[10px] font-black uppercase rounded-lg border transition-all ${designConfig.layout === l ? 'bg-[#00E5FF] text-black' : 'bg-white/5 text-gray-500'}`}
                                             >
                                                 {l}
                                             </button>
                                         ))}
                                     </div>
                                     <div className="flex gap-2 py-2">
-                                        {['#C88A04', '#00F2FF', '#FF0055', '#FFFFFF'].map(c => (
+                                        {['#00E5FF', '#00F2FF', '#FF0055', '#FFFFFF'].map(c => (
                                             <button key={c} onClick={() => setDesignConfig(prev => ({ ...prev, accent_color: c }))} className={`w-8 h-8 rounded-full ${designConfig.accent_color === c ? 'ring-2 ring-white' : ''}`} style={{ backgroundColor: c }} />
                                         ))}
                                     </div>
                                     <input
                                         type="range" min="0" max="1" step="0.1"
-                                        className="w-full accent-[#C88A04]"
+                                        className="w-full accent-[#00E5FF]"
                                         value={designConfig.overlay_opacity}
                                         onChange={(e) => setDesignConfig(prev => ({ ...prev, overlay_opacity: parseFloat(e.target.value) }))}
                                     />
                                     <div className="flex gap-2">
-                                        <Button size="sm" variant="outline" className={`flex-1 text-[9px] ${designConfig.grain_effect ? 'border-[#C88A04]' : 'opacity-40'}`} onClick={() => setDesignConfig(prev => ({ ...prev, grain_effect: !prev.grain_effect }))}>FILM GRAIN</Button>
-                                        <Button size="sm" variant="outline" className={`flex-1 text-[9px] ${designConfig.text_align === 'center' ? 'border-[#C88A04]' : 'opacity-40'}`} onClick={() => setDesignConfig(prev => ({ ...prev, text_align: prev.text_align === 'center' ? 'left' : 'center' }))}>CENTER</Button>
+                                        <Button size="sm" variant="outline" className={`flex-1 text-[9px] ${designConfig.grain_effect ? 'border-[#00E5FF]' : 'opacity-40'}`} onClick={() => setDesignConfig(prev => ({ ...prev, grain_effect: !prev.grain_effect }))}>FILM GRAIN</Button>
+                                        <Button size="sm" variant="outline" className={`flex-1 text-[9px] ${designConfig.text_align === 'center' ? 'border-[#00E5FF]' : 'opacity-40'}`} onClick={() => setDesignConfig(prev => ({ ...prev, text_align: prev.text_align === 'center' ? 'left' : 'center' }))}>CENTER</Button>
                                     </div>
                                 </div>
                             )}
@@ -975,7 +975,7 @@ export default function AnnouncementsAdminPage() {
                     </div>
                     <DialogFooter>
                         <Button variant="ghost" onClick={() => setIsEditOpen(false)}>CANCELAR</Button>
-                        <Button onClick={handleUpdate} className="bg-[#C88A04] hover:bg-[#D97706] text-black font-black px-8">GUARDAR CAMBIOS</Button>
+                        <Button onClick={handleUpdate} className="bg-[#00E5FF] hover:bg-[#D97706] text-black font-black px-8">GUARDAR CAMBIOS</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog >

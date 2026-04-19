@@ -20,7 +20,7 @@ export function AcademyStats({ level, currentXP, nextLevelXP, levelTitle }: Acad
       </div>
       
       <div className="flex flex-col md:flex-row items-start md:items-center gap-6 relative z-10">
-        <div className="flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 shadow-lg text-white font-bold text-3xl">
+        <div className="flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-cyan-400 to-orange-500 shadow-lg text-white font-bold text-3xl">
           {level}
         </div>
         
@@ -29,7 +29,7 @@ export function AcademyStats({ level, currentXP, nextLevelXP, levelTitle }: Acad
             <div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{levelTitle}</h2>
               <p className="text-sm text-gray-500 flex items-center gap-1">
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                <Star className="w-4 h-4 text-cyan-500 fill-cyan-500" />
                 {currentXP} XP Totales
               </p>
             </div>
@@ -46,7 +46,7 @@ export function AcademyStats({ level, currentXP, nextLevelXP, levelTitle }: Acad
             </div>
             <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                 <div 
-                    className="h-full bg-gradient-to-r from-yellow-400 to-orange-600 transition-all duration-1000 ease-out relative"
+                    className="h-full bg-gradient-to-r from-cyan-400 to-orange-600 transition-all duration-1000 ease-out relative"
                     style={{ width: `${progress}%` }}
                 >
                     <div className="absolute inset-0 bg-white/20 animate-pulse"></div>

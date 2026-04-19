@@ -23,7 +23,7 @@ export default function LoginPage() {
           <div className="space-y-4">
             <div className="h-12 bg-white/5 rounded-xl" />
             <div className="h-12 bg-white/5 rounded-xl" />
-            <div className="h-12 bg-amber-500/20 rounded-xl" />
+            <div className="h-12 bg-cyan-500/20 rounded-xl" />
           </div>
         </div>
       </div>

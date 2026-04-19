@@ -70,7 +70,7 @@ Todos los componentes implementados siguen **EXACTAMENTE** el diseño de Stitch:
 | Elemento | Stitch Design | Implementación | Status |
 |----------|---------------|----------------|--------|
 | **Fondo** | Negro puro (#000) | ✅ bg-black | ✅ |
-| **Acentos** | Gold/Orange | ✅ from-yellow-500 to-orange-500 | ✅ |
+| **Acentos** | Gold/Orange | ✅ from-cyan-500 to-orange-500 | ✅ |
 | **Tipografía** | 900 weight brutalist | ✅ font-black tracking-tighter | ✅ |
 | **Glass** | backdrop-blur-2xl | ✅ backdrop-blur-2xl bg-white/5 | ✅ |
 | **Borders** | 4px opacity | ✅ border-4 border-white/10 | ✅ |
@@ -242,7 +242,7 @@ Anywhere on site
 - Hero orbs pulsing (4s, 6s alternados)
 - Product cards hover: scale-[1.02] + border glow
 - Images hover: scale-110
-- Stats icons hover: bg-yellow-500/20
+- Stats icons hover: bg-cyan-500/20
 - Floating cart button: pulse badge
 
 ### **Product Details:**

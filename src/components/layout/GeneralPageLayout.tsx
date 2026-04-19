@@ -25,7 +25,7 @@ const ScrollProgress = () => {
 
     return (
         <motion.div
-            className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#C88A04] to-[#ECA413] origin-left z-[100]"
+            className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#00E5FF] to-[#00D1E6] origin-left z-[100]"
             style={{ scaleX }}
         />
     );
@@ -33,7 +33,7 @@ const ScrollProgress = () => {
 
 export function GeneralPageLayout({ children, title, subtitle, description, breadcrumb }: GeneralPageLayoutProps) {
     return (
-        <main className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#C88A04] selection:text-black overflow-x-hidden pt-32">
+        <main className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#00E5FF] selection:text-black overflow-x-hidden pt-32">
             <ScrollProgress />
             <Navbar />
 
@@ -44,7 +44,7 @@ export function GeneralPageLayout({ children, title, subtitle, description, brea
                     animate={{ opacity: 1, x: 0 }}
                     className="mb-12"
                 >
-                    <Link href="/" className="inline-flex items-center gap-2 text-[#C88A04] hover:text-white transition-colors text-sm font-mono uppercase tracking-widest group">
+                    <Link href="/" className="inline-flex items-center gap-2 text-[#00E5FF] hover:text-white transition-colors text-sm font-mono uppercase tracking-widest group">
                         <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                         VOLVER AL INICIO {breadcrumb && ` / ${breadcrumb}`}
                     </Link>
@@ -58,7 +58,7 @@ export function GeneralPageLayout({ children, title, subtitle, description, brea
                         transition={{ duration: 0.8 }}
                     >
                         {subtitle && (
-                            <span className="text-[#C88A04] font-mono text-sm tracking-[0.4em] uppercase mb-4 block">
+                            <span className="text-[#00E5FF] font-mono text-sm tracking-[0.4em] uppercase mb-4 block">
                                 {subtitle}
                             </span>
                         )}
@@ -73,7 +73,7 @@ export function GeneralPageLayout({ children, title, subtitle, description, brea
                     </motion.div>
 
                     {/* Aesthetic Background Element */}
-                    <div className="absolute -top-20 -left-20 w-64 h-64 bg-[#C88A04]/10 blur-[100px] rounded-full -z-10" />
+                    <div className="absolute -top-20 -left-20 w-64 h-64 bg-[#00E5FF]/10 blur-[100px] rounded-full -z-10" />
                 </div>
 
                 {/* Main Content */}

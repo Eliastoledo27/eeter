@@ -178,9 +178,9 @@ export const AnalyticsDashboard = () => {
             label: 'Tasa Conversión',
             value: `${analytics.summary.conversionRate}%`,
             icon: Target,
-            color: 'from-amber-500 to-amber-600',
-            bg: 'bg-amber-500/10',
-            textColor: 'text-amber-400'
+            color: 'from-cyan-500 to-cyan-600',
+            bg: 'bg-cyan-500/10',
+            textColor: 'text-cyan-400'
         }
     ] : [];
 

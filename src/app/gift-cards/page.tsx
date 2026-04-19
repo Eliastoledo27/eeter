@@ -11,11 +11,11 @@ export default function GiftCardsPage() {
         >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                 <div className="relative group">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-[#C88A04] to-[#ECA413] rounded-[2rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                    <div className="absolute -inset-1 bg-gradient-to-r from-[#00E5FF] to-[#00B8D9] rounded-[2rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
                     <div className="relative aspect-[16/9] rounded-[2rem] bg-gradient-to-br from-[#111] to-black border border-white/10 p-12 flex flex-col justify-between overflow-hidden">
                         <div className="flex justify-between items-start">
-                            <h3 className="text-4xl font-black italic tracking-tighter text-[#C88A04]">ÉTER</h3>
-                            <Sparkles className="text-[#C88A04]" size={24} />
+                            <h3 className="text-4xl font-black italic tracking-tighter text-[#00E5FF]">ÉTER</h3>
+                            <Sparkles className="text-[#00E5FF]" size={24} />
                         </div>
                         <div>
                             <span className="text-sm font-mono text-gray-500 block mb-2 uppercase">VIRTUAL GIFT CARD</span>
@@ -34,14 +34,14 @@ export default function GiftCardsPage() {
                             { icon: CreditCard, title: 'SALDO FLEXIBLE', desc: 'Cargá el monto que desees.' }
                         ].map((item, i) => (
                             <div key={i} className="p-8 rounded-[2rem] border border-white/5 bg-white/[0.02]">
-                                <item.icon className="text-[#C88A04] mb-4" size={32} />
+                                <item.icon className="text-[#00E5FF] mb-4" size={32} />
                                 <h4 className="font-bold mb-2 uppercase">{item.title}</h4>
                                 <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
                             </div>
                         ))}
                     </div>
 
-                    <button className="w-full h-16 bg-[#C88A04] hover:bg-[#ECA413] text-black font-black text-xl rounded-full transition-all shadow-[0_0_40px_-10px_rgba(200,138,4,0.4)] uppercase">
+                    <button className="w-full h-16 bg-[#00E5FF] hover:bg-[#00B8D9] text-black font-black text-xl rounded-full transition-all shadow-[0_0_40px_-10px_rgba(200,138,4,0.4)] uppercase">
                         COMPRAR AHORA
                     </button>
                     <p className="text-center text-xs text-gray-600 uppercase tracking-widest">Válida por 12 meses desde la fecha de emisión.</p>

@@ -52,15 +52,20 @@ export function ResellerNavbar({ resellerSlug, resellerName }: ResellerNavbarPro
                 <div className="flex items-center gap-8 relative z-[110]">
                     <Link href={`/c/${resellerSlug}`} className="flex items-center gap-3 group">
                         <div className="relative">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-white text-black rounded-2xl flex items-center justify-center font-black text-xl md:text-2xl shadow-[0_0_40px_rgba(255,255,255,0.2)] group-hover:bg-[#C88A04] group-hover:shadow-[0_0_40px_rgba(200,138,4,0.4)] transition-all duration-500 ease-out">
-                                É
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-white text-black rounded-2xl flex items-center justify-center font-black text-xl md:text-2xl shadow-[0_0_40px_rgba(255,255,255,0.2)] group-hover:bg-[#00E5FF] group-hover:shadow-[0_0_40px_rgba(0,229,255,0.4)] transition-all duration-500 ease-out">
+                                <span className={cn(
+                                    "transition-transform duration-500",
+                                    isScrolled ? "scale-75" : "scale-100"
+                                )}>É</span>
                             </div>
                         </div>
                         <div className="flex flex-col">
-                            <span className="font-black text-lg md:text-2xl tracking-tight text-white leading-none uppercase">ÉTER</span>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#C88A04] shadow-[0_0_8px_rgba(200,138,4,0.8)]" />
-                                <span className="text-[7px] md:text-[9px] font-black text-[#C88A04] uppercase tracking-[0.2em]">{resellerName || 'TIENDA OFICIAL'}</span>
+                            <span className="text-xl md:text-2xl font-black tracking-tighter text-white group-hover:text-[#00E5FF] transition-colors leading-none uppercase">
+                                ÉTER<span className="text-[#00E5FF]">.</span>
+                            </span>
+                            <div className="flex items-center gap-1.5 mt-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] shadow-[0_0_8px_rgba(0,229,255,0.8)]" />
+                                <span className="text-[7px] md:text-[9px] font-black text-[#00E5FF] uppercase tracking-[0.2em]">{resellerName || 'TIENDA OFICIAL'}</span>
                             </div>
                         </div>
                     </Link>
@@ -89,7 +94,7 @@ export function ResellerNavbar({ resellerSlug, resellerName }: ResellerNavbarPro
                     </button>
 
                     <div className="hidden md:flex items-center gap-2 text-[8px] font-black uppercase tracking-widest text-white/40 px-4 h-10 rounded-xl border border-white/5 bg-white/[0.02]">
-                        <Globe size={12} className="text-[#C88A04]/50" />
+                        <Globe size={12} className="text-[#00E5FF]/50" />
                         ARG / ES
                     </div>
                 </div>

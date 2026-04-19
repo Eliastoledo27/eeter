@@ -14,65 +14,65 @@ const config: Config = {
 				surface: {
 					DEFAULT: '#1a1a1a',
 					hover: '#262626',
-					active: '#c88a04'
+					active: '#00E5FF'
 				},
 				border: '#262626',
 				primary: {
-					DEFAULT: '#c88a04',
-					foreground: '#FFFFFF',
-					hover: '#eab308'
+					DEFAULT: '#00E5FF',
+					foreground: '#000000',
+					hover: '#00B8D4'
 				},
 				accent: {
 					blue: '#0EA5E9',
 					purple: '#D946EF',
-					gold: '#c88a04',
+					cyan: '#00E5FF',
 					teal: '#14B8A6',
 					rose: '#F43F5E',
-					DEFAULT: '#c88a04',
-					foreground: '#FFFFFF'
+					DEFAULT: '#00E5FF',
+					foreground: '#000000'
 				},
-				'background-dark': '#0A0A0A',
-				'hud-black': '#0A0A0A',
-				'hud-gray': '#1a1a1a',
+				'background-dark': '#050505',
+				'hud-black': '#050505',
+				'hud-gray': '#0D0D0D',
 				content: {
 					heading: '#FFFFFF',
-					body: '#A1A1AA',
-					muted: '#52525B'
+					body: '#D1D1D6',
+					muted: '#8E8E93'
 				},
-				success: '#10B981',
-				warning: '#F59E0B',
-				error: '#EF4444',
-				'accent-gold': '#c88a04',
-				gold: {
-					DEFAULT: '#ffd900',
-					dim: '#c88a04',
-					light: '#ffe033',
+				success: '#00FF94',
+				warning: '#FFB800',
+				error: '#FF3B30',
+				'accent-cyan': '#00E5FF',
+				cyan: {
+					DEFAULT: '#00E5FF',
+					dim: '#008394',
+					light: '#80F2FF',
 				},
-				'electric-blue': '#0EA5E9',
-				'slate-panel': 'rgba(20, 20, 20, 0.6)',
+				'electric-blue': '#00E5FF',
+				'slate-panel': 'rgba(10, 10, 10, 0.7)',
 				foreground: '#FFFFFF',
 				card: {
-					DEFAULT: 'rgba(20, 20, 20, 0.6)',
+					DEFAULT: 'rgba(15, 15, 15, 0.5)',
 					foreground: '#FFFFFF'
 				},
 				popover: {
-					DEFAULT: '#1a1a1a',
+					DEFAULT: '#0D0D0D',
 					foreground: '#FFFFFF'
 				},
 				secondary: {
-					DEFAULT: '#262626',
+					DEFAULT: '#121212',
 					foreground: '#FFFFFF'
 				},
 				muted: {
-					DEFAULT: '#262626',
-					foreground: '#A1A1AA'
+					DEFAULT: '#121212',
+					foreground: '#8E8E93'
 				},
 				destructive: {
-					DEFAULT: '#EF4444',
+					DEFAULT: '#FF3B30',
 					foreground: '#FFFFFF'
 				},
-				input: '#1a1a1a',
-				ring: '#c88a04',
+				input: '#0D0D0D',
+				ring: '#00E5FF',
 				chart: {
 					'1': 'hsl(var(--chart-1))',
 					'2': 'hsl(var(--chart-2))',
@@ -83,8 +83,9 @@ const config: Config = {
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-				'gradient-glow': 'conic-gradient(from 180deg at 50% 50%, #F59E0B 0deg, #F43F5E 180deg, #EA580C 360deg)',
-				'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))'
+				'gradient-glow': 'conic-gradient(from 180deg at 50% 50%, #00E5FF 0deg, #0EA5E9 180deg, #00FF94 360deg)',
+				'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+				'glass-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%)',
 			},
 			fontFamily: {
 				heading: [
@@ -118,17 +119,42 @@ const config: Config = {
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
+			boxShadow: {
+				'glow': '0 0 20px rgba(0, 229, 255, 0.3)',
+				'cyan-glow': '0 0 25px rgba(0, 229, 255, 0.2)',
+				'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.8)',
+			},
 			animation: {
 				'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'float': 'float 6s ease-in-out infinite',
 			},
 			keyframes: {
 				pulse: {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.5' },
 				},
+				float: {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-20px)' },
+				}
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require("tailwindcss-animate"),
+		function ({ addUtilities }: any) {
+			addUtilities({
+				'.text-shadow-glow': {
+					'text-shadow': '0 0 20px rgba(0, 229, 255, 0.4)',
+				},
+				'.text-shadow-cyan': {
+					'text-shadow': '0 0 10px rgba(0, 229, 255, 0.5)',
+				},
+				'.backdrop-blur-20': {
+					'backdrop-filter': 'blur(20px)',
+				}
+			})
+		}
+	],
 };
 export default config;

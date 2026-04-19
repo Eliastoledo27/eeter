@@ -41,7 +41,7 @@ export const TopProductsTable = ({ data }: TopProductsTableProps) => {
                                 <td className="py-3 px-2">
                                     <div className={cn(
                                         'w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black',
-                                        idx === 0 ? 'bg-amber-500/20 text-amber-400' :
+                                        idx === 0 ? 'bg-cyan-500/20 text-cyan-400' :
                                             idx === 1 ? 'bg-gray-400/20 text-gray-300' :
                                                 idx === 2 ? 'bg-orange-500/20 text-orange-400' :
                                                     'bg-white/5 text-gray-500'

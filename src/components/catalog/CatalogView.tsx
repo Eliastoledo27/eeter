@@ -55,7 +55,7 @@ export default function CatalogView({ initialProducts }: CatalogViewProps) {
                             </p>
                             <button
                                 onClick={() => setSelectedCategory(null)}
-                                className="mt-4 text-[#ffd900] hover:underline"
+                                className="mt-4 text-[#00E5FF] hover:underline uppercase font-bold tracking-widest text-[10px]"
                             >
                                 Ver todos los productos
                             </button>

@@ -69,7 +69,7 @@ export const DashboardAcademy = ({ isPremium: initialPremium, items: initialItem
           <p className="text-slate-400 mt-1">Capacitate y desbloqueá nuevos niveles de ganancias.</p>
         </div>
         {!isPremium && (
-          <button className="bg-amber-500 text-amber-950 px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-amber-500/20 hover:scale-105 transition-transform">
+          <button className="bg-cyan-500 text-cyan-950 px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-cyan-500/20 hover:scale-105 transition-transform">
             <Crown size={18} /> Ser Premium
           </button>
         )}
@@ -104,7 +104,7 @@ export const DashboardAcademy = ({ isPremium: initialPremium, items: initialItem
                 onClick={() => setShowVipOnly(!showVipOnly)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border transition-colors ${
                     showVipOnly 
-                    ? 'bg-amber-500/20 border-amber-500/50 text-amber-500' 
+                    ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-500' 
                     : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:text-white'
                 }`}
             >
@@ -156,8 +156,8 @@ export const DashboardAcademy = ({ isPremium: initialPremium, items: initialItem
                 
                 {item.is_vip && !isPremium && (
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center bg-slate-950/60 backdrop-blur-sm">
-                    <div className="bg-amber-500/20 p-4 rounded-full mb-4 animate-pulse">
-                    <Lock className="text-amber-500" size={32} />
+                    <div className="bg-cyan-500/20 p-4 rounded-full mb-4 animate-pulse">
+                    <Lock className="text-cyan-500" size={32} />
                     </div>
                     <h4 className="text-white font-bold text-lg">Contenido Exclusivo</h4>
                     <p className="text-xs text-slate-300 mt-2 max-w-[200px]">Desbloqueá este material convirtiéndote en socio Premium.</p>

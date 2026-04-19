@@ -41,7 +41,7 @@ export function ResellerCatalogClient({
                             key={cat}
                             onClick={() => setActiveCategory(cat)}
                             className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeCategory === cat
-                                ? 'bg-[#C88A04] text-black shadow-[0_0_20px_rgba(200,138,4,0.3)]'
+                                ? 'bg-[#00E5FF] text-black shadow-[0_0_20px_rgba(200,138,4,0.3)]'
                                 : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
                                 }`}
                         >
@@ -57,7 +57,7 @@ export function ResellerCatalogClient({
                         placeholder="BUSCAR PRODUCTO..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 text-[10px] font-bold tracking-widest uppercase focus:outline-none focus:border-[#C88A04]/50 transition-all"
+                        className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 text-[10px] font-bold tracking-widest uppercase focus:outline-none focus:border-[#00E5FF]/50 transition-all"
                     />
                 </div>
             </div>

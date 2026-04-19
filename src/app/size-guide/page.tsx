@@ -23,7 +23,7 @@ export default function SizeGuidePage() {
             <div className="flex flex-col lg:flex-row gap-16 items-start">
                 <div className="lg:w-1/2 overflow-hidden rounded-[2.5rem] border border-white/10">
                     <table className="w-full text-left">
-                        <thead className="bg-[#C88A04] text-black font-bold uppercase text-sm">
+                        <thead className="bg-[#00E5FF] text-black font-bold uppercase text-sm">
                             <tr>
                                 <th className="p-6">ARG / BR</th>
                                 <th className="p-6">CM (Largo)</th>
@@ -43,8 +43,8 @@ export default function SizeGuidePage() {
                 </div>
 
                 <div className="lg:w-1/2 space-y-12">
-                    <div className="p-10 rounded-[2.5rem] border border-[#C88A04]/20 bg-[#C88A04]/5">
-                        <Ruler className="text-[#C88A04] mb-6" size={40} />
+                    <div className="p-10 rounded-[2.5rem] border border-[#00E5FF]/20 bg-[#00E5FF]/5">
+                        <Ruler className="text-[#00E5FF] mb-6" size={40} />
                         <h3 className="text-3xl font-black mb-6 uppercase leading-tight">¿Cómo medir tu pie?</h3>
                         <ol className="space-y-6 list-decimal list-inside text-gray-300">
                             <li>Colocá una hoja de papel en el piso contra la pared.</li>

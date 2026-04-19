@@ -77,8 +77,8 @@
 
 ```css
 /* Primary Gold */
---color-primary: #C88A04;
---color-primary-light: #ECA413;
+--color-primary: #00E5FF;
+--color-primary-light: #00B8D9;
 --color-primary-dark: #A67203;
 
 /* Backgrounds */
@@ -119,7 +119,7 @@
 
 ```css
 /* Golden Gradient (Primary) */
-background: linear-gradient(135deg, #C88A04 0%, #ECA413 100%);
+background: linear-gradient(135deg, #00E5FF 0%, #00B8D9 100%);
 
 /* Dark Gradient (Backgrounds) */
 background: linear-gradient(180deg, #131313 0%, #0A0A0A 100%);
@@ -209,7 +209,7 @@ background: linear-gradient(
 // CSS
 .btn-primary {
   padding: 12px 32px;
-  background: linear-gradient(135deg, #C88A04 0%, #ECA413 100%);
+  background: linear-gradient(135deg, #00E5FF 0%, #00B8D9 100%);
   color: #FFFFFF;
   border: none;
   border-radius: 12px;
@@ -235,8 +235,8 @@ background: linear-gradient(
 .btn-secondary {
   padding: 12px 32px;
   background: transparent;
-  color: #C88A04;
-  border: 2px solid #C88A04;
+  color: #00E5FF;
+  border: 2px solid #00E5FF;
   border-radius: 12px;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
@@ -247,7 +247,7 @@ background: linear-gradient(
 
 .btn-secondary:hover {
   background: rgba(200, 138, 4, 0.1);
-  border-color: #ECA413;
+  border-color: #00B8D9;
 }
 ```
 
@@ -322,7 +322,7 @@ background: linear-gradient(
   font-family: 'Inter', sans-serif;
   font-size: 24px;
   font-weight: 700;
-  color: #C88A04;
+  color: #00E5FF;
   margin-bottom: 16px;
 }
 ```
@@ -413,13 +413,13 @@ background: linear-gradient(
   left: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, #C88A04, #ECA413);
+  background: linear-gradient(90deg, #00E5FF, #00B8D9);
   transition: width 0.3s ease;
 }
 
 .navbar-menu a.active,
 .navbar-menu a:hover {
-  color: #C88A04;
+  color: #00E5FF;
 }
 
 .navbar-menu a.active::after,
@@ -510,7 +510,7 @@ background: linear-gradient(
 
 .form-input:focus {
   outline: none;
-  border-color: #C88A04;
+  border-color: #00E5FF;
   box-shadow: 0 0 0 4px rgba(200, 138, 4, 0.1);
 }
 
@@ -766,7 +766,7 @@ const shimmer = keyframes`
 ```tsx
 // Focus Visible Styles
 *:focus-visible {
-  outline: 2px solid #C88A04;
+  outline: 2px solid #00E5FF;
   outline-offset: 4px;
 }
 
@@ -779,7 +779,7 @@ const shimmer = keyframes`
   position: absolute;
   top: -40px;
   left: 0;
-  background: #C88A04;
+  background: #00E5FF;
   color: #0A0A0A;
   padding: 8px 16px;
   z-index: 1000;
@@ -841,8 +841,8 @@ const shimmer = keyframes`
 ```css
 :root {
   /* Colors */
-  --color-primary: #C88A04;
-  --color-primary-light: #ECA413;
+  --color-primary: #00E5FF;
+  --color-primary-light: #00B8D9;
   --color-primary-dark: #A67203;
   
   --color-bg-darkest: #0A0A0A;
@@ -974,9 +974,9 @@ const CustomTooltip = ({ active, payload }: any) => {
     <Line 
       type="monotone" 
       dataKey="value" 
-      stroke="#C88A04"
+      stroke="#00E5FF"
       strokeWidth={3}
-      dot={{ fill: '#ECA413', r: 6 }}
+      dot={{ fill: '#00B8D9', r: 6 }}
       activeDot={{ r: 8 }}
     />
   </LineChart>
@@ -1002,7 +1002,7 @@ const CustomTooltip = ({ active, payload }: any) => {
   font-family: 'Manrope', sans-serif;
   font-size: 18px;
   font-weight: 700;
-  color: #C88A04;
+  color: #00E5FF;
 }
 ```
 

@@ -19,7 +19,7 @@ export const DashboardRanking = ({ ranking, currentUserId }: DashboardRankingPro
     <GlassCard className="p-8">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-xl font-bold flex items-center gap-2">
-          <Crown size={20} className="text-amber-500" /> Top de la Semana
+          <Crown size={20} className="text-cyan-500" /> Top de la Semana
         </h2>
         <button className="text-sky-400 text-xs font-bold hover:underline">Ver todo</button>
       </div>
@@ -34,7 +34,7 @@ export const DashboardRanking = ({ ranking, currentUserId }: DashboardRankingPro
               }`}
             >
               <div className="flex items-center gap-4">
-                <span className={`w-6 font-black text-center ${idx === 0 ? 'text-amber-500' : 'text-slate-500'}`}>
+                <span className={`w-6 font-black text-center ${idx === 0 ? 'text-cyan-500' : 'text-slate-500'}`}>
                   {idx + 1}
                 </span>
                 <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white uppercase shadow-inner">

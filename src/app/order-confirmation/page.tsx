@@ -36,7 +36,7 @@ function OrderConfirmationContent() {
                         <p className="text-sm text-gray-400 uppercase tracking-wider mb-2">
                             Código de Referencia
                         </p>
-                        <p className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500">
+                        <p className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-orange-500">
                             {referenceCode}
                         </p>
                         <p className="text-sm text-gray-400 mt-4">
@@ -51,8 +51,8 @@ function OrderConfirmationContent() {
 
                     <div className="space-y-4">
                         <div className="flex gap-4">
-                            <div className="flex-shrink-0 w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center">
-                                <span className="text-yellow-500 font-black">1</span>
+                            <div className="flex-shrink-0 w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center">
+                                <span className="text-cyan-500 font-black">1</span>
                             </div>
                             <div>
                                 <h3 className="font-bold text-white">Confirmación</h3>
@@ -61,8 +61,8 @@ function OrderConfirmationContent() {
                         </div>
 
                         <div className="flex gap-4">
-                            <div className="flex-shrink-0 w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center">
-                                <span className="text-yellow-500 font-black">2</span>
+                            <div className="flex-shrink-0 w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center">
+                                <span className="text-cyan-500 font-black">2</span>
                             </div>
                             <div>
                                 <h3 className="font-bold text-white">Preparación</h3>
@@ -71,8 +71,8 @@ function OrderConfirmationContent() {
                         </div>
 
                         <div className="flex gap-4">
-                            <div className="flex-shrink-0 w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center">
-                                <span className="text-yellow-500 font-black">3</span>
+                            <div className="flex-shrink-0 w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center">
+                                <span className="text-cyan-500 font-black">3</span>
                             </div>
                             <div>
                                 <h3 className="font-bold text-white">Entrega</h3>
@@ -86,7 +86,7 @@ function OrderConfirmationContent() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom duration-700" style={{ animationDelay: '800ms' }}>
                     <Link
                         href="/"
-                        className="py-5 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-black text-lg rounded-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3"
+                        className="py-5 bg-gradient-to-r from-cyan-500 to-orange-500 text-black font-black text-lg rounded-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3"
                     >
                         <Home size={24} />
                         VOLVER AL INICIO
@@ -94,7 +94,7 @@ function OrderConfirmationContent() {
 
                     <Link
                         href="/catalog"
-                        className="py-5 border-4 border-yellow-500 text-white font-black text-lg rounded-2xl hover:bg-yellow-500 hover:text-black transition-all duration-300 flex items-center justify-center gap-3"
+                        className="py-5 border-4 border-cyan-500 text-white font-black text-lg rounded-2xl hover:bg-cyan-500 hover:text-black transition-all duration-300 flex items-center justify-center gap-3"
                     >
                         <Package size={24} />
                         SEGUIR COMPRANDO
@@ -123,7 +123,7 @@ export default function OrderConfirmationPage() {
     return (
         <Suspense fallback={
             <div className="min-h-screen bg-black text-white flex items-center justify-center">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-yellow-500" />
+                <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-cyan-500" />
             </div>
         }>
             <OrderConfirmationContent />

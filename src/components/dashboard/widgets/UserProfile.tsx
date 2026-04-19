@@ -19,10 +19,10 @@ export function UserProfile() {
     return (
         <div className="bg-black/40 backdrop-blur-md border border-primary/30 shadow-[0_4px_30px_rgba(0,0,0,0.5)] rounded-xl p-6 flex items-center gap-6 h-full">
             <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-full opacity-75 group-hover:opacity-100 blur transition duration-1000 group-hover:duration-200 animate-tilt"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-orange-600 rounded-full opacity-75 group-hover:opacity-100 blur transition duration-1000 group-hover:duration-200 animate-tilt"></div>
                 <Avatar className="h-20 w-20 border-2 border-black relative">
                     <AvatarImage src={user.avatar_url || ''} alt={user.name || 'User'} />
-                    <AvatarFallback className="bg-zinc-800 text-yellow-500 font-bold text-xl">
+                    <AvatarFallback className="bg-zinc-800 text-cyan-500 font-bold text-xl">
                         {initials}
                     </AvatarFallback>
                 </Avatar>

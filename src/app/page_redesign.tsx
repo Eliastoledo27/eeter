@@ -10,7 +10,7 @@ export default async function IndexPage() {
             {/* Background Ambience */}
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] bg-[#EC4899]/10 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#CA8A04]/10 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#00B8D9]/10 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
                 <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay" style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
                 }}></div>
@@ -25,7 +25,7 @@ export default async function IndexPage() {
                     {/* Left Content */}
                     <div className="space-y-8 text-center lg:text-left">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-glow animate-in slide-in-from-bottom-4 fade-in duration-700">
-                            <Star size={14} className="text-[#CA8A04] fill-[#CA8A04]" />
+                            <Star size={14} className="text-[#00B8D9] fill-[#00B8D9]" />
                             <span className="text-sm font-medium text-gray-200">Plataforma B2B Premium #1</span>
                         </div>
 
@@ -34,7 +34,7 @@ export default async function IndexPage() {
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400">
                                 imperio de
                             </span> <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#CA8A04] via-[#F59E0B] to-[#EC4899] relative">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00B8D9] via-[#F59E0B] to-[#EC4899] relative">
                                 sneakers
                             </span>
                         </h1>
@@ -45,7 +45,7 @@ export default async function IndexPage() {
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4 animate-in slide-in-from-bottom-10 fade-in duration-700 delay-300">
                             <Link href="/register" className="group">
-                                <button className="w-full sm:w-auto bg-gradient-to-r from-[#EC4899] to-[#CA8A04] text-white px-8 py-5 rounded-2xl font-bold text-lg hover:placeholder-opacity-100 hover:scale-[1.02] hover:shadow-[0_0_40px_-10px_rgba(236,72,153,0.5)] transition-all flex items-center justify-center gap-3">
+                                <button className="w-full sm:w-auto bg-gradient-to-r from-[#EC4899] to-[#00B8D9] text-white px-8 py-5 rounded-2xl font-bold text-lg hover:placeholder-opacity-100 hover:scale-[1.02] hover:shadow-[0_0_40px_-10px_rgba(236,72,153,0.5)] transition-all flex items-center justify-center gap-3">
                                     Empezar ahora <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </Link>
@@ -99,7 +99,7 @@ export default async function IndexPage() {
                         </div>
 
                         {/* Background Glows */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-r from-[#CA8A04] to-[#EC4899] rounded-full blur-[100px] opacity-20 -z-10 animate-pulse"></div>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-r from-[#00B8D9] to-[#EC4899] rounded-full blur-[100px] opacity-20 -z-10 animate-pulse"></div>
                     </div>
                 </div>
             </section>
@@ -109,7 +109,7 @@ export default async function IndexPage() {
                 <div className="container px-6 mx-auto">
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
-                            { icon: ShieldCheck, title: "Sin Riesgos", desc: "No necesitas comprar stock. Paga solo cuando vendes.", color: "text-[#CA8A04]" },
+                            { icon: ShieldCheck, title: "Sin Riesgos", desc: "No necesitas comprar stock. Paga solo cuando vendes.", color: "text-[#00B8D9]" },
                             { icon: Globe, title: "Logística Global", desc: "Enviamos a tus clientes en todo el mundo con tracking.", color: "text-sky-500" },
                             { icon: BarChart3, title: "Alta Rentabilidad", desc: "Márgenes optimizados para el mercado de lujo.", color: "text-emerald-500" },
                             { icon: Lock, title: "100% Seguro", desc: "Pagos y transacciones protegidas con tecnología militar.", color: "text-[#EC4899]" },
@@ -157,7 +157,7 @@ export default async function IndexPage() {
             <footer className="border-t border-white/5 py-16 bg-black/50 backdrop-blur-xl">
                 <div className="container px-6 mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#EC4899] to-[#CA8A04] rounded-xl flex items-center justify-center text-black font-black text-xl">É</div>
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#EC4899] to-[#00B8D9] rounded-xl flex items-center justify-center text-black font-black text-xl">É</div>
                         <span className="font-bold text-2xl tracking-tight text-white">ÉTER STORE</span>
                     </div>
                     <div className="text-gray-500 text-sm">

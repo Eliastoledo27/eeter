@@ -39,13 +39,13 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 bg-transparent border border-[#C88A04] flex items-center justify-center rounded-lg">
-            <span className="text-3xl font-bold text-[#C88A04] animate-pulse">É</span>
+          <div className="w-12 h-12 bg-transparent border border-[#00E5FF] flex items-center justify-center rounded-lg">
+            <span className="text-3xl font-bold text-[#00E5FF] animate-pulse">É</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-[#C88A04] rounded-full animate-bounce [animation-delay:0ms]" />
-            <div className="w-2 h-2 bg-[#C88A04] rounded-full animate-bounce [animation-delay:150ms]" />
-            <div className="w-2 h-2 bg-[#C88A04] rounded-full animate-bounce [animation-delay:300ms]" />
+            <div className="w-2 h-2 bg-[#00E5FF] rounded-full animate-bounce [animation-delay:0ms]" />
+            <div className="w-2 h-2 bg-[#00E5FF] rounded-full animate-bounce [animation-delay:150ms]" />
+            <div className="w-2 h-2 bg-[#00E5FF] rounded-full animate-bounce [animation-delay:300ms]" />
           </div>
           <p className="text-xs text-gray-500 font-mono uppercase tracking-wider">
             Verificando sesión...
@@ -92,7 +92,7 @@ export default function ProtectedLayout({
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-[#0A0A0A] font-sans text-white selection:bg-[#c88a04]/20 overflow-x-hidden">
+      <div className="min-h-screen bg-[#0A0A0A] font-sans text-white selection:bg-[#00E5FF]/20 overflow-x-hidden">
 
         {/* Mobile overlay */}
         {sidebarOpen && (

@@ -22,7 +22,7 @@ function getPasswordStrength(pw: string): { label: string; score: number; color:
 
     if (score <= 1) return { label: 'Débil', score, color: 'bg-red-500' }
     if (score <= 2) return { label: 'Regular', score, color: 'bg-orange-500' }
-    if (score <= 3) return { label: 'Buena', score, color: 'bg-yellow-500' }
+    if (score <= 3) return { label: 'Buena', score, color: 'bg-cyan-500' }
     return { label: 'Fuerte', score, color: 'bg-emerald-500' }
 }
 
@@ -132,7 +132,7 @@ export default function LoginForm() {
                 <div className="mb-8">
                     <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">
                         Bienvenido de{' '}
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500">
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-cyan-400 to-cyan-500">
                             vuelta
                         </span>
                     </h2>
@@ -175,7 +175,7 @@ export default function LoginForm() {
                                 aria-invalid={!!errors.email}
                                 aria-describedby={errors.email ? 'login-email-error' : undefined}
                                 className={`w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/[0.04] border text-white text-sm placeholder:text-gray-600 
-                  focus:outline-none focus:ring-2 focus:ring-[#CA8A04]/40 focus:border-[#CA8A04]/60 transition-all duration-200
+                  focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 transition-all duration-200
                   ${errors.email ? 'border-red-500/50' : 'border-white/10 hover:border-white/20'}`}
                             />
                             {touched.email && email && !errors.email && (
@@ -205,7 +205,7 @@ export default function LoginForm() {
                                 aria-invalid={!!errors.password}
                                 aria-describedby={errors.password ? 'login-password-error' : undefined}
                                 className={`w-full pl-11 pr-12 py-3.5 rounded-xl bg-white/[0.04] border text-white text-sm placeholder:text-gray-600
-                  focus:outline-none focus:ring-2 focus:ring-[#CA8A04]/40 focus:border-[#CA8A04]/60 transition-all duration-200
+                  focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 transition-all duration-200
                   ${errors.password ? 'border-red-500/50' : 'border-white/10 hover:border-white/20'}`}
                             />
                             <button
@@ -244,11 +244,11 @@ export default function LoginForm() {
                         <label className="flex items-center gap-2 cursor-pointer text-gray-400 hover:text-gray-300 transition-colors group">
                             <input
                                 type="checkbox"
-                                className="w-4 h-4 rounded border-white/20 bg-white/5 text-[#CA8A04] focus:ring-[#CA8A04]/40 focus:ring-offset-0 cursor-pointer"
+                                className="w-4 h-4 rounded border-white/20 bg-white/5 text-[#00B8D9] focus:ring-[#00B8D9]/40 focus:ring-offset-0 cursor-pointer"
                             />
                             <span className="text-xs">Recordarme</span>
                         </label>
-                        <Link href="/login" className="text-xs text-[#CA8A04] hover:text-amber-300 transition-colors font-medium">
+                        <Link href="/login" className="text-xs text-[#00B8D9] hover:text-cyan-300 transition-colors font-medium">
                             ¿Olvidaste tu contraseña?
                         </Link>
                     </div>
@@ -257,8 +257,8 @@ export default function LoginForm() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full py-3.5 rounded-xl font-bold text-sm text-black bg-gradient-to-r from-amber-500 via-[#CA8A04] to-amber-600
-              hover:from-amber-400 hover:via-amber-500 hover:to-amber-500 transition-all duration-300
+                        className="w-full py-3.5 rounded-xl font-bold text-sm text-black bg-gradient-to-r from-cyan-500 via-[#00B8D9] to-cyan-600
+              hover:from-cyan-400 hover:via-cyan-500 hover:to-cyan-500 transition-all duration-300
               shadow-[0_0_30px_rgba(200,138,4,0.2)] hover:shadow-[0_0_40px_rgba(200,138,4,0.35)]
               disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none
               flex items-center justify-center gap-2"
@@ -318,7 +318,7 @@ export default function LoginForm() {
                 {/* Register link */}
                 <p className="mt-7 text-center text-sm text-gray-500">
                     ¿No tienes una cuenta?{' '}
-                    <Link href="/register" className="text-[#CA8A04] hover:text-amber-300 transition-colors font-semibold">
+                    <Link href="/register" className="text-[#00B8D9] hover:text-cyan-300 transition-colors font-semibold">
                         Crea tu tienda
                     </Link>
                 </p>

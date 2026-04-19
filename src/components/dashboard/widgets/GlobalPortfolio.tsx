@@ -79,9 +79,9 @@ export function GlobalPortfolio() {
                     <svg className="w-full h-full transform -rotate-90">
                         <circle cx="96" cy="96" fill="none" r="88" stroke="rgba(255,255,255,0.05)" strokeWidth="4"></circle>
                         <circle
-                            className="drop-shadow-[0_0_4px_#c88a04]"
+                            className="drop-shadow-[0_0_4px_#00E5FF]"
                             cx="96" cy="96" fill="none" r="88"
-                            stroke="#c88a04"
+                            stroke="#00E5FF"
                             strokeDasharray="552"
                             strokeDashoffset="138" // Fixed static for now, could be dynamic based on target
                             strokeWidth="2"

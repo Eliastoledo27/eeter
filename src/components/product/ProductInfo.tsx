@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Heart, Share2, ShoppingCart, Shield, Package, Truck } from 'lucide-react'
+import { Heart, Share2, ShoppingCart, Shield, Truck } from 'lucide-react'
 import { ProductType } from '@/app/actions/products'
 import { useCart } from '@/hooks/useCart'
 import { toast } from 'sonner'
@@ -18,14 +18,12 @@ export function ProductInfo({ product, hideOutboundLinks }: ProductInfoProps) {
     const [selectedSize, setSelectedSize] = useState<string | null>(null)
     const quantity = 1
 
-    // Obtener talles disponibles del stock_by_size
     const availableSizes = Object.entries(product.stock_by_size || {})
         .filter(([, stock]) => stock > 0)
         .map(([size]) => size)
         .sort((a, b) => Number(a) - Number(b))
 
     const totalStock = Object.values(product.stock_by_size || {}).reduce((a, b) => a + b, 0)
-    const isLowStock = totalStock < 10
 
     const handleAddToCart = (silent = false) => {
         if (!selectedSize) {
@@ -33,7 +31,6 @@ export function ProductInfo({ product, hideOutboundLinks }: ProductInfoProps) {
             return false;
         }
 
-        // Convert ProductType back to Product entity for the store
         const productToCart: any = {
             id: product.id,
             name: product.name,
@@ -67,66 +64,59 @@ export function ProductInfo({ product, hideOutboundLinks }: ProductInfoProps) {
         const added = handleAddToCart(true);
         if (added) {
             setCartStep('checkout');
-            // Ensure cart is open and state propagated
             setTimeout(() => openCart(), 0);
         }
     }
 
     return (
-        <div className="sticky top-40 backdrop-blur-3xl lg:bg-white/[0.03] lg:rounded-[3rem] p-6 sm:p-10 lg:border border-white/5 space-y-6 sm:space-y-10 lg:shadow-2xl relative overflow-hidden">
-            {/* Ambient Background Glow in Sidebar */}
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#CA8A04]/10 rounded-full blur-3xl pointer-events-none" />
-
-            {/* Brand & Name */}
-            <div className="space-y-2 sm:space-y-4">
-                <div className="flex items-center gap-3">
-                    <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-[#CA8A04]/10 border border-[#CA8A04]/30 rounded-full text-[8px] sm:text-[10px] font-bold text-[#CA8A04] tracking-[0.2em] uppercase">
-                        {product.category || 'Premium Selection'}
-                    </span>
-                    <span className="text-[8px] sm:text-[10px] font-mono text-gray-600 tracking-widest uppercase">STRICT_AUTH</span>
-                </div>
-                <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tighter leading-none uppercase">
-                    {product.name}
-                </h1>
-                {isLowStock && (
-                    <motion.div
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-rose-500/10 border border-rose-500/20 rounded-full"
-                    >
-                        <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-rose-500 animate-pulse" />
-                        <span className="text-rose-400 font-bold text-[8px] sm:text-[10px] uppercase tracking-widest">Stock Limitado</span>
-                    </motion.div>
-                )}
+        <div className="sticky top-24 space-y-10 pb-12">
+            {/* Category + Badge */}
+            <div className="flex justify-between items-center">
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[10px] font-black text-[#00E5FF] tracking-widest uppercase rounded-md shadow-[0_0_10px_rgba(0,229,255,0.2)]">
+                    {product.category || 'Sneakers'}
+                </span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#00E5FF]/50 drop-shadow-[0_0_5px_#00E5FF40]">
+                    ÉTER NEON ARCHIVE
+                </span>
             </div>
 
-            {/* Price */}
-            <div className="space-y-1">
-                <div className="flex items-baseline gap-2 sm:gap-4">
-                    <span className="text-4xl sm:text-6xl font-light text-white tracking-tighter">
-                        ${product.base_price.toLocaleString('es-AR')}
-                    </span>
+            {/* GIANT Price — flyer style */}
+            <motion.div 
+                initial={{ opacity: 0, x: 30 }} 
+                animate={{ opacity: 1, x: 0 }} 
+                transition={{ duration: 0.7, delay: 0.2 }}
+                className="relative"
+            >
+                <div className="text-6xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-none drop-shadow-[0_0_15px_rgba(0,229,255,0.15)]">
+                    $ {product.base_price.toLocaleString('es-AR')}
                 </div>
-                <p className="text-[8px] sm:text-[10px] font-mono text-gray-500 tracking-[0.2em] uppercase">IVA INCLUIDO / ENVÍO SIN CARGO</p>
-            </div>
+                <p className="text-xs mt-2 font-bold uppercase tracking-widest text-[#00E5FF]">
+                    Hasta 3 cuotas sin interés
+                </p>
+            </motion.div>
 
-            {/* Size Selector */}
+            {/* Size Selector — Bold Grid */}
             {availableSizes.length > 0 && (
-                <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                        <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-500">Seleccionar Talle</label>
+                        <label className="text-xs font-black uppercase tracking-widest text-white/70">
+                            Elegí tu talle
+                        </label>
                         {!hideOutboundLinks && (
-                            <Link href="/size-guide" className="text-[8px] sm:text-[10px] text-[#CA8A04] hover:underline font-bold uppercase tracking-widest">Guía de talles</Link>
+                            <Link href="/size-guide" className="text-[10px] uppercase tracking-widest text-[#00E5FF]/70 hover:text-[#00E5FF] transition-colors font-bold hover:drop-shadow-[0_0_8px_#00E5FF80]">
+                                Guía de talles →
+                            </Link>
                         )}
                     </div>
-                    <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-2 sm:gap-3">
+                    
+                    <div className="grid grid-cols-4 gap-2">
                         {availableSizes.map((size) => (
                             <button
                                 key={size}
                                 onClick={() => setSelectedSize(size)}
-                                className={`h-10 sm:h-14 rounded-xl sm:rounded-2xl font-mono font-bold text-xs sm:text-sm transition-all duration-500 transform ${selectedSize === size
-                                    ? 'bg-[#CA8A04] text-black shadow-[0_0_30px_rgba(202,138,4,0.3)] scale-105'
-                                    : 'bg-white/5 border border-white/10 text-gray-400 hover:border-[#CA8A04]/50 hover:bg-white/10 hover:text-white'
+                                className={`h-14 font-black text-sm transition-all duration-300 rounded-lg border-2 ${selectedSize === size
+                                    ? 'bg-[#00E5FF] text-black border-[#00E5FF] shadow-[0_0_20px_rgba(0,229,255,0.4)] scale-105'
+                                    : 'bg-white/5 text-white/80 border-white/10 hover:border-[#00E5FF]/50 hover:text-white hover:shadow-[0_0_10px_rgba(0,229,255,0.1)]'
                                     }`}
                             >
                                 {size}
@@ -136,55 +126,76 @@ export function ProductInfo({ product, hideOutboundLinks }: ProductInfoProps) {
                 </div>
             )}
 
-            {/* Description */}
-            {product.description && (
-                <div className="space-y-2 sm:space-y-3">
-                    <h3 className="text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500">Morfología y ADN</h3>
-                    <p className="text-gray-400 text-xs sm:text-sm leading-relaxed font-light">{product.description}</p>
-                </div>
-            )}
-
-            {/* CTAs */}
-            <div className="space-y-3 sm:space-y-4 pt-4 sm:pt-6">
+            {/* CTAs — Flyer Impact Buttons */}
+            <div className="space-y-3 pt-4">
                 <button
                     onClick={() => handleAddToCart()}
                     disabled={availableSizes.length === 0}
-                    className="w-full h-14 sm:h-20 bg-white text-black font-black text-base sm:text-lg rounded-xl sm:rounded-[1.5rem] hover:bg-[#CA8A04] transition-all duration-700 shadow-xl flex items-center justify-center gap-3 sm:gap-4 group disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-tighter"
+                    className="group relative w-full h-16 overflow-hidden rounded-xl transition-all duration-500 disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(0,229,255,0.2)] hover:shadow-[0_0_30px_rgba(0,229,255,0.4)]"
                 >
-                    <ShoppingCart size={20} className="sm:size-[24px] group-hover:scale-110 transition-transform" />
-                    {availableSizes.length === 0 ? 'Sin Stock' : 'Añadir al Carrito'}
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#00B3FF] to-[#00E5FF] group-hover:from-[#00E5FF] group-hover:to-[#50EFFF] transition-all" />
+                    <div className="absolute inset-0 bg-white/0 group-hover:bg-white/20 transition-all" />
+                    <div className="relative z-10 flex items-center justify-center gap-3 text-black font-black text-sm uppercase tracking-widest">
+                        <ShoppingCart size={18} className="group-hover:scale-110 transition-transform" />
+                        {availableSizes.length === 0 ? 'AGOTADO' : 'AGREGAR AL CARRITO'}
+                    </div>
                 </button>
 
                 <button
                     onClick={handleBuyNow}
                     disabled={availableSizes.length === 0}
-                    className="w-full h-14 sm:h-20 border border-white/10 text-white font-bold text-base sm:text-lg rounded-xl sm:rounded-[1.5rem] hover:bg-white/5 hover:border-white/20 transition-all duration-500 disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-tighter"
+                    className="group w-full h-14 rounded-xl bg-transparent border-2 border-white/20 hover:border-[#00E5FF] hover:shadow-[inset_0_0_15px_rgba(0,229,255,0.2)] transition-all duration-300 text-white hover:text-[#00E5FF] font-black text-xs uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                    Comprar Ahora
+                    COMPRAR AHORA →
                 </button>
             </div>
 
-            {/* Footer Features */}
-            <div className="grid grid-cols-2 gap-4 pt-10 border-t border-white/5">
+            {/* Description */}
+            {product.description && (
+                <div className="space-y-5 pt-8 border-t border-white/10">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-[#00E5FF] drop-shadow-[0_0_5px_rgba(0,229,255,0.5)]">Detalles del Producto</h3>
+                    
+                    <div className="text-white/70 text-sm leading-relaxed font-light space-y-3">
+                        {product.description.split('\n').map((line, i) => {
+                            const isHeader = line.includes(':') || (line === line.toUpperCase() && line.length > 5);
+                            if (!line.trim()) return <div key={i} className="h-2" />;
+                            return (
+                                <span key={i} className={`block ${isHeader ? 'font-black text-white tracking-wide text-xs uppercase mt-5 mb-1 flex items-center gap-2' : ''}`}>
+                                    {isHeader && <div className="w-2 h-2 bg-[#00E5FF] rounded-sm shadow-[0_0_5px_#00E5FF80]" />}
+                                    {line.replace(/\*/g, '')}
+                                </span>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* Trust Features */}
+            <div className="grid grid-cols-2 gap-3 pt-8 border-t border-white/10">
                 {[
-                    { label: 'CALIDAD_CERT', value: 'ÉTER ORIGINALS' },
-                    { label: 'LOGÍSTICA_EST', value: 'PREMIUM_SECURE' }
+                    { icon: Shield, label: 'Autenticidad', value: '100% Original' },
+                    { icon: Truck, label: 'Envíos', value: 'Todo el país' }
                 ].map((spec, idx) => (
-                    <div key={idx} className="space-y-1">
-                        <div className="text-[10px] text-gray-600 font-mono tracking-widest">{spec.label}</div>
-                        <div className="text-xs text-white font-bold tracking-widest">{spec.value}</div>
+                    <div key={idx} className="flex gap-3 items-center p-3 bg-gradient-to-r from-transparent to-[#00E5FF]/[0.02] hover:bg-[#00E5FF]/[0.05] transition-colors rounded-lg border border-white/5 hover:border-[#00E5FF]/20">
+                        <div className="w-10 h-10 flex items-center justify-center bg-[#00E5FF]/10 rounded-lg shadow-[inset_0_0_10px_rgba(0,229,255,0.1)]">
+                            <spec.icon size={16} className="text-[#00E5FF] drop-shadow-[0_0_3px_rgba(0,229,255,0.8)]" />
+                        </div>
+                        <div>
+                            <div className="text-[10px] text-[#00E5FF]/80 uppercase tracking-widest font-bold">{spec.label}</div>
+                            <div className="text-xs text-white font-bold">{spec.value}</div>
+                        </div>
                     </div>
                 ))}
             </div>
 
-            {/* Social Share */}
-            <div className="flex items-center gap-4 pt-4">
-                <button className="flex-1 h-12 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all flex items-center justify-center gap-2 group">
-                    <Heart size={16} className="text-gray-500 group-hover:text-rose-500 transition-colors" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Deseados</span>
+            {/* Social */}
+            <div className="flex items-center gap-3 pt-4">
+                <button className="flex-1 h-12 bg-white/5 hover:bg-[#00E5FF]/10 border border-white/5 hover:border-[#00E5FF]/30 rounded-lg transition-all flex items-center justify-center gap-2 group hover:shadow-[0_0_15px_rgba(0,229,255,0.1)]">
+                    <Heart size={14} className="text-white/50 group-hover:text-[#00E5FF] transition-colors" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 group-hover:text-[#00E5FF]">Favoritos</span>
                 </button>
-                <button className="h-12 w-12 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all flex items-center justify-center group">
-                    <Share2 size={16} className="text-gray-500 group-hover:text-white transition-colors" />
+                <button className="h-12 w-12 bg-white/5 hover:bg-[#00E5FF]/10 border border-white/5 hover:border-[#00E5FF]/30 rounded-lg transition-all flex items-center justify-center group hover:shadow-[0_0_15px_rgba(0,229,255,0.1)]">
+                    <Share2 size={14} className="text-white/50 group-hover:text-[#00E5FF] transition-colors" />
                 </button>
             </div>
         </div>

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
-import { useCart } from '@/hooks/useCart';
+import { useCartStore } from '@/store/cart-store';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ShoppingBag, Search, User, Heart } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -16,12 +16,12 @@ const NAV_LINKS = [
 ];
 
 export function CatalogNavbar() {
-    const { user, loading: isLoading } = useAuth();
-    const { totals, openCart } = useCart();
+    const { profile, loading: isLoading } = useAuth();
+    const { totals, setIsOpen: setIsCartOpen } = useCartStore();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    const cartCount = totals.itemCount;
+    const cartCount = totals()?.itemCount || 0;
 
     useEffect(() => {
         const handleScroll = () => {
@@ -37,7 +37,7 @@ export function CatalogNavbar() {
                 className={cn(
                     'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
                     isScrolled
-                        ? 'bg-[#0a0a0a]/90 backdrop-blur-2xl border-b border-white/5 shadow-2xl'
+                        ? 'bg-[#020202]/90 backdrop-blur-2xl border-b border-white/5 shadow-2xl'
                         : 'bg-transparent border-b border-transparent'
                 )}
             >
@@ -48,7 +48,7 @@ export function CatalogNavbar() {
                             <span
                                 className={cn(
                                     'font-display font-black text-2xl tracking-tighter transition-all duration-300',
-                                    'text-white group-hover:text-[#ffd900]'
+                                    'text-white group-hover:text-[#00E5FF]'
                                 )}
                             >
                                 ÉTER
@@ -62,14 +62,14 @@ export function CatalogNavbar() {
                                     key={link.label}
                                     href={link.href}
                                     className={cn(
-                                        'text-sm font-display font-semibold tracking-wider uppercase transition-colors relative group',
+                                        'text-[11px] font-black tracking-widest uppercase transition-colors relative group',
                                         link.isHighlight
-                                            ? 'text-[#ffd900] hover:text-[#ffe033]'
-                                            : 'text-gray-300 hover:text-white'
+                                            ? 'text-[#00E5FF] hover:text-white'
+                                            : 'text-gray-400 hover:text-white'
                                     )}
                                 >
                                     {link.label}
-                                    <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#ffd900] transition-all duration-300 group-hover:w-full" />
+                                    <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#00E5FF] transition-all duration-300 group-hover:w-full" />
                                 </Link>
                             ))}
                         </div>
@@ -77,23 +77,23 @@ export function CatalogNavbar() {
                         {/* Desktop Actions */}
                         <div className="hidden md:flex items-center gap-2">
                             {/* Search */}
-                            <button className="p-2.5 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+                            <button className="p-2.5 rounded-xl text-gray-400 hover:text-[#00E5FF] hover:bg-white/5 transition-all">
                                 <Search size={18} />
                             </button>
 
                             {/* Favorites */}
-                            <button className="p-2.5 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+                            <button className="p-2.5 rounded-xl text-gray-400 hover:text-[#00E5FF] hover:bg-white/5 transition-all">
                                 <Heart size={18} />
                             </button>
 
                             {/* Cart */}
                             <button
-                                onClick={openCart}
-                                className="relative p-2.5 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                                onClick={() => setIsCartOpen(true)}
+                                className="relative p-2.5 rounded-xl text-gray-400 hover:text-[#00E5FF] hover:bg-white/5 transition-all"
                             >
                                 <ShoppingBag size={18} />
                                 {cartCount > 0 && (
-                                    <span className="absolute -top-0.5 -right-0.5 bg-[#ffd900] text-black text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                                    <span className="absolute top-1.5 right-1.5 bg-[#00E5FF] text-black text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full shadow-[0_0_10px_rgba(0,229,255,0.4)]">
                                         {cartCount}
                                     </span>
                                 )}
@@ -102,15 +102,15 @@ export function CatalogNavbar() {
                             {/* User / Auth */}
                             {isLoading ? (
                                 <div className="w-16 h-8 bg-white/5 animate-pulse rounded-full" />
-                            ) : user ? (
+                            ) : profile ? (
                                 <Link href="/dashboard">
-                                    <button className="ml-2 px-5 py-2 rounded-full font-display font-bold text-xs tracking-wider uppercase bg-white/5 text-white border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all">
-                                        Mi Cuenta
+                                    <button className="ml-2 px-6 py-2 rounded-xl font-black text-[10px] tracking-widest uppercase bg-white text-black hover:bg-[#00E5FF] transition-all duration-500 shadow-xl shadow-black/20">
+                                        Boarding
                                     </button>
                                 </Link>
                             ) : (
                                 <Link href="/login">
-                                    <button className="ml-2 p-2.5 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+                                    <button className="ml-2 p-2.5 rounded-xl text-gray-400 hover:text-[#00E5FF] hover:bg-white/5 transition-all">
                                         <User size={18} />
                                     </button>
                                 </Link>
@@ -120,18 +120,18 @@ export function CatalogNavbar() {
                         {/* Mobile Controls */}
                         <div className="flex items-center gap-3 md:hidden">
                             <button
-                                onClick={openCart}
-                                className="relative p-2 rounded-full text-white hover:bg-white/10 transition-colors"
+                                onClick={() => setIsCartOpen(true)}
+                                className="relative p-2 rounded-xl text-white hover:bg-white/10 transition-colors"
                             >
                                 <ShoppingBag size={22} />
                                 {cartCount > 0 && (
-                                    <span className="absolute -top-0.5 -right-0.5 bg-[#ffd900] text-black text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                                    <span className="absolute top-1 right-1 bg-[#00E5FF] text-black text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full">
                                         {cartCount}
                                     </span>
                                 )}
                             </button>
                             <button
-                                className="relative z-50 p-2 rounded-full text-white hover:bg-white/10 transition-all active:scale-95"
+                                className="relative z-50 p-2 rounded-xl text-white hover:bg-white/10 transition-all active:scale-95"
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             >
                                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -144,23 +144,26 @@ export function CatalogNavbar() {
                 <AnimatePresence>
                     {isMobileMenuOpen && (
                         <motion.div
-                            initial={{ opacity: 0, y: -20, height: 0 }}
-                            animate={{ opacity: 1, y: 0, height: '100vh' }}
-                            exit={{ opacity: 0, y: -20, height: 0 }}
-                            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                            className="md:hidden fixed inset-0 bg-[#0a0a0a]/98 backdrop-blur-3xl z-40 flex flex-col pt-28 px-8"
+                            initial={{ opacity: 0, x: 50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 50 }}
+                            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                            className="md:hidden fixed inset-0 bg-[#020202] z-40 flex flex-col pt-28 px-8"
                         >
-                            <div className="space-y-2">
+                            {/* Background decoration */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-[#00E5FF]/10 blur-[100px] pointer-events-none" />
+
+                            <div className="space-y-6">
                                 {NAV_LINKS.map((link) => (
                                     <Link
                                         key={link.label}
                                         href={link.href}
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         className={cn(
-                                            'block text-3xl font-display font-bold py-4 border-b border-white/5 transition-colors',
+                                            'block text-4xl font-black uppercase tracking-tighter transition-all',
                                             link.isHighlight
-                                                ? 'text-[#ffd900] hover:text-[#ffe033]'
-                                                : 'text-white hover:text-[#ffd900]'
+                                                ? 'text-[#00E5FF]'
+                                                : 'text-white hover:text-[#00E5FF]'
                                         )}
                                     >
                                         {link.label}
@@ -168,23 +171,23 @@ export function CatalogNavbar() {
                                 ))}
                             </div>
 
-                            <div className="mt-auto pb-12 flex flex-col gap-3">
-                                {user ? (
+                            <div className="mt-auto pb-12 flex flex-col gap-4">
+                                {profile ? (
                                     <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                                        <button className="w-full bg-[#ffd900] text-black py-4 rounded-full font-display font-bold uppercase tracking-wider text-sm">
-                                            Mi Cuenta
+                                        <button className="w-full bg-[#00E5FF] text-black py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-[#00E5FF]/20">
+                                            Ir al Dashboard
                                         </button>
                                     </Link>
                                 ) : (
                                     <>
                                         <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                                            <button className="w-full bg-white/5 border border-white/10 text-white py-4 rounded-full font-display font-bold uppercase tracking-wider text-sm hover:bg-white/10 transition-colors">
+                                            <button className="w-full bg-white text-black py-5 rounded-2xl font-black uppercase tracking-widest text-[10px]">
                                                 Ingresar
                                             </button>
                                         </Link>
                                         <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                                            <button className="w-full bg-[#ffd900] text-black py-4 rounded-full font-display font-bold uppercase tracking-wider text-sm">
-                                                Crear Cuenta
+                                            <button className="w-full bg-white/5 border border-white/10 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[10px]">
+                                                Empieza Ahora
                                             </button>
                                         </Link>
                                     </>

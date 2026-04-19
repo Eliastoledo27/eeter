@@ -20,7 +20,7 @@
 |------|-----|--------------|
 | Primary | `#1C1917` | `--color-primary` |
 | Secondary | `#44403C` | `--color-secondary` |
-| CTA/Accent | `#CA8A04` | `--color-cta` |
+| CTA/Accent | `#00B8D9` | `--color-cta` |
 | Background | `#FAFAF9` | `--color-background` |
 | Text | `#0C0A09` | `--color-text` |
 
@@ -68,7 +68,7 @@
 ```css
 /* Primary Button */
 .btn-primary {
-  background: #CA8A04;
+  background: #00B8D9;
   color: white;
   padding: 12px 24px;
   border-radius: 8px;

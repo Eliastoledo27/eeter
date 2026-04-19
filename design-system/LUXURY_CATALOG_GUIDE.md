@@ -14,7 +14,7 @@ Quiet luxury meets Scandinavian minimalism. Understated elegance with sophistica
 
 ### Metallic Accents
 - **Gold**: `#C9A227` - Primary accent, CTAs
-- **Champagne Gold**: `#D4AF37` - Hover states
+- **Champagne Gold**: `#00E5FF` - Hover states
 - **Silver**: `#C0C0C0` - Secondary accents
 - **Copper**: `#B87333` - Warm highlights
 - **Rose Gold**: `#B76E79` - Elegant touches

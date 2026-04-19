@@ -66,14 +66,14 @@ export function Navbar() {
           <div className="flex items-center gap-8 relative z-[110]">
             <Link href="/" className="flex items-center gap-3 group">
               <div className="relative">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-white text-black rounded-2xl flex items-center justify-center font-black text-xl md:text-2xl shadow-[0_0_40px_rgba(255,255,255,0.2)] group-hover:bg-[#C88A04] group-hover:shadow-[0_0_40px_rgba(200,138,4,0.4)] transition-all duration-500 ease-out">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-white text-black rounded-2xl flex items-center justify-center font-black text-xl md:text-2xl shadow-[0_0_40px_rgba(255,255,255,0.2)] group-hover:bg-[#00E5FF] group-hover:text-black group-hover:shadow-[0_0_40px_rgba(0,229,255,0.4)] transition-all duration-500 ease-out">
                   É
                 </div>
               </div>
               <div className="hidden sm:flex flex-col">
                 <span className="font-black text-lg md:text-2xl tracking-tight text-white leading-none">ÉTER</span>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="w-1 h-1 rounded-full bg-[#00E5FF] animate-pulse shadow-[0_0_10px_rgba(0,229,255,0.8)]" />
                   <span className="text-[8px] font-black text-gray-500 uppercase tracking-[0.3em]">Live Drop</span>
                 </div>
               </div>
@@ -99,7 +99,7 @@ export function Navbar() {
                     className="absolute inset-0 bg-white/5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                     layoutId="navHover"
                   />
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#C88A04] rounded-full opacity-0 group-hover:opacity-100 blur-[2px] transition-all" />
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#00E5FF] rounded-full opacity-0 group-hover:opacity-100 blur-[2px] transition-all" />
                 </Link>
               ))}
             </div>
@@ -118,9 +118,9 @@ export function Navbar() {
               className="relative p-3 rounded-2xl group transition-all"
             >
               <div className="absolute inset-0 bg-white/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-all border border-white/10" />
-              <ShoppingCart size={20} className="text-zinc-400 group-hover:text-white relative z-10" />
+              <ShoppingCart size={20} className="text-zinc-400 group-hover:text-[#00E5FF] relative z-10" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-white text-black text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-[0_0_15px_rgba(255,255,255,0.4)]">
+                <span className="absolute -top-1 -right-1 bg-[#00E5FF] text-black text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-[0_0_15px_rgba(0,229,255,0.4)]">
                   {cartCount}
                 </span>
               )}
@@ -132,7 +132,7 @@ export function Navbar() {
               <Link href="/dashboard">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
-                  className="w-10 h-10 md:w-auto md:px-6 bg-[#C88A04] hover:bg-[#ECA413] text-black rounded-2xl font-black text-[10px] tracking-widest uppercase flex items-center justify-center gap-2"
+                  className="w-10 h-10 md:w-auto md:px-6 bg-[#00E5FF] hover:bg-[#00D1E6] text-black rounded-2xl font-black text-[10px] tracking-widest uppercase flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(0,229,255,0.2)]"
                 >
                   <LayoutDashboard size={16} />
                   <span className="hidden md:block">Dashboard</span>
@@ -143,7 +143,7 @@ export function Navbar() {
                 <Link href="/login">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
-                    className="text-white hover:text-[#C88A04] px-4 font-black text-[10px] tracking-widest uppercase transition-colors"
+                    className="text-white hover:text-[#00E5FF] px-4 font-black text-[10px] tracking-widest uppercase transition-colors"
                   >
                     Ingresar
                   </motion.button>
@@ -151,13 +151,14 @@ export function Navbar() {
                 <Link href="/register">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
-                    className="bg-white text-black px-6 h-12 rounded-2xl font-black text-[10px] tracking-widest uppercase"
+                    className="bg-white text-black px-6 h-12 rounded-2xl font-black text-[10px] tracking-widest uppercase hover:bg-[#00E5FF] transition-all"
                   >
                     Regístrate
                   </motion.button>
                 </Link>
               </div>
             )}
+
 
             <button
               className="lg:hidden p-3 rounded-2xl bg-white/5 border border-white/10 text-white transition-all active:scale-90"
@@ -181,10 +182,10 @@ export function Navbar() {
               className="lg:hidden fixed inset-0 bg-[#0A0A0A] z-[90] flex flex-col pt-32 p-8"
             >
               {/* Background Decoration */}
-              <div className="absolute top-0 right-0 w-[100vw] h-[100vh] bg-radial-gradient from-[#C88A04]/10 to-transparent blur-[120px] pointer-events-none" />
+              <div className="absolute top-0 right-0 w-[100vw] h-[100vh] bg-radial-gradient from-[#00E5FF]/10 to-transparent blur-[120px] pointer-events-none" />
 
               <div className="relative z-10 space-y-4">
-                <span className="text-[10px] font-black text-[#C88A04] tracking-[0.5em] uppercase px-4">Menu de Navegación</span>
+                <span className="text-[10px] font-black text-[#00E5FF] tracking-[0.5em] uppercase px-4">Menu de Navegación</span>
                 <div className="flex flex-col">
                   {NAV_LINKS.map((link, i) => (
                     <motion.div
@@ -198,8 +199,8 @@ export function Navbar() {
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="group flex items-center justify-between py-5 px-4 rounded-3xl hover:bg-white/[0.03] transition-all"
                       >
-                        <span className="text-5xl font-black text-white tracking-tighter uppercase group-hover:text-[#C88A04] transition-colors">{link.name}</span>
-                        <ArrowUpRight className="text-gray-700 group-hover:text-[#C88A04] transition-all group-hover:translate-x-2 group-hover:-translate-y-2" size={32} />
+                        <span className="text-5xl font-black text-white tracking-tighter uppercase group-hover:text-[#00E5FF] transition-colors">{link.name}</span>
+                        <ArrowUpRight className="text-gray-700 group-hover:text-[#00E5FF] transition-all group-hover:translate-x-2 group-hover:-translate-y-2" size={32} />
                       </Link>
                     </motion.div>
                   ))}
@@ -218,7 +219,7 @@ export function Navbar() {
                         </button>
                       </Link>
                       <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                        <button className="w-full py-5 rounded-3xl bg-[#C88A04] text-black font-black text-xs tracking-widest uppercase hover:bg-[#ECA413] transition-all shadow-[0_10px_30px_rgba(200,138,4,0.3)]">
+                        <button className="w-full py-5 rounded-3xl bg-[#00E5FF] text-black font-black text-xs tracking-widest uppercase hover:bg-[#00D1E6] transition-all shadow-[0_10px_30px_rgba(0,229,255,0.3)]">
                           Regístrate
                         </button>
                       </Link>
@@ -233,7 +234,7 @@ export function Navbar() {
                       className="mt-8 px-4"
                     >
                       <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                        <button className="w-full py-5 rounded-3xl bg-[#C88A04] text-black font-black text-xs tracking-widest uppercase flex items-center justify-center gap-3">
+                        <button className="w-full py-5 rounded-3xl bg-[#00E5FF] text-black font-black text-xs tracking-widest uppercase flex items-center justify-center gap-3">
                           <LayoutDashboard size={18} />
                           Panel de Control
                         </button>
@@ -247,10 +248,10 @@ export function Navbar() {
                 <div className="space-y-4">
                   <span className="text-[9px] font-black text-gray-600 uppercase tracking-widest block">Social</span>
                   <div className="flex gap-4">
-                    <Link href="#" className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white hover:bg-[#C88A04] hover:text-black transition-all border border-white/5">
+                    <Link href="#" className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white hover:bg-[#00E5FF] hover:text-black transition-all border border-white/5">
                       <Instagram size={20} />
                     </Link>
-                    <Link href="#" className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white hover:bg-[#C88A04] hover:text-black transition-all border border-white/5">
+                    <Link href="#" className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white hover:bg-[#00E5FF] hover:text-black transition-all border border-white/5">
                       <MessageCircle size={20} />
                     </Link>
                   </div>
@@ -258,7 +259,7 @@ export function Navbar() {
                 <div className="space-y-4">
                   <span className="text-[9px] font-black text-gray-600 uppercase tracking-widest block">Región</span>
                   <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white px-4 h-12 rounded-2xl border border-white/5 bg-white/5">
-                    <Globe size={14} className="text-[#C88A04]" />
+                    <Globe size={14} className="text-[#00E5FF]" />
                     ARG / ES
                   </button>
                 </div>

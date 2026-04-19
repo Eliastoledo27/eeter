@@ -166,10 +166,10 @@ function CheckoutHandler() {
     }
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-6 selection:bg-yellow-500 selection:text-black">
+        <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-6 selection:bg-cyan-500 selection:text-black">
             {/* Ambient Background */}
             <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-yellow-500/5 rounded-full blur-[120px]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-cyan-500/5 rounded-full blur-[120px]" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
             </div>
 
@@ -180,7 +180,7 @@ function CheckoutHandler() {
             >
                 <div className="bg-white/[0.03] border border-white/10 p-12 rounded-[3.5rem] backdrop-blur-3xl shadow-2xl overflow-hidden relative group">
                     {/* Decorative Corner */}
-                    <div className="absolute -top-12 -right-12 w-24 h-24 bg-yellow-500/20 blur-2xl rounded-full group-hover:bg-yellow-500/30 transition-colors" />
+                    <div className="absolute -top-12 -right-12 w-24 h-24 bg-cyan-500/20 blur-2xl rounded-full group-hover:bg-cyan-500/30 transition-colors" />
 
                     <div className="flex flex-col items-center text-center">
                         <AnimatePresence mode="wait">
@@ -198,7 +198,7 @@ function CheckoutHandler() {
                                     key="loading"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    className="p-6 bg-yellow-500/10 rounded-3xl mb-8 relative flex items-center justify-center overflow-hidden"
+                                    className="p-6 bg-cyan-500/10 rounded-3xl mb-8 relative flex items-center justify-center overflow-hidden"
                                 >
                                     {isCreditPurchase ? (
                                         <motion.img
@@ -211,22 +211,22 @@ function CheckoutHandler() {
                                         />
                                     ) : isMetaSync ? (
                                         <div className="relative">
-                                            <ShoppingBag size={64} className="text-yellow-500" />
+                                            <ShoppingBag size={64} className="text-cyan-500" />
                                             <motion.div
                                                 animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
                                                 transition={{ duration: 2, repeat: Infinity }}
                                                 className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-black" />
                                         </div>
                                     ) : (
-                                        <ShoppingBag size={64} className="text-yellow-500" />
+                                        <ShoppingBag size={64} className="text-cyan-500" />
                                     )}
-                                    <div className="absolute inset-0 border-2 border-yellow-500/30 rounded-3xl animate-[ping_2s_infinite]" />
+                                    <div className="absolute inset-0 border-2 border-cyan-500/30 rounded-3xl animate-[ping_2s_infinite]" />
                                 </motion.div>
                             )}
                         </AnimatePresence>
 
                         <h1 className="text-4xl font-black mb-2 tracking-tighter uppercase italic">
-                            Éter <span className="text-yellow-500">{isCreditPurchase ? 'PROTOCOL' : isMetaSync ? 'Meta Sync' : 'Checkout'}</span>
+                            Éter <span className="text-cyan-500">{isCreditPurchase ? 'PROTOCOL' : isMetaSync ? 'Meta Sync' : 'Checkout'}</span>
                         </h1>
                         <p className="text-gray-500 text-[10px] font-mono tracking-[0.4em] uppercase mb-8">
                             {isCreditPurchase ? 'ADQUISICIÓN DE SALDO PREVENTIVO' : isMetaSync ? 'Protocolo de Sincronización Meta' : 'Procesando Pedido...'}
@@ -237,11 +237,11 @@ function CheckoutHandler() {
                                 initial={{ width: "0%" }}
                                 animate={{ width: processed ? "100%" : "70%" }}
                                 transition={{ duration: 2, ease: "easeInOut" }}
-                                className={`h-full ${error ? 'bg-red-500' : 'bg-yellow-500'}`}
+                                className={`h-full ${error ? 'bg-red-500' : 'bg-cyan-500'}`}
                             />
                         </div>
 
-                        <div className={`flex items-center gap-3 font-bold text-sm tracking-widest uppercase ${error ? 'text-red-400' : 'text-yellow-500/80'}`}>
+                        <div className={`flex items-center gap-3 font-bold text-sm tracking-widest uppercase ${error ? 'text-red-400' : 'text-cyan-500/80'}`}>
                             {!processed && !error && <Loader2 className="animate-spin" size={18} />}
                             {error || status}
                         </div>
@@ -269,8 +269,8 @@ function CheckoutHandler() {
 export default function CheckoutPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center text-yellow-500 font-mono tracking-widest uppercase gap-4">
-                <Loader2 className="animate-spin text-yellow-500" size={48} />
+            <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center text-cyan-500 font-mono tracking-widest uppercase gap-4">
+                <Loader2 className="animate-spin text-cyan-500" size={48} />
                 <div className="animate-pulse">Iniciando Protocolo Éter...</div>
             </div>
         }>

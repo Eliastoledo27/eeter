@@ -9,12 +9,12 @@ import { motion } from 'framer-motion';
 
 export default function ExportPage() {
     return (
-        <main className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#C88A04] selection:text-black overflow-x-hidden">
+        <main className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#00E5FF] selection:text-black overflow-x-hidden">
             <Navbar />
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 px-6 lg:px-12 flex flex-col items-center justify-center min-h-[70vh]">
-                <div className="absolute inset-0 bg-radial-gradient from-[#C88A04]/5 to-transparent blur-[120px] pointer-events-none" />
+                <div className="absolute inset-0 bg-radial-gradient from-[#00E5FF]/5 to-transparent blur-[120px] pointer-events-none" />
 
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -22,12 +22,12 @@ export default function ExportPage() {
                     transition={{ duration: 0.8 }}
                     className="text-center max-w-4xl relative z-10"
                 >
-                    <span className="inline-block px-4 py-1 bg-[#C88A04]/20 border border-[#C88A04]/30 text-[#C88A04] text-[10px] font-black tracking-[0.3em] uppercase rounded-full mb-8">
+                    <span className="inline-block px-4 py-1 bg-[#00E5FF]/20 border border-[#00E5FF]/30 text-[#00E5FF] text-[10px] font-black tracking-[0.3em] uppercase rounded-full mb-8">
                         Data Export Protocol
                     </span>
 
                     <h1 className="text-5xl md:text-8xl font-black tracking-tighter mb-6 leading-none uppercase italic">
-                        Cátalogo <span className="text-[#C88A04]">Meta compatible</span>
+                        Cátalogo <span className="text-[#00E5FF]">Meta compatible</span>
                     </h1>
 
                     <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 font-light">
@@ -39,10 +39,10 @@ export default function ExportPage() {
                         {/* Excel Option */}
                         <motion.div
                             whileHover={{ scale: 1.02 }}
-                            className="bg-[#111] border border-white/5 rounded-3xl p-8 text-left group hover:border-[#C88A04]/50 transition-all cursor-pointer relative overflow-hidden"
+                            className="bg-[#111] border border-white/5 rounded-3xl p-8 text-left group hover:border-[#00E5FF]/50 transition-all cursor-pointer relative overflow-hidden"
                             onClick={() => window.location.href = '/api/export/excel/download?format=xlsx'}
                         >
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#C88A04]/5 blur-[60px] group-hover:bg-[#C88A04]/10 transition-all" />
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#00E5FF]/5 blur-[60px] group-hover:bg-[#00E5FF]/10 transition-all" />
                             <div className="size-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-6 border border-emerald-500/20">
                                 <FileSpreadsheet size={28} />
                             </div>
@@ -56,7 +56,7 @@ export default function ExportPage() {
                         {/* CSV Option */}
                         <motion.div
                             whileHover={{ scale: 1.02 }}
-                            className="bg-[#111] border border-white/5 rounded-3xl p-8 text-left group hover:border-[#C88A04]/50 transition-all cursor-pointer relative overflow-hidden"
+                            className="bg-[#111] border border-white/5 rounded-3xl p-8 text-left group hover:border-[#00E5FF]/50 transition-all cursor-pointer relative overflow-hidden"
                             onClick={() => window.location.href = '/api/export/excel/download?format=csv'}
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 blur-[60px] group-hover:bg-sky-500/10 transition-all" />
@@ -91,7 +91,7 @@ export default function ExportPage() {
                                 { title: 'Variantes Automáticas', desc: 'Soporte nativo para Item Group ID, permitiendo mostrar múltiples talles en una sola publicación.' }
                             ].map((spec, i) => (
                                 <div key={i} className="flex gap-6 items-start p-6 bg-white/[0.02] rounded-2xl border border-white/5">
-                                    <div className="text-[#C88A04] shrink-0"><CheckCircle2 size={24} /></div>
+                                    <div className="text-[#00E5FF] shrink-0"><CheckCircle2 size={24} /></div>
                                     <div>
                                         <h4 className="font-bold text-lg mb-1 tracking-tight">{spec.title}</h4>
                                         <p className="text-gray-500 text-sm leading-relaxed">{spec.desc}</p>

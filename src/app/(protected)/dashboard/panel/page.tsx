@@ -66,8 +66,8 @@ function PanelContent() {
             )}
 
             <div className="flex items-center gap-3 mb-8">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                    <LayoutDashboard className="text-amber-500" size={16} />
+                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                    <LayoutDashboard className="text-cyan-500" size={16} />
                 </div>
                 <h1 className="text-2xl font-black uppercase tracking-tighter">Panel de Gestión <span className="text-white/20">/</span> Estadísticas y Control</h1>
             </div>
@@ -79,7 +79,7 @@ function PanelContent() {
 
 export default function PanelPage() {
     return (
-        <Suspense fallback={<div className="p-8"><Loader2 className="w-8 h-8 animate-spin text-amber-500 mx-auto" /></div>}>
+        <Suspense fallback={<div className="p-8"><Loader2 className="w-8 h-8 animate-spin text-cyan-500 mx-auto" /></div>}>
             <PanelContent />
         </Suspense>
     );

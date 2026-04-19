@@ -53,8 +53,8 @@ export const typography = {
 export const colors = {
   // Primary - Gold accent
   primary: {
-    DEFAULT: '#ffd900',
-    dim: '#c88a04',
+    DEFAULT: '#00E5FF',
+    dim: '#00E5FF',
     light: '#ffe033',
     dark: '#b37800',
   },
@@ -79,7 +79,7 @@ export const colors = {
   accent: {
     blue: '#0EA5E9',
     purple: '#D946EF',
-    gold: '#ffd900',
+    gold: '#00E5FF',
     teal: '#14B8A6',
     rose: '#F43F5E',
     orange: '#F97316',

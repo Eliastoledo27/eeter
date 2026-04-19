@@ -46,8 +46,8 @@ export default async function ResellerProductDetailPage({
             {/* Background Ambience & Grid */}
 
             <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-[#CA8A04]/10 rounded-full blur-[150px] animate-pulse-slow" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#CA8A04]/5 rounded-full blur-[120px]" />
+                <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-[#00B8D9]/10 rounded-full blur-[150px] animate-pulse-slow" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#00B8D9]/5 rounded-full blur-[120px]" />
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(200,138,4,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,138,4,0.03)_1px,transparent_1px)] bg-[size:100px_100px] opacity-40" />
             </div>
 
@@ -63,12 +63,12 @@ export default async function ResellerProductDetailPage({
                         <div className="flex items-center gap-6">
                             <Link
                                 href={`/c/${params.slug}`}
-                                className="h-12 w-12 flex items-center justify-center bg-white/5 hover:bg-[#CA8A04] hover:text-black rounded-full border border-white/10 transition-all group"
+                                className="h-12 w-12 flex items-center justify-center bg-white/5 hover:bg-[#00B8D9] hover:text-black rounded-full border border-white/10 transition-all group"
                             >
                                 <ArrowLeft className="group-hover:-translate-x-1 transition-transform" size={20} />
                             </Link>
                             <nav className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 flex items-center gap-3">
-                                <Link href={`/c/${params.slug}`} className="hover:text-[#CA8A04] transition-colors">Volver a Tienda de {reseller.full_name}</Link>
+                                <Link href={`/c/${params.slug}`} className="hover:text-[#00B8D9] transition-colors">Volver a Tienda de {reseller.full_name}</Link>
                                 <span className="text-gray-800">/</span>
                                 <span className="text-white truncate max-w-[200px]">{product.name}</span>
                             </nav>
@@ -105,7 +105,7 @@ export default async function ResellerProductDetailPage({
                             { icon: Truck, label: 'GARANTÍA ÉTER', value: 'CALIDAD ASEGURADA' }
                         ].map((item, idx) => (
                             <div key={idx} className="group flex flex-col items-center">
-                                <div className="h-20 w-20 flex items-center justify-center bg-[#CA8A04]/10 rounded-[1.5rem] border border-[#CA8A04]/20 mb-8 group-hover:bg-[#CA8A04] group-hover:text-black transition-all duration-500">
+                                <div className="h-20 w-20 flex items-center justify-center bg-[#00B8D9]/10 rounded-[1.5rem] border border-[#00B8D9]/20 mb-8 group-hover:bg-[#00B8D9] group-hover:text-black transition-all duration-500">
                                     <item.icon size={32} />
                                 </div>
                                 <h4 className="text-xl font-black tracking-tighter text-white mb-2 uppercase">

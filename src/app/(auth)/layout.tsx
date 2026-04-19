@@ -54,9 +54,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 >
                     {/* Logo */}
                     <Link href="/" className="inline-flex items-center gap-3 mb-12 group">
-                        <div className="w-14 h-14 bg-transparent border-2 border-[#CA8A04] flex items-center justify-center rounded-xl relative shadow-[0_0_25px_rgba(200,138,4,0.2)] group-hover:shadow-[0_0_35px_rgba(200,138,4,0.35)] transition-shadow duration-500">
-                            <span className="text-4xl font-bold text-[#CA8A04]">É</span>
-                            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#CA8A04] rounded-full animate-pulse" />
+                        <div className="w-14 h-14 bg-transparent border-2 border-[#00B8D9] flex items-center justify-center rounded-xl relative shadow-[0_0_25px_rgba(200,138,4,0.2)] group-hover:shadow-[0_0_35px_rgba(200,138,4,0.35)] transition-shadow duration-500">
+                            <span className="text-4xl font-bold text-[#00B8D9]">É</span>
+                            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#00B8D9] rounded-full animate-pulse" />
                         </div>
                         <span className="text-2xl font-bold text-white tracking-tight">ÉTER STORE</span>
                     </Link>
@@ -74,14 +74,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                                 {isLogin ? (
                                     <>
                                         Define tu estilo,{' '}
-                                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500">
+                                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-cyan-400 to-cyan-500">
                                             lidera el mercado
                                         </span>
                                     </>
                                 ) : (
                                     <>
                                         Únete a la{' '}
-                                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500">
+                                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-cyan-400 to-cyan-500">
                                             élite del reselling
                                         </span>
                                     </>
@@ -98,13 +98,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                     {/* Trust badges */}
                     <div className="flex items-center gap-6 text-sm text-gray-500">
                         <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4 text-[#CA8A04]" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-4 h-4 text-[#00B8D9]" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
                             </svg>
                             <span>Más de 500 revendedores</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4 text-[#CA8A04]" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-4 h-4 text-[#00B8D9]" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
                             </svg>
                             <span>Soporte 24/7</span>
@@ -131,8 +131,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                     {/* Mobile logo */}
                     <div className="lg:hidden text-center mb-8">
                         <Link href="/" className="inline-flex items-center gap-2">
-                            <div className="w-10 h-10 bg-transparent border border-[#CA8A04] flex items-center justify-center rounded-lg">
-                                <span className="text-2xl font-bold text-[#CA8A04]">É</span>
+                            <div className="w-10 h-10 bg-transparent border border-[#00B8D9] flex items-center justify-center rounded-lg">
+                                <span className="text-2xl font-bold text-[#00B8D9]">É</span>
                             </div>
                             <span className="text-lg font-bold text-white">ÉTER STORE</span>
                         </Link>

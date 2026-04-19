@@ -293,7 +293,7 @@ interface Product {
   "colorMode": "DARK",
   "font": "SPACE_GROTESK",
   "roundness": "ROUND_EIGHT",
-  "customColor": "#ffd900",
+  "customColor": "#00E5FF",
   "saturation": 3
 }
 ```

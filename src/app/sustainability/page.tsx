@@ -12,13 +12,13 @@ export default function SustainabilityPage() {
             <div className="space-y-32">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                     <div className="space-y-8">
-                        <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">Menos impacto, <br /> <span className="text-[#C88A04]">más futuro.</span></h2>
+                        <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">Menos impacto, <br /> <span className="text-[#00E5FF]">más futuro.</span></h2>
                         <p className="text-gray-400 text-lg font-light leading-relaxed">
                             Nuestra cadena de suministro está optimizada para reducir residuos. Desde el uso de cueros sintéticos de alta tecnología hasta el packaging 100% reciclable, cada paso cuenta.
                         </p>
                         <div className="grid grid-cols-2 gap-6">
                             <div className="p-6 border border-white/5 rounded-2xl bg-white/[0.01]">
-                                <Recycle className="text-[#C88A04] mb-4" size={32} />
+                                <Recycle className="text-[#00E5FF] mb-4" size={32} />
                                 <h4 className="font-bold mb-1 uppercase">CIRCULAR</h4>
                                 <p className="text-xs text-gray-500">Programa de reciclaje de calzado usado.</p>
                             </div>

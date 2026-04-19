@@ -38,10 +38,10 @@ export function CartSidebar() {
     customerPhone: '',
     resellerName: user?.name || '',
     deliveryAddress: '',
-    paymentMethod: 'stripe' as 'stripe',
+    paymentMethod: 'mercadopago' as 'stripe' | 'mercadopago',
     notes: ''
   });
-  const [stripeInitPoint, setStripeInitPoint] = useState<string | null>(null);
+  const [paymentInitPoint, setPaymentInitPoint] = useState<string | null>(null);
 
   // Coupon State
   const [couponCode, setCouponCode] = useState('');
@@ -93,43 +93,43 @@ export function CartSidebar() {
         setReferenceCode(result.referenceCode!);
         setCartStep('success');
 
-        if (formData.paymentMethod === 'stripe') {
-          try {
-            const response = await fetch('/api/checkout/stripe', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                items: items.map(i => ({
-                  id: i.id,
-                  name: i.name,
-                  price: i.basePrice,
-                  size: i.selectedSize,
-                  quantity: i.quantity,
-                  images: i.images
-                })),
-                payer: {
-                  firstName: formData.customerName,
-                  lastName: '',
-                  email: '',
-                  phone: fullCustomerPhone,
-                  address: formData.deliveryAddress,
-                  city: '',
-                  postalCode: '',
-                  province: ''
-                }
-              })
-            });
-            const resultStripe = await response.json();
-            if (resultStripe.success && resultStripe.init_point) {
-              setStripeInitPoint(resultStripe.init_point);
-            } else {
-              console.error("Stripe Integration Error:", resultStripe.error);
-              toast.error(`Stripe: ${resultStripe.error || "Error al iniciar el pago"}`);
-            }
-          } catch (error) {
-            console.error("Network Error:", error);
-            toast.error("Error de red al conectar pasarela de pago");
+        const paymentEndpoint = formData.paymentMethod === 'mercadopago' ? '/api/checkout/mercadopago' : '/api/checkout/stripe';
+
+        try {
+          const response = await fetch(paymentEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              items: items.map(i => ({
+                id: i.id,
+                name: i.name,
+                price: i.basePrice,
+                size: i.selectedSize,
+                quantity: i.quantity,
+                images: i.images
+              })),
+              payer: {
+                firstName: formData.customerName,
+                lastName: '',
+                email: '',
+                phone: fullCustomerPhone,
+                address: formData.deliveryAddress,
+                city: '',
+                postalCode: '',
+                province: ''
+              }
+            })
+          });
+          const resultPayment = await response.json();
+          if (resultPayment.success && resultPayment.init_point) {
+            setPaymentInitPoint(resultPayment.init_point);
+          } else {
+            console.error(`${formData.paymentMethod} Integration Error:`, resultPayment.error);
+            toast.error(`${formData.paymentMethod}: ${resultPayment.error || "Error al iniciar el pago"}`);
           }
+        } catch (error) {
+          console.error("Network Error:", error);
+          toast.error("Error de red al conectar pasarela de pago");
         }
 
       } else {
@@ -189,7 +189,7 @@ export function CartSidebar() {
                     {cartStep === 'items' ? 'Tu Selección' : cartStep === 'checkout' ? 'Datos de Envío' : 'Pedido Confirmado'}
                   </h2>
                   {cartStep === 'items' && items.length > 0 && (
-                    <p className="text-[9px] md:text-[10px] font-bold text-[#C88A04] tracking-[0.3em] uppercase mt-1">
+                    <p className="text-[9px] md:text-[10px] font-bold text-[#00E5FF] tracking-[0.3em] uppercase mt-1">
                       {items.reduce((a, b) => a + b.quantity, 0)} PRODUCTOS LISTOS
                     </p>
                   )}
@@ -241,7 +241,7 @@ export function CartSidebar() {
                               <div className="flex justify-between items-start mb-2">
                                 <div>
                                   <h3 className="font-black text-white text-lg tracking-tight uppercase leading-none mb-2">{item.name}</h3>
-                                  <span className="text-[10px] font-black text-[#C88A04]/80 uppercase tracking-widest">TALLE {item.selectedSize}</span>
+                                  <span className="text-[10px] font-black text-[#00E5FF]/80 uppercase tracking-widest">TALLE {item.selectedSize}</span>
                                 </div>
                                 <button
                                   onClick={() => removeItem(item.id, item.selectedSize)}
@@ -285,12 +285,12 @@ export function CartSidebar() {
                         <div className="space-y-2">
                           <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Revendedor Responsable</label>
                           <div className="relative">
-                            <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C88A04]" size={16} />
+                            <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-[#00E5FF]" size={16} />
                             <input
                               required
                               type="text"
                               placeholder="Nombre del Revendedor / Empresa"
-                              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-[#C88A04] transition-all"
+                              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-[#00E5FF] transition-all"
                               value={formData.resellerName}
                               onChange={e => setFormData({ ...formData, resellerName: e.target.value })}
                             />
@@ -300,12 +300,12 @@ export function CartSidebar() {
                         <div className="space-y-2">
                           <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Nombre del Cliente</label>
                           <div className="relative">
-                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C88A04]" size={16} />
+                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#00E5FF]" size={16} />
                             <input
                               required
                               type="text"
                               placeholder="Nombre y Apellido del Cliente"
-                              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-[#C88A04] transition-all"
+                              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-[#00E5FF] transition-all"
                               value={formData.customerName}
                               onChange={e => setFormData({ ...formData, customerName: e.target.value })}
                             />
@@ -315,12 +315,12 @@ export function CartSidebar() {
                         <div className="space-y-2">
                           <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">WhatsApp Cliente</label>
                           <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C88A04] font-bold text-sm whitespace-nowrap">+54 9</span>
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#00E5FF] font-bold text-sm whitespace-nowrap">+54 9</span>
                             <input
                               required
                               type="tel"
                               placeholder="2235000000"
-                              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-20 pr-4 text-sm text-white focus:outline-none focus:border-[#C88A04] transition-all"
+                              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-20 pr-4 text-sm text-white focus:outline-none focus:border-[#00E5FF] transition-all"
                               value={formData.customerPhone}
                               onChange={e => setFormData({ ...formData, customerPhone: e.target.value.replace(/[^0-9]/g, '') })}
                             />
@@ -330,12 +330,12 @@ export function CartSidebar() {
                         <div className="space-y-2">
                           <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Dirección de Envío</label>
                           <div className="relative">
-                            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C88A04]" size={16} />
+                            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-[#00E5FF]" size={16} />
                             <input
                               required
                               type="text"
                               placeholder="Calle, Número, Localidad"
-                              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-[#C88A04] transition-all"
+                              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-[#00E5FF] transition-all"
                               value={formData.deliveryAddress}
                               onChange={e => setFormData({ ...formData, deliveryAddress: e.target.value })}
                             />
@@ -346,23 +346,34 @@ export function CartSidebar() {
                           <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Notas Adicionales</label>
                           <textarea
                             placeholder="Indicaciones para el envío, referencias, etc."
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 px-4 text-sm text-white focus:outline-none focus:border-[#C88A04] transition-all min-h-[100px] resize-none"
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 px-4 text-sm text-white focus:outline-none focus:border-[#00E5FF] transition-all min-h-[100px] resize-none"
                             value={formData.notes}
                             onChange={e => setFormData({ ...formData, notes: e.target.value })}
                           />
                         </div>
 
-                        <div className="grid grid-cols-1 gap-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div
+                            onClick={() => setFormData({ ...formData, paymentMethod: 'mercadopago' })}
+                            className={cn(
+                              "p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-center min-h-[80px]",
+                              formData.paymentMethod === 'mercadopago' ? "border-[#009EE3] bg-[#009EE3]/10 text-[#009EE3]" : "border-white/10 text-gray-400 hover:border-white/20"
+                            )}
+                          >
+                            <Wallet size={24} className="mb-2" />
+                            <span className="text-[10px] font-black uppercase leading-tight text-center">Mercado Pago</span>
+                            <span className="text-[8px] font-bold mt-1 opacity-60">Recomendado</span>
+                          </div>
                           <div
                             onClick={() => setFormData({ ...formData, paymentMethod: 'stripe' })}
                             className={cn(
                               "p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-center min-h-[80px]",
-                              formData.paymentMethod === 'stripe' ? "border-[#FFD200] bg-[#FFD200]/10 text-[#FFD200]" : "border-white/10 text-gray-400 hover:border-white/20"
+                              formData.paymentMethod === 'stripe' ? "border-[#00E5FF] bg-[#00E5FF]/10 text-[#00E5FF]" : "border-white/10 text-gray-400 hover:border-white/20"
                             )}
                           >
-                            <Wallet size={24} className="mb-2" />
-                            <span className="text-xs font-black uppercase leading-tight text-center">Stripe Checkout</span>
-                            <span className="text-[8px] font-bold mt-1 opacity-60">Pago Seguro</span>
+                            <Building2 size={24} className="mb-2" />
+                            <span className="text-[10px] font-black uppercase leading-tight text-center">Internacional</span>
+                            <span className="text-[8px] font-bold mt-1 opacity-60">Stripe</span>
                           </div>
                         </div>
                       </div>
@@ -370,7 +381,7 @@ export function CartSidebar() {
                       <button
                         type="submit"
                         disabled={isProcessing}
-                        className="w-full bg-[#C88A04] h-16 rounded-2xl flex items-center justify-center gap-3 text-black font-black text-xs tracking-[0.2em] uppercase hover:bg-[#ECA413] transition-all disabled:opacity-50 shadow-[0_10px_30px_rgba(200,138,4,0.3)]"
+                        className="w-full bg-[#00E5FF] h-16 rounded-2xl flex items-center justify-center gap-3 text-black font-black text-xs tracking-[0.2em] uppercase hover:bg-[#00B8D9] transition-all disabled:opacity-50 shadow-[0_10px_30px_rgba(0,229,255,0.3)]"
                       >
                         {isProcessing ? 'Procesando...' : 'Finalizar Pedido'}
                         <ArrowRight size={16} />
@@ -397,11 +408,11 @@ export function CartSidebar() {
 
                     {/* Digital Ticket */}
                     <div className="w-full bg-[#111] border border-white/10 rounded-[2.5rem] p-10 relative overflow-hidden shadow-2xl">
-                      <div className="absolute top-0 left-0 w-full h-2 bg-[#C88A04] shadow-[0_4px_20px_rgba(200,138,4,0.4)]" />
+                      <div className="absolute top-0 left-0 w-full h-2 bg-[#00E5FF] shadow-[0_4px_20px_rgba(0,229,255,0.4)]" />
 
                       <div className="flex justify-between items-start mb-8">
                         <div>
-                          <span className="text-[8px] font-black text-[#C88A04] tracking-[0.4em] uppercase block mb-1">ID REFERENCIA</span>
+                          <span className="text-[8px] font-black text-[#00E5FF] tracking-[0.4em] uppercase block mb-1">ID REFERENCIA</span>
                           <h4 className="text-xl font-black text-white tracking-tighter">{referenceCode}</h4>
                         </div>
                         <div className="text-right">
@@ -413,14 +424,14 @@ export function CartSidebar() {
                       <div className="space-y-4 mb-8 border-y border-white/5 py-8">
                         {orderedItems.map(item => (
                           <div key={`${item.id}-${item.selectedSize}`} className="flex justify-between text-xs font-bold uppercase tracking-tight">
-                            <span className="text-gray-400">{item.quantity}x {item.name} <span className="text-[9px] text-[#C88A04]/60 ml-2">{item.selectedSize}</span></span>
+                            <span className="text-gray-400">{item.quantity}x {item.name} <span className="text-[9px] text-[#00E5FF]/60 ml-2">{item.selectedSize}</span></span>
                             <span className="text-white">${(item.basePrice * item.quantity).toLocaleString('es-AR')}</span>
                           </div>
                         ))}
                       </div>
 
                       <div className="flex justify-between items-center mb-8">
-                        <span className="text-[10px] font-black text-[#C88A04] tracking-widest uppercase">TOTAL DEL PEDIDO</span>
+                        <span className="text-[10px] font-black text-[#00E5FF] tracking-widest uppercase">TOTAL DEL PEDIDO</span>
                         <span className="text-3xl font-black text-white">${orderedTotal.toLocaleString('es-AR')}</span>
                       </div>
 
@@ -448,23 +459,26 @@ export function CartSidebar() {
                     </div>
 
                     <div className="mt-12 w-full space-y-4">
-                      {stripeInitPoint ? (
+                      {paymentInitPoint ? (
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className="w-full bg-[#FFD200] text-black h-16 rounded-2xl flex items-center justify-center gap-3 font-black text-xs tracking-widest uppercase shadow-[0_10px_30px_rgba(255,210,0,0.3)]"
+                          className={cn(
+                            "w-full h-16 rounded-2xl flex items-center justify-center gap-3 font-black text-xs tracking-widest uppercase shadow-lg",
+                            formData.paymentMethod === 'mercadopago' ? "bg-[#009EE3] text-white" : "bg-[#00E5FF] text-black"
+                          )}
                           onClick={() => {
                             clearCart();
-                            window.location.href = stripeInitPoint;
+                            window.location.href = paymentInitPoint;
                           }}
                         >
                           <Wallet size={24} />
-                          Pagar Seguro con Stripe
+                          Pagar con {formData.paymentMethod === 'mercadopago' ? 'Mercado Pago' : 'Stripe'}
                         </motion.button>
                       ) : (
                         <button disabled className="w-full bg-gray-800 text-gray-400 h-16 rounded-2xl flex items-center justify-center gap-3 font-black text-xs tracking-widest uppercase">
                           <Loader2 className="animate-spin" size={20} />
-                          Generando link de Stripe...
+                          Generando link de pago...
                         </button>
                       )}
                       <button
@@ -505,7 +519,7 @@ export function CartSidebar() {
                           placeholder="CÓDIGO"
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                          className="w-full bg-white/[0.03] border border-white/5 rounded-xl py-2 pl-9 pr-4 text-[10px] font-black text-white placeholder:text-gray-700 focus:outline-none focus:border-[#C88A04]/50 transition-all uppercase"
+                          className="w-full bg-white/[0.03] border border-white/5 rounded-xl py-2 pl-9 pr-4 text-[10px] font-black text-white placeholder:text-gray-700 focus:outline-none focus:border-[#00E5FF]/50 transition-all uppercase"
                         />
                       </div>
                       <button
@@ -562,11 +576,11 @@ export function CartSidebar() {
 
                     <div className="grid grid-cols-2 gap-4 mt-6">
                       <div className="flex items-center gap-2 opacity-40">
-                        <ShieldCheck size={14} className="text-[#C88A04]" />
+                        <ShieldCheck size={14} className="text-[#00E5FF]" />
                         <span className="text-[8px] font-black uppercase tracking-widest">Protocolo Seguro</span>
                       </div>
                       <div className="flex items-center gap-2 opacity-40">
-                        <RefreshCw size={14} className="text-[#C88A04]" />
+                        <RefreshCw size={14} className="text-[#00E5FF]" />
                         <span className="text-[8px] font-black uppercase tracking-widest">Garantía Éter</span>
                       </div>
                     </div>
@@ -582,3 +596,4 @@ export function CartSidebar() {
     </>
   );
 }
+

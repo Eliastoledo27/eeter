@@ -6,7 +6,7 @@ export default function NotFound() {
     <div className="min-h-screen bg-primary flex items-center justify-center p-6">
       <div className="text-center">
         <div className="bg-white/5 border border-white/10 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-xl">
-          <FileQuestion className="text-accent-gold w-10 h-10" />
+          <FileQuestion className="text-accent-cyan w-10 h-10" />
         </div>
         
         <h1 className="text-4xl md:text-6xl font-black text-white mb-4">404</h1>

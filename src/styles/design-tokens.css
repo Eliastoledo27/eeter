@@ -10,10 +10,11 @@
      ============================================ */
 
     /* Primary Gold */
-    --color-primary: #C88A04;
-    --color-primary-light: #ECA413;
-    --color-primary-dark: #A67203;
+    --color-primary: #00E5FF;
+    --color-primary-light: #00B8D9;
+    --color-primary-dark: #00D1E6;
     --color-primary-rgb: 200, 138, 4;
+    --color-primary-glow: rgba(0, 229, 255, 0.4);
 
     /* Backgrounds */
     --color-bg-darkest: #0A0A0A;

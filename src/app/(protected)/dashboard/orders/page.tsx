@@ -7,7 +7,7 @@ import { usePermissions } from '@/hooks/usePermissions'
 import { toast } from 'sonner'
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType; bg: string }> = {
-    pending: { label: 'Pendiente', color: 'text-amber-400', icon: Clock, bg: 'bg-amber-500/10 border-amber-500/20' },
+    pending: { label: 'Pendiente', color: 'text-cyan-400', icon: Clock, bg: 'bg-cyan-500/10 border-cyan-500/20' },
     confirmed: { label: 'Confirmado', color: 'text-blue-400', icon: CheckCircle2, bg: 'bg-blue-500/10 border-blue-500/20' },
     processing: { label: 'Procesando', color: 'text-purple-400', icon: Package, bg: 'bg-purple-500/10 border-purple-500/20' },
     shipped: { label: 'Enviado', color: 'text-cyan-400', icon: Truck, bg: 'bg-cyan-500/10 border-cyan-500/20' },
@@ -53,8 +53,8 @@ export default function OrdersPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-xl border border-amber-500/20">
-                        <ClipboardList className="w-6 h-6 text-amber-400" />
+                    <div className="p-2.5 bg-gradient-to-br from-cyan-500/20 to-cyan-600/10 rounded-xl border border-cyan-500/20">
+                        <ClipboardList className="w-6 h-6 text-cyan-400" />
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold text-white tracking-tight">Gestión de Pedidos</h1>
@@ -99,7 +99,7 @@ export default function OrdersPage() {
                         placeholder="Buscar por cliente..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-white/[0.03] border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/30 focus:ring-1 focus:ring-amber-500/20 transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white/[0.03] border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/30 focus:ring-1 focus:ring-cyan-500/20 transition-all"
                     />
                 </div>
                 <button
@@ -115,7 +115,7 @@ export default function OrdersPage() {
             <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden backdrop-blur-sm">
                 {loading ? (
                     <div className="flex items-center justify-center py-20">
-                        <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+                        <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
                     </div>
                 ) : orders.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-gray-500">
@@ -195,7 +195,7 @@ export default function OrdersPage() {
                                                     <h4 className="text-[10px] uppercase tracking-wider text-gray-500 font-mono mb-2">Envío</h4>
                                                     <p className="text-xs text-gray-400">{order.shipping_address || 'Sin dirección'}</p>
                                                     {order.tracking_number && (
-                                                        <p className="text-xs text-amber-400">Tracking: {order.tracking_number}</p>
+                                                        <p className="text-xs text-cyan-400">Tracking: {order.tracking_number}</p>
                                                     )}
                                                     {order.notes && (
                                                         <p className="text-xs text-gray-500 italic mt-2">&quot;{order.notes}&quot;</p>

@@ -34,7 +34,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
   // Role badge colors
   const roleColors: Record<string, string> = {
-    admin: 'text-[#C88A04]',
+    admin: 'text-[#00E5FF]',
     support: 'text-blue-400',
     reseller: 'text-emerald-400',
     user: 'text-gray-400',

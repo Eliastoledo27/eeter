@@ -18,7 +18,7 @@ const CONTACT_METHODS = [
         desc: 'Consultas sobre logística y envíos',
         value: 'soporte@eterstore.com.ar',
         icon: Mail,
-        color: '#C88A04'
+        color: '#00E5FF'
     },
     {
         title: 'Instagram',
@@ -31,7 +31,7 @@ const CONTACT_METHODS = [
 
 export default function SupportPage() {
     return (
-        <main className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#C88A04] selection:text-black overflow-x-hidden">
+        <main className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#00E5FF] selection:text-black overflow-x-hidden">
             <Navbar />
 
             {/* Hero Section */}
@@ -44,7 +44,7 @@ export default function SupportPage() {
                     >
                         <h1 className="text-7xl md:text-9xl font-black mb-8 tracking-tighter uppercase leading-none">
                             SOPORTE <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C88A04] to-[#ECA413]">ÉTER</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00E5FF] to-[#00B8D9]">ÉTER</span>
                         </h1>
                         <p className="text-lg text-gray-400 font-light max-w-xl mx-auto tracking-widest uppercase">
                             Estamos acá para que tu negocio nunca se detenga.
@@ -71,7 +71,7 @@ export default function SupportPage() {
                                     </div>
                                     <h3 className="text-2xl font-black mb-2 uppercase tracking-tight">{method.title}</h3>
                                     <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-6">{method.desc}</p>
-                                    <div className="text-white font-mono text-sm border-t border-white/5 pt-6 group-hover:text-[#C88A04] transition-colors">
+                                    <div className="text-white font-mono text-sm border-t border-white/5 pt-6 group-hover:text-[#00E5FF] transition-colors">
                                         {method.value}
                                     </div>
                                 </div>
@@ -87,7 +87,7 @@ export default function SupportPage() {
                 <div className="container mx-auto px-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                         <div className="space-y-12">
-                            <h2 className="text-4xl font-black uppercase tracking-tighter">PREGUNTAS <span className="text-[#C88A04]">FRECUENTES</span></h2>
+                            <h2 className="text-4xl font-black uppercase tracking-tighter">PREGUNTAS <span className="text-[#00E5FF]">FRECUENTES</span></h2>
                             {[
                                 { q: '¿Cuál es el tiempo de entrega?', a: 'Los pedidos se procesan en 24hs y llegan a destino en 2 a 5 días hábiles.' },
                                 { q: '¿Tienen garantía los productos?', a: 'Todos nuestros calzados cuentan con garantía de fábrica por 30 días.' },
@@ -97,7 +97,7 @@ export default function SupportPage() {
                                     key={i}
                                     initial={{ opacity: 0, x: -20 }}
                                     whileInView={{ opacity: 1, x: 0 }}
-                                    className="space-y-2 border-l-2 border-[#C88A04]/20 pl-6 hover:border-[#C88A04] transition-colors"
+                                    className="space-y-2 border-l-2 border-[#00E5FF]/20 pl-6 hover:border-[#00E5FF] transition-colors"
                                 >
                                     <h4 className="text-white font-black text-sm uppercase tracking-widest">{faq.q}</h4>
                                     <p className="text-gray-500 text-sm">{faq.a}</p>
@@ -106,7 +106,7 @@ export default function SupportPage() {
                         </div>
                         <div className="bg-[#white]/[0.02] border border-white/5 rounded-[3rem] p-12 flex flex-col justify-center space-y-8">
                             <div className="flex items-center gap-6">
-                                <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-[#C88A04] bg-black">
+                                <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-[#00E5FF] bg-black">
                                     <MapPin size={24} />
                                 </div>
                                 <div className="flex flex-col">
@@ -115,7 +115,7 @@ export default function SupportPage() {
                                 </div>
                             </div>
                             <div className="flex items-center gap-6">
-                                <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-[#C88A04] bg-black">
+                                <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-[#00E5FF] bg-black">
                                     <Clock size={24} />
                                 </div>
                                 <div className="flex flex-col">

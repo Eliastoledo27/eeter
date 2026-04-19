@@ -8,8 +8,8 @@
    ============================================ */
 
 export const chartColors = {
-    primary: '#C88A04',
-    primaryLight: '#ECA413',
+    primary: '#00E5FF',
+    primaryLight: '#00B8D9',
     primaryDark: '#A67203',
 
     success: '#10B981',
@@ -19,8 +19,8 @@ export const chartColors = {
 
     // Multi-series colors
     series: [
-        '#C88A04', // Gold
-        '#ECA413', // Light Gold
+        '#00E5FF', // Gold
+        '#00B8D9', // Light Gold
         '#10B981', // Green
         '#3B82F6', // Blue
         '#F59E0B', // Orange

@@ -24,7 +24,7 @@ export default function CareersPage() {
                     { icon: Briefcase, title: 'FLEXIBLE', desc: 'Work-life balance como prioridad.' }
                 ].map((item, i) => (
                     <div key={i} className="p-8 border border-white/5 rounded-3xl bg-white/[0.02]">
-                        <item.icon className="text-[#C88A04] mb-4" size={32} />
+                        <item.icon className="text-[#00E5FF] mb-4" size={32} />
                         <h4 className="font-bold mb-2 uppercase">{item.title}</h4>
                         <p className="text-gray-500 text-xs uppercase tracking-widest">{item.desc}</p>
                     </div>
@@ -32,11 +32,11 @@ export default function CareersPage() {
             </div>
 
             <div className="space-y-6">
-                <h3 className="text-2xl font-black uppercase tracking-widest mb-10 text-[#C88A04]">Posiciones Abiertas</h3>
+                <h3 className="text-2xl font-black uppercase tracking-widest mb-10 text-[#00E5FF]">Posiciones Abiertas</h3>
                 {roles.map((role, i) => (
-                    <div key={i} className="group flex flex-col md:flex-row justify-between items-center p-8 rounded-2xl border border-white/5 hover:border-[#C88A04]/50 hover:bg-white/[0.03] transition-all cursor-pointer">
+                    <div key={i} className="group flex flex-col md:flex-row justify-between items-center p-8 rounded-2xl border border-white/5 hover:border-[#00E5FF]/50 hover:bg-white/[0.03] transition-all cursor-pointer">
                         <div className="text-center md:text-left mb-4 md:mb-0">
-                            <span className="text-[#C88A04] text-xs font-mono uppercase tracking-[0.2em]">{role.area}</span>
+                            <span className="text-[#00E5FF] text-xs font-mono uppercase tracking-[0.2em]">{role.area}</span>
                             <h4 className="text-2xl font-bold uppercase">{role.title}</h4>
                         </div>
                         <div className="flex items-center gap-8">
@@ -49,7 +49,7 @@ export default function CareersPage() {
 
             <div className="mt-24 p-12 text-center border border-white/10 rounded-[3rem] bg-white/[0.01]">
                 <h3 className="text-2xl font-bold mb-4 uppercase">¿No encontrás lo que buscás?</h3>
-                <p className="text-gray-500 mb-8">Envíanos tu CV de forma espontánea a <span className="text-[#C88A04]">talento@eter.store</span></p>
+                <p className="text-gray-500 mb-8">Envíanos tu CV de forma espontánea a <span className="text-[#00E5FF]">talento@eter.store</span></p>
             </div>
         </GeneralPageLayout>
     );

@@ -11,7 +11,7 @@ export default function AccessoriesPage() {
             breadcrumb="TIENDA / ACCESORIOS"
         >
             <div className="flex flex-col items-center justify-center py-20 text-center">
-                <Sparkles className="text-[#C88A04] mb-8 animate-pulse" size={64} />
+                <Sparkles className="text-[#00E5FF] mb-8 animate-pulse" size={64} />
                 <h2 className="text-4xl font-black uppercase tracking-tighter mb-4 text-white">Próximamente</h2>
                 <p className="text-gray-500 max-w-md mb-12">Estamos finalizando los detalles de nuestra nueva línea de accesorios. Registrate para recibir la notificación de lanzamiento.</p>
 
@@ -24,7 +24,7 @@ export default function AccessoriesPage() {
                 </div>
 
                 <Link href="/catalog" className="mt-16 group">
-                    <button className="h-16 px-10 bg-white text-black font-black rounded-full hover:bg-[#C88A04] hover:text-white transition-all flex items-center gap-4">
+                    <button className="h-16 px-10 bg-white text-black font-black rounded-full hover:bg-[#00E5FF] hover:text-white transition-all flex items-center gap-4">
                         VOLVER AL CATÁLOGO
                         <Star size={20} className="group-hover:rotate-45 transition-transform" />
                     </button>

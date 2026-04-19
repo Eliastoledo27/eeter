@@ -12,7 +12,7 @@ This page-specific guide overrides the global master for the public catalog expe
 ### Colors
 - Primary: #1C1917
 - Secondary: #44403C
-- Accent/CTA: #CA8A04
+- Accent/CTA: #00B8D9
 - Background: #FAFAF9
 - Surface: #FFFFFF (80-90% opacity for glass)
 - Text: #0C0A09
@@ -80,6 +80,6 @@ This page-specific guide overrides the global master for the public catalog expe
 - Analytics: log events for search, filter, quick view, add to cart.
 
 ## Component Tokens
-- CTA button: bg #CA8A04, text #0C0A09, radius 12-16px.
+- CTA button: bg #00B8D9, text #0C0A09, radius 12-16px.
 - Ghost button: white surface, border #0000001A.
-- Input focus: ring #CA8A04 at 20% opacity.
+- Input focus: ring #00B8D9 at 20% opacity.

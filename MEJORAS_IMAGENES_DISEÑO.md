@@ -36,7 +36,7 @@ images: ['https://images.unsplash.com/photo-1552346154-21d32810aba3?q=90&w=2670&
 
 **A. Glow Effect Radial**
 ```tsx
-<div className="absolute inset-0 bg-gradient-radial from-[#C88A04]/30 via-[#C88A04]/10 to-transparent blur-[80px] scale-110" />
+<div className="absolute inset-0 bg-gradient-radial from-[#00E5FF]/30 via-[#00E5FF]/10 to-transparent blur-[80px] scale-110" />
 ```
 - Resplandor dorado detrás del producto
 - Efecto de profundidad y dimensión
@@ -59,7 +59,7 @@ className="filter drop-shadow-[0_20px_80px_rgba(200,138,4,0.4)] drop-shadow-[0_0
 
 **D. Reflection Effect**
 ```tsx
-<div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-[#C88A04]/5 to-transparent blur-xl" />
+<div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-[#00E5FF]/5 to-transparent blur-xl" />
 ```
 - Reflejo sutil debajo del producto
 - Simula superficie reflectante
@@ -90,7 +90,7 @@ className="bg-gradient-to-br from-[#0F0F0F] to-[#0A0A0A]"
 
 **B. Animated Glow**
 ```tsx
-<div className="bg-gradient-radial from-[#C88A04]/20 via-[#C88A04]/10 to-transparent blur-[120px] group-hover:from-[#C88A04]/30 group-hover:via-[#C88A04]/15" />
+<div className="bg-gradient-radial from-[#00E5FF]/20 via-[#00E5FF]/10 to-transparent blur-[120px] group-hover:from-[#00E5FF]/30 group-hover:via-[#00E5FF]/15" />
 ```
 - Resplandor que se intensifica al hover
 - Transición de 1 segundo
@@ -106,7 +106,7 @@ className="w-[85%] h-[85%] group-hover:scale-105 group-hover:rotate-1"
 
 **D. Image Glow on Hover**
 ```tsx
-<div className="bg-gradient-radial from-[#C88A04]/20 to-transparent blur-2xl scale-110 opacity-0 group-hover:opacity-100" />
+<div className="bg-gradient-radial from-[#00E5FF]/20 to-transparent blur-2xl scale-110 opacity-0 group-hover:opacity-100" />
 ```
 - Resplandor adicional que aparece al hover
 - Efecto de "iluminación" del producto
@@ -122,7 +122,7 @@ className="drop-shadow-[0_30px_60px_rgba(0,0,0,0.6)] drop-shadow-[0_0_80px_rgba(
 
 **F. Reflection Effect**
 ```tsx
-<div className="h-1/4 bg-gradient-to-t from-[#C88A04]/10 to-transparent blur-xl opacity-60" />
+<div className="h-1/4 bg-gradient-to-t from-[#00E5FF]/10 to-transparent blur-xl opacity-60" />
 ```
 - Reflejo dorado en la parte inferior
 - Simula superficie premium
@@ -130,7 +130,7 @@ className="drop-shadow-[0_30px_60px_rgba(0,0,0,0.6)] drop-shadow-[0_0_80px_rgba(
 
 **G. Badge Gradient**
 ```tsx
-className="bg-gradient-to-r from-[#C88A04] to-[#ECA413] shadow-lg shadow-[#C88A04]/30"
+className="bg-gradient-to-r from-[#00E5FF] to-[#00B8D9] shadow-lg shadow-[#00E5FF]/30"
 ```
 - Badge con gradiente dorado
 - Sombra que refuerza el branding
@@ -138,7 +138,7 @@ className="bg-gradient-to-r from-[#C88A04] to-[#ECA413] shadow-lg shadow-[#C88A0
 
 **H. Border Hover Effect**
 ```tsx
-className="hover:border-[#C88A04]/30"
+className="hover:border-[#00E5FF]/30"
 ```
 - Borde que se ilumina al hover
 - Feedback visual inmediato
@@ -159,7 +159,7 @@ className="bg-gradient-to-br from-[#0F0F0F] to-[#0A0A0A]"
 
 **B. Background Glow on Hover**
 ```tsx
-<div className="w-[300px] h-[300px] bg-gradient-radial from-[#C88A04]/10 to-transparent blur-[80px] opacity-0 group-hover:opacity-100" />
+<div className="w-[300px] h-[300px] bg-gradient-radial from-[#00E5FF]/10 to-transparent blur-[80px] opacity-0 group-hover:opacity-100" />
 ```
 - Resplandor que aparece al hover
 - Tamaño proporcional a la tarjeta
@@ -175,7 +175,7 @@ className="hover:shadow-[0_0_40px_rgba(200,138,4,0.15)]"
 
 **D. Image Glow Effect**
 ```tsx
-<div className="bg-gradient-radial from-[#C88A04]/20 to-transparent blur-xl scale-125 opacity-0 group-hover:opacity-100" />
+<div className="bg-gradient-radial from-[#00E5FF]/20 to-transparent blur-xl scale-125 opacity-0 group-hover:opacity-100" />
 ```
 - Resplandor alrededor de la imagen
 - Aparece al hover
@@ -199,7 +199,7 @@ className="drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)] drop-shadow-[0_0_60px_rgba(
 
 **G. Badge Enhancement**
 ```tsx
-className="backdrop-blur-sm shadow-lg shadow-[#C88A04]/20"
+className="backdrop-blur-sm shadow-lg shadow-[#00E5FF]/20"
 ```
 - Blur de fondo para legibilidad
 - Sombra dorada sutil
@@ -279,8 +279,8 @@ priority                                        // Above fold
 ## 🎨 Paleta de Efectos Visuales
 
 ### Colores de Glow
-- `#C88A04` - Dorado principal (20-30% opacity)
-- `#ECA413` - Dorado claro (gradientes)
+- `#00E5FF` - Dorado principal (20-30% opacity)
+- `#00B8D9` - Dorado claro (gradientes)
 - `rgba(0,0,0,0.4-0.6)` - Sombras negras
 
 ### Blur Levels
@@ -322,7 +322,7 @@ sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
 ```tsx
 <motion.div className="w-[700px] h-[700px]">
     {/* Glow */}
-    <div className="bg-gradient-radial from-[#C88A04]/30 via-[#C88A04]/10 to-transparent blur-[80px]" />
+    <div className="bg-gradient-radial from-[#00E5FF]/30 via-[#00E5FF]/10 to-transparent blur-[80px]" />
     
     {/* Image */}
     <Image
@@ -332,7 +332,7 @@ sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
     />
     
     {/* Reflection */}
-    <div className="bg-gradient-to-t from-[#C88A04]/5 to-transparent blur-xl" />
+    <div className="bg-gradient-to-t from-[#00E5FF]/5 to-transparent blur-xl" />
 </motion.div>
 ```
 

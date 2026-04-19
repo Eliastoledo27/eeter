@@ -67,7 +67,7 @@ Inner padding: p-8 (32px)
 ### 3. **Paleta de Colores Refinada**
 ```css
 Primarios:
-- Gold: from-yellow-500 to-orange-600
+- Gold: from-cyan-500 to-orange-600
 - Purple: from-purple-600 to-blue-500
 - Black: #000000 (fondo puro)
 

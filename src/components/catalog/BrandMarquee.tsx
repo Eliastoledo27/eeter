@@ -35,8 +35,8 @@ export function BrandMarquee() {
           <span
             key={i}
             className={`mx-4 text-sm font-display font-bold tracking-[0.2em] uppercase ${item === '•'
-              ? 'text-[#ffd900]/40'
-              : 'text-white/30 hover:text-[#ffd900]/80 transition-colors duration-300 cursor-default'
+              ? 'text-[#00E5FF]/40'
+              : 'text-white/30 hover:text-[#00E5FF]/80 transition-colors duration-300 cursor-default'
               }`}
           >
             {item}

@@ -36,7 +36,7 @@ export const CatalogWidget = ({ products }: CatalogWidgetProps) => {
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
             <div className="absolute bottom-0 left-0 p-6 w-full">
-                <span className="px-2 py-1 rounded bg-accent-gold text-black text-[10px] font-bold uppercase tracking-widest mb-2 inline-block shadow-[0_0_10px_rgba(245,158,11,0.4)]">
+                <span className="px-2 py-1 rounded bg-accent-cyan text-black text-[10px] font-bold uppercase tracking-widest mb-2 inline-block shadow-[0_0_10px_rgba(245,158,11,0.4)]">
                     Nuevo Ingreso
                 </span>
                 <h3 className="text-xl font-bold text-white mb-1 line-clamp-2 leading-tight text-glow">

@@ -10,15 +10,15 @@ export default async function CollectionPage() {
     const products = await getProducts();
 
     return (
-        <main className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#C88A04] selection:text-black overflow-x-hidden">
+        <main className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#00E5FF] selection:text-black overflow-x-hidden">
             <Navbar />
 
             <section className="pt-48 pb-12 bg-[#0A0A0A]">
                 <div className="container mx-auto px-6">
                     <div className="max-w-4xl mx-auto text-center">
-                        <span className="text-[#C88A04] font-black text-[10px] tracking-[0.5em] uppercase mb-6 block">Curaduría Exclusiva</span>
+                        <span className="text-[#00E5FF] font-black text-[10px] tracking-[0.5em] uppercase mb-6 block">Curaduría Exclusiva</span>
                         <h1 className="text-6xl md:text-8xl font-black mb-12 tracking-tighter uppercase leading-none">
-                            LA <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C88A04] to-[#ECA413]">COLECCIÓN</span>
+                            LA <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00E5FF] to-[#00B8D9]">COLECCIÓN</span>
                         </h1>
                     </div>
                 </div>

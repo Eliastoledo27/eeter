@@ -29,7 +29,7 @@ export function CatalogFilters({
           className={cn(
             'shrink-0 px-5 py-2.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 border',
             !selectedCategory
-              ? 'bg-[#ffd900] text-black border-[#ffd900] shadow-[0_0_20px_rgba(255,217,0,0.2)]'
+              ? 'bg-[#00E5FF] text-black border-[#00E5FF] shadow-[0_0_20px_rgba(0,229,255,0.2)]'
               : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20'
           )}
         >
@@ -44,7 +44,7 @@ export function CatalogFilters({
             className={cn(
               'shrink-0 px-5 py-2.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 border',
               selectedCategory === cat
-                ? 'bg-[#ffd900] text-black border-[#ffd900] shadow-[0_0_20px_rgba(255,217,0,0.2)]'
+                ? 'bg-[#00E5FF] text-black border-[#00E5FF] shadow-[0_0_20px_rgba(0,229,255,0.2)]'
                 : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20'
             )}
           >
@@ -60,7 +60,7 @@ export function CatalogFilters({
           className={cn(
             'p-2 rounded-lg transition-all duration-200',
             viewMode === 'grid'
-              ? 'bg-[#ffd900] text-black'
+              ? 'bg-[#00E5FF] text-black'
               : 'text-gray-500 hover:text-white'
           )}
           title="Vista grilla"
@@ -72,13 +72,14 @@ export function CatalogFilters({
           className={cn(
             'p-2 rounded-lg transition-all duration-200',
             viewMode === 'list'
-              ? 'bg-[#ffd900] text-black'
+              ? 'bg-[#00E5FF] text-black'
               : 'text-gray-500 hover:text-white'
           )}
           title="Vista lista"
         >
           <List size={16} />
         </button>
+
       </div>
     </div>
   );

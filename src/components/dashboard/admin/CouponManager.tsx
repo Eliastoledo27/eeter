@@ -108,7 +108,7 @@ export function CouponManager() {
                         });
                         setShowForm(true);
                     }}
-                    className="bg-[#C88A04] hover:bg-[#ECA413] text-black font-black px-6 py-4 rounded-2xl flex items-center justify-center gap-2 text-xs tracking-widest uppercase transition-all shadow-xl"
+                    className="bg-[#00E5FF] hover:bg-[#00D1E6] text-black font-black px-6 py-4 rounded-2xl flex items-center justify-center gap-2 text-xs tracking-widest uppercase transition-all shadow-xl shadow-[#00E5FF]/20"
                 >
                     <Plus size={16} /> Nuevo Cupón
                 </button>
@@ -122,7 +122,7 @@ export function CouponManager() {
                 </div>
                 <div className="bg-white/5 border border-white/5 rounded-3xl p-6">
                     <span className="text-gray-500 text-[9px] font-black uppercase tracking-widest block mb-2">Activos</span>
-                    <span className="text-2xl font-black text-[#C88A04]">{coupons.filter(c => c.is_active).length}</span>
+                    <span className="text-2xl font-black text-[#00E5FF]">{coupons.filter(c => c.is_active).length}</span>
                 </div>
                 <div className="bg-white/5 border border-white/5 rounded-3xl p-6">
                     <span className="text-gray-500 text-[9px] font-black uppercase tracking-widest block mb-2">Redimidos</span>
@@ -142,7 +142,7 @@ export function CouponManager() {
                 <input
                     type="text"
                     placeholder="BUSCAR CÓDIGO..."
-                    className="w-full bg-[#111] border border-white/5 rounded-2xl py-5 pl-14 pr-6 text-sm text-white placeholder:text-gray-700 focus:outline-none focus:border-[#C88A04]/50 transition-all uppercase font-black"
+                    className="w-full bg-[#111] border border-white/5 rounded-2xl py-5 pl-14 pr-6 text-sm text-white placeholder:text-gray-700 focus:outline-none focus:border-[#00E5FF]/50 transition-all uppercase font-black"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
@@ -150,7 +150,7 @@ export function CouponManager() {
 
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-20">
-                    <Loader2 className="animate-spin text-[#C88A04] mb-4" size={40} />
+                    <Loader2 className="animate-spin text-[#00E5FF] mb-4" size={40} />
                     <p className="text-gray-600 text-[10px] font-black tracking-widest uppercase">Escaneando Criptocupones...</p>
                 </div>
             ) : filteredCoupons.length === 0 ? (
@@ -171,8 +171,8 @@ export function CouponManager() {
                             >
                                 <div className="p-8">
                                     <div className="flex justify-between items-start mb-6">
-                                        <div className="px-4 py-2 bg-[#C88A04]/10 border border-[#C88A04]/20 rounded-xl">
-                                            <span className="text-lg font-black text-[#C88A04] tracking-tighter">{coupon.code}</span>
+                                        <div className="px-4 py-2 bg-[#00E5FF]/10 border border-[#00E5FF]/20 rounded-xl">
+                                            <span className="text-lg font-black text-[#00E5FF] tracking-tighter">{coupon.code}</span>
                                         </div>
                                         <div className="flex gap-2">
                                             <button
@@ -215,18 +215,18 @@ export function CouponManager() {
 
                                         <div className="pt-4 border-t border-white/5 space-y-2">
                                             <div className="flex items-center gap-2 text-[10px] text-gray-400">
-                                                <Tag size={12} className="text-[#C88A04]" />
+                                                <Tag size={12} className="text-[#00E5FF]" />
                                                 <span className="font-bold text-gray-300 uppercase">Aplica a: {coupon.applies_to.toUpperCase()} {coupon.applies_to === 'category' ? `(${coupon.target_id})` : ''}</span>
                                             </div>
                                             <div className="flex items-center gap-2 text-[10px] text-gray-400">
-                                                <Calendar size={12} className="text-[#C88A04]" />
+                                                <Calendar size={12} className="text-[#00E5FF]" />
                                                 <span className="font-bold">Habilitado desde: {new Date(coupon.valid_from).toLocaleDateString()}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className={`h-1 w-full ${coupon.is_active ? 'bg-[#C88A04]' : 'bg-gray-800'}`} />
+                                <div className={`h-1 w-full ${coupon.is_active ? 'bg-[#00E5FF]' : 'bg-gray-800'}`} />
                             </motion.div>
                         ))}
                     </AnimatePresence>
@@ -261,7 +261,7 @@ export function CouponManager() {
                                                 required
                                                 type="text"
                                                 placeholder="EJ: ETERVIP2026"
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black uppercase tracking-widest focus:outline-none focus:border-[#C88A04] transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black uppercase tracking-widest focus:outline-none focus:border-[#00E5FF] transition-all"
                                                 value={formData.code}
                                                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                                             />
@@ -269,7 +269,7 @@ export function CouponManager() {
                                         <div className="space-y-2">
                                             <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Tipo de Descuento</label>
                                             <select
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-bold uppercase focus:outline-none focus:border-[#C88A04] transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-bold uppercase focus:outline-none focus:border-[#00E5FF] transition-all"
                                                 value={formData.discount_type}
                                                 onChange={(e) => setFormData({ ...formData, discount_type: e.target.value as any })}
                                             >
@@ -285,7 +285,7 @@ export function CouponManager() {
                                             <input
                                                 required
                                                 type="number"
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black focus:outline-none focus:border-[#C88A04] transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black focus:outline-none focus:border-[#00E5FF] transition-all"
                                                 value={formData.discount_value}
                                                 onChange={(e) => setFormData({ ...formData, discount_value: Number(e.target.value) })}
                                             />
@@ -294,7 +294,7 @@ export function CouponManager() {
                                             <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Compra Mínima</label>
                                             <input
                                                 type="number"
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black focus:outline-none focus:border-[#C88A04] transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black focus:outline-none focus:border-[#00E5FF] transition-all"
                                                 value={formData.min_purchase_amount}
                                                 onChange={(e) => setFormData({ ...formData, min_purchase_amount: Number(e.target.value) })}
                                             />
@@ -307,7 +307,7 @@ export function CouponManager() {
                                             <input
                                                 type="number"
                                                 placeholder="Ej: 10"
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black focus:outline-none focus:border-[#C88A04] transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black focus:outline-none focus:border-[#00E5FF] transition-all"
                                                 value={formData.usage_limit || ''}
                                                 onChange={(e) => setFormData({ ...formData, usage_limit: e.target.value ? Number(e.target.value) : undefined })}
                                             />
@@ -317,7 +317,7 @@ export function CouponManager() {
                                             <input
                                                 type="number"
                                                 placeholder="Ej: 1"
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black focus:outline-none focus:border-[#C88A04] transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black focus:outline-none focus:border-[#00E5FF] transition-all"
                                                 value={formData.usage_limit_per_user || ''}
                                                 onChange={(e) => setFormData({ ...formData, usage_limit_per_user: e.target.value ? Number(e.target.value) : undefined })}
                                             />
@@ -328,7 +328,7 @@ export function CouponManager() {
                                         <div className="space-y-2">
                                             <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Aplica a</label>
                                             <select
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-bold uppercase focus:outline-none focus:border-[#C88A04] transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-bold uppercase focus:outline-none focus:border-[#00E5FF] transition-all"
                                                 value={formData.applies_to}
                                                 onChange={(e) => {
                                                     const val = e.target.value as any;
@@ -356,7 +356,7 @@ export function CouponManager() {
                                             <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Seleccionar Categoría</label>
                                             <select
                                                 required
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-bold uppercase focus:outline-none focus:border-[#C88A04] transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-bold uppercase focus:outline-none focus:border-[#00E5FF] transition-all"
                                                 value={formData.target_id || ''}
                                                 onChange={(e) => setFormData({ ...formData, target_id: e.target.value })}
                                             >

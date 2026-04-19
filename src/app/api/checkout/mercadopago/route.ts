@@ -39,19 +39,25 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: 'No valid items found' }, { status: 400 });
         }
 
-        if (!process.env.MP_ACCESS_TOKEN) {
+        const accessToken = (process.env.MP_ACCESS_TOKEN || '').replace(/['"]/g, '').trim();
+        if (!accessToken) {
             console.error('[Mercado Pago] Missing MP_ACCESS_TOKEN inside .env.local');
             return NextResponse.json({ success: false, error: 'Server configuration error' }, { status: 500 });
         }
 
-        const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN, options: { timeout: 10000 } });
+        const client = new MercadoPagoConfig({ accessToken, options: { timeout: 10000 } });
         const preference = new Preference(client);
 
-        // Ensure baseUrl is absolute and valid. Mercado Pago in 2025+ REQUIRES HTTPS for all back_urls.
-        let baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        // Sanitize baseUrl (remove quotes if present in .env)
+        let baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://xn--ter-9la.store').replace(/['"]/g, '').trim();
         if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
 
-        // Force HTTPS for non-localhost, and recommended even for localhost if using a tunnel
+        // Ensure we use the production domain if we are not in localhost
+        if (baseUrl.includes('localhost') && process.env.NODE_ENV === 'production') {
+            baseUrl = 'https://xn--ter-9la.store';
+        }
+
+        // Force HTTPS for non-localhost
         if (!baseUrl.startsWith('http')) {
             baseUrl = `https://${baseUrl}`;
         } else if (baseUrl.startsWith('http://') && !baseUrl.includes('localhost')) {
@@ -63,42 +69,39 @@ export async function POST(req: NextRequest) {
                 items: preferenceItems,
                 payer: {
                     name: payer?.firstName || 'Cliente',
-                    surname: payer?.lastName || 'Final',
-                    email: payer?.email || 'vendedor@eterstore.com.ar', // Real-looking email
+                    surname: payer?.lastName || '',
+                    email: payer?.email || 'vendedor@eterstore.com.ar',
                     phone: {
                         area_code: '54',
-                        number: (payer?.phone || '1122334455').replace(/\D/g, '')
+                        number: (payer?.phone || '').replace(/\D/g, '')
                     },
                     address: {
-                        street_name: payer?.address || 'Calle Falsa 123',
-                        zip_code: payer?.postalCode || '1000'
+                        street_name: payer?.address || '',
+                        zip_code: payer?.postalCode || ''
                     }
                 },
                 back_urls: {
                     success: `${baseUrl}/catalog?payment=success`,
-                    pending: `${baseUrl}/catalog?payment=pending`,
-                    failure: `${baseUrl}/catalog?payment=failure`
+                    failure: `${baseUrl}/catalog?payment=failure`,
+                    pending: `${baseUrl}/catalog?payment=pending`
                 },
-                auto_return: 'approved',
+                auto_return: baseUrl.startsWith('https') ? 'approved' : undefined,
+                notification_url: baseUrl.startsWith('https') ? `${baseUrl}/api/webhooks/mercadopago` : undefined,
                 statement_descriptor: 'ETER STORE',
                 external_reference: `ORDER-${Date.now()}`
             }
         };
 
-        console.log('[Mercado Pago] Creating Preference with Body:', JSON.stringify(preferenceData.body, null, 2));
         const result = await preference.create(preferenceData);
-
-        console.log('[Mercado Pago] Preference Created:', result.id);
 
         return NextResponse.json({
             success: true,
             id: result.id,
-            init_point: result.init_point,
-            sandbox_init_point: result.sandbox_init_point
+            init_point: accessToken.startsWith('APP_USR') ? result.init_point : (result.sandbox_init_point || result.init_point)
         });
 
     } catch (error: any) {
-        console.error('[Mercado Pago] Error creating preference:', error);
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        console.error('[Mercado Pago PROD] Error:', error);
+        return NextResponse.json({ success: false, error: 'Hubo un problema al procesar el pago. Por favor intente nuevamente.' }, { status: 500 });
     }
 }

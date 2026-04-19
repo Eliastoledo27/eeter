@@ -6,7 +6,7 @@ const NAVE_PAYMENT_URL = 'https://api.navenegocios.ar/api/v1/checkout/payment-in
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { items, payer, integration_id } = body;
+        const { items, payer, integration_id = 'P-69AF-88A4-X' } = body;
 
         // Credentials should come from environment variables once the store is "Activa" in Nave
         const client_id = process.env.NAVE_CLIENT_ID;

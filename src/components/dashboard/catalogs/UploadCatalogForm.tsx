@@ -119,7 +119,7 @@ export const UploadCatalogForm = ({ onSuccess }: { onSuccess: (newCatalog?: Cata
           <button
             type="submit"
             disabled={isUploading || !file}
-            className="w-full bg-gradient-to-r from-amber-300 via-orange-300 to-rose-300 hover:from-amber-200 hover:via-orange-200 hover:to-rose-200 disabled:bg-slate-800 disabled:cursor-not-allowed text-slate-950 font-black py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-xl shadow-amber-200/10"
+            className="w-full bg-gradient-to-r from-cyan-300 via-orange-300 to-rose-300 hover:from-amber-200 hover:via-orange-200 hover:to-rose-200 disabled:bg-slate-800 disabled:cursor-not-allowed text-slate-950 font-black py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-xl shadow-amber-200/10"
           >
             {isUploading ? <Loader2 className="animate-spin" /> : <Upload size={18} />}
             {isUploading ? 'Subiendo...' : 'Publicar catálogo'}
@@ -148,7 +148,7 @@ export const UploadCatalogForm = ({ onSuccess }: { onSuccess: (newCatalog?: Cata
                     />
                   </div>
                 ) : (
-                  <FileText size={48} className="text-amber-300 mb-2" />
+                  <FileText size={48} className="text-cyan-300 mb-2" />
                 )}
                 <p className="text-sm font-bold text-white">{file.name}</p>
                 <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>

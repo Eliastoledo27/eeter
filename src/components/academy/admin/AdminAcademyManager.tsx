@@ -138,7 +138,7 @@ export function AdminAcademyManager({ initialCourses, initialModules }: AdminAca
                             <p className="font-bold">{c.title}</p>
                             <p className="text-xs text-gray-500">/{c.slug}</p>
                         </div>
-                        <span className={c.is_published ? "text-green-500 text-xs" : "text-yellow-500 text-xs"}>
+                        <span className={c.is_published ? "text-green-500 text-xs" : "text-cyan-500 text-xs"}>
                             {c.is_published ? 'Publicado' : 'Borrador'}
                         </span>
                     </div>

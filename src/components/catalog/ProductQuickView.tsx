@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { X, Plus, Minus, ShoppingCart, Heart, Package, ShieldCheck, Truck, Check } from 'lucide-react';
+import { X, Plus, Minus, ShoppingCart, Heart, Package, ShieldCheck, Truck, ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ProductType } from '@/app/actions/products';
-import { useCart } from '@/hooks/useCart';
+import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
 
 interface ProductQuickViewProps {
@@ -15,7 +15,7 @@ interface ProductQuickViewProps {
 }
 
 export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
-    const { addItem, openCart, setCartStep } = useCart();
+    const { addItem, setIsOpen: setIsCartOpen } = useCartStore();
     const [selectedImage, setSelectedImage] = useState(0);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [quantity, setQuantity] = useState(1);
@@ -41,26 +41,29 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
     }, [handleEsc]);
 
     const availableSizes = Object.entries(product.stock_by_size || {})
-        .filter(([, stock]) => stock > 0)
+        .filter(([, stock]) => Number(stock) > 0)
         .map(([size]) => size)
         .sort((a, b) => Number(a) - Number(b));
 
-    const totalStock = Object.values(product.stock_by_size || {}).reduce((a, b) => a + b, 0);
+    const totalStock = Object.values(product.stock_by_size || {}).reduce((a, b) => Number(a) + Number(b), 0);
     const isLowStock = totalStock < 10 && totalStock > 0;
 
     const displayImages = Array.from(new Set(
         product.images && product.images.length > 0
             ? product.images
-            : ['https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200']
+            : ['/placeholder-shoe.png']
     ));
 
-    const handleAddToCart = (silent = false) => {
+    const handleAddToCart = (buyNow = false) => {
         if (!selectedSize) {
-            toast.error('Por favor seleccioná un talle');
+            toast.error('SELECCIÓN REQUERIDA', {
+                description: 'Por favor seleccioná un talle para continuar.',
+                style: { background: '#020202', color: '#FAFAF9', border: '1px solid rgba(239, 68, 68, 0.2)' }
+            });
             return false;
         }
 
-        if (!silent) setIsAdding(true);
+        setIsAdding(true);
 
         // Convert ProductType back to Product entity for the store
         const productToCart: any = {
@@ -78,33 +81,22 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
 
         addItem(productToCart, selectedSize, quantity);
 
-        if (!silent) {
-            setTimeout(() => {
-                setIsAdding(false);
-                toast.success('¡Producto agregado!', {
-                    description: `${quantity}x ${product.name} - Talle ${selectedSize}`,
-                    action: {
-                        label: 'Ver carrito',
-                        onClick: () => {
-                            setCartStep('items');
-                            onClose();
-                            openCart();
-                        },
-                    },
+        setTimeout(() => {
+            setIsAdding(false);
+            if (!buyNow) {
+                toast.success('ARCHIVO ACTUALIZADO', {
+                    description: `${product.name} (Talle ${selectedSize}) añadido.`,
+                    style: { background: '#020202', color: '#FAFAF9', border: '1px solid rgba(0, 229, 255, 0.2)' }
                 });
-            }, 500);
-        }
+                setIsCartOpen(true);
+                onClose();
+            } else {
+                setIsCartOpen(true);
+                onClose();
+            }
+        }, 500);
+        
         return true;
-    };
-
-    const handleBuyNow = () => {
-        const added = handleAddToCart(true);
-        if (added) {
-            setCartStep('checkout');
-            onClose();
-            // Use timeout to ensure state propagation before opening
-            setTimeout(() => openCart(), 0);
-        }
     };
 
     return (
@@ -112,241 +104,142 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 sm:p-6"
         >
             {/* Backdrop */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-black/70 backdrop-blur-xl"
+                className="absolute inset-0 bg-black/80 backdrop-blur-2xl"
                 onClick={onClose}
             />
 
             {/* Modal */}
             <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 50 }}
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 50 }}
+                exit={{ opacity: 0, scale: 0.9, y: 30 }}
                 transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-                className="relative w-full max-w-5xl h-full sm:h-auto sm:max-h-[90vh] bg-[#0A0A0A] sm:bg-[#111]/95 backdrop-blur-3xl sm:rounded-[2.5rem] rounded-t-[2.5rem] border-t sm:border border-white/10 overflow-hidden shadow-2xl shadow-black"
+                className="relative w-full max-w-6xl h-full sm:h-auto sm:max-h-[85vh] bg-[#020202] rounded-[2.5rem] border border-white/10 overflow-hidden shadow-[0_0_100px_rgba(0,0,0,1)]"
             >
-                {/* Header / Close Controller */}
-                <div className="absolute top-0 left-0 right-0 z-[60] p-4 sm:p-8 flex justify-between items-center pointer-events-none">
-                    <div className="flex items-center gap-2 sm:gap-4 bg-black/80 backdrop-blur-3xl px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full border border-white/10 pointer-events-auto shadow-2xl">
-                        <div className="relative">
-                            <div className="w-2 h-2 sm:w-2.5 h-2.5 rounded-full bg-[#ffd900] animate-pulse" />
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-white">
-                                Vista_Rápida
-                            </span>
-                        </div>
-                    </div>
-
+                {/* Header Actions */}
+                <div className="absolute top-8 right-8 z-[70] hidden sm:block">
                     <button
                         onClick={onClose}
-                        className="group flex items-center gap-2 sm:gap-4 bg-white/5 hover:bg-rose-500/20 backdrop-blur-3xl border border-white/10 px-3 sm:px-6 py-1.5 sm:py-3 rounded-full transition-all duration-700 pointer-events-auto"
+                        className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300"
                     >
-                        <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 group-hover:text-rose-400">
-                            Cerrar
-                        </span>
-                        <div className="w-6 h-6 sm:w-8 h-8 flex items-center justify-center rounded-full bg-white/5 border border-white/10 group-hover:bg-rose-500/20">
-                            <X className="text-gray-400 group-hover:text-rose-400" size={14} />
-                        </div>
+                        <X size={20} />
                     </button>
                 </div>
 
                 {/* Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-y-auto h-full sm:max-h-[90vh] pb-32 sm:pb-0">
-                    {/* LEFT: Gallery */}
-                    <div className="p-6 lg:p-8 space-y-4">
-                        {/* Main Image Stage */}
-                        <div className="relative aspect-square md:rounded-2xl overflow-hidden bg-gradient-to-br from-white/[0.03] to-transparent border-b md:border border-white/5">
+                <div className="grid grid-cols-1 lg:grid-cols-2 h-full overflow-y-auto no-scrollbar">
+                    {/* LEFT: Image System */}
+                    <div className="relative p-8 lg:p-12 flex flex-col gap-6">
+                        <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-white/[0.02] border border-white/5 flex items-center justify-center">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={selectedImage}
-                                    initial={{ opacity: 0, scale: 1.1 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.95 }}
-                                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                                    initial={{ opacity: 0, scale: 1.1, rotate: -3 }}
+                                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                                    exit={{ opacity: 0, scale: 0.9, rotate: 3 }}
+                                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                                     className="relative w-full h-full"
                                 >
                                     <Image
                                         src={displayImages[selectedImage]}
                                         fill
-                                        className="object-contain p-4 sm:p-0"
+                                        className="object-contain p-12"
                                         alt={product.name}
                                         priority
-                                        sizes="(max-width: 768px) 100vw, 50vw"
                                     />
                                 </motion.div>
                             </AnimatePresence>
 
-                            {/* Kinetic Image Scan Line */}
+                            {/* Neon Scanner Effect */}
                             <motion.div
-                                initial={{ top: '0%' }}
-                                animate={{ top: '100%' }}
-                                transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
-                                className="absolute left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#ffd900]/40 to-transparent z-[31] pointer-events-none"
+                                animate={{ top: ['-10%', '110%'] }}
+                                transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+                                className="absolute left-0 w-full h-[1px] bg-[#00E5FF]/30 blur-[2px] z-20 pointer-events-none"
                             />
 
-                            {/* Badges */}
-                            <div className="absolute top-4 left-4 flex items-center gap-2">
-                                <span className="bg-[#ffd900]/90 backdrop-blur px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-[0.15em] text-black">
-                                    {product.category || 'General'}
+                            {/* Tags */}
+                            <div className="absolute top-6 left-6 flex flex-col gap-2">
+                                <span className="bg-[#00E5FF]/10 text-[#00E5FF] px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border border-[#00E5FF]/20 backdrop-blur-md">
+                                    {product.category || 'Limited Archive'}
                                 </span>
-                                {totalStock > 0 && (
-                                    <span className="bg-white/10 backdrop-blur px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-[0.15em] text-white border border-white/20">
-                                        Stock Real
+                                {totalStock > 0 && totalStock < 10 && (
+                                    <span className="bg-red-500/10 text-red-500 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border border-red-500/20 backdrop-blur-md animate-pulse">
+                                        Escasez Crítica
                                     </span>
                                 )}
                             </div>
-
-                            {/* Navigation Dots (Always visible on mobile, dots only on desktop if dots > 1) */}
-                            {displayImages.length > 1 && (
-                                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 bg-black/60 backdrop-blur-xl px-4 py-2 rounded-full border border-white/10 z-30">
-                                    {displayImages.map((_, idx) => (
-                                        <button
-                                            key={idx}
-                                            onClick={() => setSelectedImage(idx)}
-                                            className={`h-1.5 rounded-full transition-all duration-500 ${selectedImage === idx ? 'bg-[#ffd900] w-6' : 'bg-white/20 w-1.5'}`}
-                                        />
-                                    ))}
-                                </div>
-                            )}
                         </div>
 
-                        {/* Thumbnails - Optimized for Mobile Horizontal Scroll */}
+                        {/* Gallery Thumbnails */}
                         {displayImages.length > 1 && (
-                            <div className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth px-2 py-1 md:grid md:grid-cols-4 md:px-0">
+                            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
                                 {displayImages.map((img, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => setSelectedImage(idx)}
-                                        className={`relative w-20 h-20 md:w-full md:aspect-square shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-500 ${selectedImage === idx
-                                            ? 'border-[#ffd900] shadow-glow scale-[1.05]'
-                                            : 'border-white/5 opacity-50 hover:opacity-100'
+                                        className={`relative w-24 h-24 shrink-0 rounded-2xl overflow-hidden border-2 transition-all duration-500 ${selectedImage === idx
+                                            ? 'border-[#00E5FF] bg-[#00E5FF]/5 shadow-[0_0_20px_rgba(0,229,255,0.2)]'
+                                            : 'border-white/5 bg-white/5 opacity-50 hover:opacity-100'
                                             }`}
                                     >
-                                        <Image
-                                            src={img}
-                                            fill
-                                            className="object-contain p-1"
-                                            alt={`Vista ${idx + 1}`}
-                                        />
+                                        <Image src={img} fill className="object-contain p-2" alt="Thumb" />
                                     </button>
                                 ))}
                             </div>
                         )}
-
-                        {/* Trust Badges */}
-                        <div className="grid grid-cols-3 gap-3">
-                            {[
-                                { icon: ShieldCheck, label: 'Autenticidad', desc: 'Verificada Éter' },
-                                { icon: Package, label: 'Envío MDQ', desc: 'A todo el país' },
-                                { icon: Truck, label: '48-72hs', desc: 'Despacho ágil' },
-                            ].map((badge, idx) => (
-                                <div
-                                    key={idx}
-                                    className="bg-white/[0.03] rounded-xl p-3 text-center border border-white/[0.08]"
-                                >
-                                    <badge.icon className="mx-auto mb-1.5 text-[#ffd900]" size={18} />
-                                    <p className="text-[9px] font-bold text-white uppercase tracking-wider">
-                                        {badge.label}
-                                    </p>
-                                    <p className="text-[8px] text-gray-500 mt-0.5">{badge.desc}</p>
-                                </div>
-                            ))}
-                        </div>
                     </div>
 
-                    {/* RIGHT: Product Info */}
-                    <div className="p-6 lg:p-10 flex flex-col bg-white/[0.02] border-l border-white/5 relative">
-                        {/* Product Header / Identity */}
-                        <div className="mb-10 mt-8 lg:mt-0">
-                            <div className="flex items-center gap-3 mb-4">
-                                <span className="bg-[#ffd900] text-black text-[9px] font-black uppercase px-2 py-1 rounded-sm transform -skew-x-12">
-                                    {product.category || 'Limited Edition'}
-                                </span>
-                                <span className="w-1 h-1 rounded-full bg-white/20" />
-                                <span className="text-[9px] text-gray-500 font-black uppercase tracking-[0.2em]">
-                                    Archivo_2026
-                                </span>
-                            </div>
-
-                            <h2 className="font-heading text-3xl md:text-5xl font-black text-white leading-none tracking-tighter uppercase mb-6 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-white/60 transition-all">
+                    {/* RIGHT: Specs & Intelligence */}
+                    <div className="p-8 lg:p-16 flex flex-col bg-white/[0.01] border-l border-white/5 relative h-full">
+                        <div className="mb-8">
+                            <span className="text-[10px] font-black text-[#00E5FF] uppercase tracking-[0.5em] mb-4 block">Detalles del Archivo</span>
+                            <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none mb-6">
                                 {product.name}
                             </h2>
-
-                            {/* Status Bar: High Density */}
-                            <div className="flex flex-wrap gap-3">
-                                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border ${totalStock > 0 ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-rose-500/10 border-rose-500/20'}`}>
-                                    <div className={`w-1.5 h-1.5 rounded-full ${totalStock > 0 ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-rose-500 animate-pulse'}`} />
-                                    <span className={`text-[8px] font-black uppercase tracking-widest ${totalStock > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                                        {totalStock > 0 ? 'Sinc_Stock: OK' : 'Stock_Agotado'}
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-xl">
-                                    <ShieldCheck size={12} className="text-[#ffd900]" />
-                                    <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">
-                                        Auth_Origen: VERIFICADO
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center gap-2 px-3 py-1.5 bg-[#ffd900]/5 border border-[#ffd900]/10 rounded-xl">
-                                    <span className="text-[8px] font-mono text-[#ffd900]/60 uppercase">
-                                        Ref: #{product.id.split('-')[0].toUpperCase()}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Price & Summary */}
-                        <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/5">
-                            <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Inversión</span>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-3xl md:text-5xl font-black text-[#ffd900] tracking-tighter">
+                            <div className="flex items-center gap-6">
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">Precio Miembro</span>
+                                    <span className="text-4xl font-black text-[#00E5FF] tracking-tighter">
                                         ${product.base_price.toLocaleString('es-AR')}
                                     </span>
-                                    <span className="text-sm text-gray-600 font-medium line-through decoration-rose-500/50">
-                                        ${Math.round(product.base_price * 1.3).toLocaleString('es-AR')}
-                                    </span>
+                                </div>
+                                <div className="h-10 w-px bg-white/10" />
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">Estado</span>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />
+                                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Sincronizado</span>
+                                    </div>
                                 </div>
                             </div>
-                            {totalStock > 0 && totalStock < 10 && (
-                                <div className="flex flex-col items-end">
-                                    <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest animate-pulse">Últimas</span>
-                                    <span className="text-2xl font-black text-rose-500 tracking-tighter">{totalStock}</span>
-                                </div>
-                            )}
                         </div>
 
+                        {/* Description */}
+                        <p className="text-white/50 text-base leading-relaxed mb-10 font-light border-l-2 border-[#00E5FF]/20 pl-6">
+                            {product.description || 'Este producto forma parte de la selección curada de Éter Store. Diseñado para ofrecer una estética disruptiva y un rendimiento superior en entornos urbanos.'}
+                        </p>
+
                         {/* Size Selection Grid */}
-                        <div className="mb-8">
+                        <div className="mb-10">
                             <div className="flex justify-between items-center mb-4">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Escala de Talles</span>
-                                {selectedSize && (
-                                    <motion.span
-                                        initial={{ opacity: 0, x: 5 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="text-[10px] font-black text-[#ffd900] uppercase tracking-widest"
-                                    >
-                                        Sel: {selectedSize}
-                                    </motion.span>
-                                )}
+                                <span className="text-[10px] font-black uppercase tracking-widest text-[#00E5FF]/60">Escala de Talles</span>
+                                <span className="text-[9px] text-white/30 font-black uppercase">Stock Verificado</span>
                             </div>
-                            <div className="grid grid-cols-5 gap-2">
+                            <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
                                 {availableSizes.map((size) => (
                                     <button
                                         key={size}
                                         onClick={() => setSelectedSize(size)}
-                                        className={`h-12 flex items-center justify-center rounded-xl text-xs font-black transition-all duration-300 border
-                                            ${selectedSize === size
-                                                ? 'bg-[#ffd900] border-[#ffd900] text-black shadow-glow scale-[1.05]'
-                                                : 'bg-white/5 border-white/10 text-gray-300 hover:border-[#ffd900]/30 hover:bg-white/10'}`}
+                                        className={`h-14 flex items-center justify-center rounded-2xl text-xs font-black transition-all duration-500 border ${selectedSize === size
+                                            ? 'bg-[#00E5FF] border-[#00E5FF] text-black shadow-[0_0_30px_rgba(0,229,255,0.3)]'
+                                            : 'bg-white/5 border-white/10 text-white/50 hover:border-[#00E5FF]/40 hover:text-white'}`}
                                     >
                                         {size}
                                     </button>
@@ -354,113 +247,65 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
                             </div>
                         </div>
 
-                        {/* Actions & Quantity */}
-                        <div className="mt-auto space-y-4 pt-8 border-t border-white/5">
+                        {/* Actions */}
+                        <div className="mt-auto pt-8 border-t border-white/5 space-y-4">
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center bg-white/5 rounded-2xl p-1 border border-white/10">
                                     <button
                                         onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                                        className="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-[#ffd900] transition-colors"
+                                        className="w-12 h-14 flex items-center justify-center text-white/40 hover:text-[#00E5FF] transition-colors"
                                     >
                                         <Minus size={16} />
                                     </button>
-                                    <span className="w-10 text-center font-black text-lg">{quantity}</span>
+                                    <span className="w-12 text-center font-black text-lg">{quantity}</span>
                                     <button
                                         onClick={() => setQuantity(q => q + 1)}
-                                        className="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-[#ffd900] transition-colors"
+                                        className="w-12 h-14 flex items-center justify-center text-white/40 hover:text-[#00E5FF] transition-colors"
                                     >
                                         <Plus size={16} />
                                     </button>
                                 </div>
-
-                                <button className="flex-1 h-14 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 hover:border-rose-500/30 transition-all text-gray-500 hover:text-rose-500">
-                                    <Heart size={20} />
-                                    <span className="ml-3 text-[10px] font-black uppercase tracking-widest hidden md:inline">Favoritos</span>
+                                <button className="flex-1 h-16 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 hover:border-white/30 transition-all text-white/40 hover:text-white group">
+                                    <Heart size={20} className="group-hover:fill-white" />
+                                    <span className="ml-3 text-[10px] font-black uppercase tracking-widest">Añadir a Deseos</span>
                                 </button>
                             </div>
 
-                            <div className="flex flex-col sm:flex-row gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <button
                                     onClick={() => handleAddToCart()}
                                     disabled={isAdding || availableSizes.length === 0}
-                                    className="flex-[3] h-14 sm:h-16 bg-[#ffd900] hover:bg-[#ffe033] disabled:opacity-30 text-black font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-[#ffd900]/10"
+                                    className="h-16 bg-[#00E5FF] hover:bg-white text-black font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl flex items-center justify-center gap-3 transition-all duration-500 shadow-2xl shadow-[#00E5FF]/20 active:scale-[0.98]"
                                 >
                                     {isAdding ? (
-                                        <motion.div
-                                            animate={{ rotate: 360 }}
-                                            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                                            className="w-5 h-5 border-3 border-black border-t-transparent rounded-full"
-                                        />
+                                        <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
                                     ) : (
                                         <>
                                             <ShoppingCart size={18} />
-                                            AGREGAR AL ARSENAL
+                                            Agregar al Arsenal
                                         </>
                                     )}
                                 </button>
                                 <button
-                                    onClick={handleBuyNow}
+                                    onClick={() => handleAddToCart(true)}
                                     disabled={availableSizes.length === 0}
-                                    className="hidden sm:flex flex-[2] h-16 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl transition-all items-center justify-center"
+                                    className="h-16 bg-white text-black font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl flex items-center justify-center gap-3 hover:bg-[#00E5FF] transition-all duration-500"
                                 >
-                                    COMPRA FLASH
+                                    Compra Express
+                                    <ArrowUpRight size={18} />
                                 </button>
                             </div>
-                            <Link
-                                href={`/catalog/${product.id}`}
-                                className="hidden sm:block w-full py-8 text-[9px] font-black uppercase tracking-[0.5em] text-gray-700 hover:text-[#ffd900] transition-colors text-center"
-                            >
-                                / ver_archivo_completo
-                            </Link>
                         </div>
                     </div>
                 </div>
 
-                {/* Mobile Sticky Footer */}
-                <div className="lg:hidden absolute bottom-0 left-0 right-0 p-6 bg-black/90 backdrop-blur-2xl border-t border-white/10 z-[70] flex flex-col gap-4">
-                    <div className="flex items-center justify-between px-2">
-                        <div className="flex flex-col">
-                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Precio Final</span>
-                            <span className="text-2xl font-black text-[#ffd900] tracking-tighter">
-                                ${product.base_price.toLocaleString('es-AR')}
-                            </span>
-                        </div>
-                        {selectedSize && (
-                            <div className="text-right">
-                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Talle Seleccionado</span>
-                                <p className="text-sm font-black text-white">{selectedSize}</p>
-                            </div>
-                        )}
-                    </div>
-                    <div className="flex gap-3">
-                        <button
-                            onClick={() => handleAddToCart()}
-                            disabled={isAdding || availableSizes.length === 0}
-                            className="flex-[3] h-16 bg-white/5 text-white border border-white/10 font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl flex items-center justify-center gap-3 active:scale-[0.95] transition-all"
-                        >
-                            {isAdding ? (
-                                <motion.div
-                                    animate={{ rotate: 360 }}
-                                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                                />
-                            ) : (
-                                <>
-                                    <ShoppingCart size={18} />
-                                    CARRITO
-                                </>
-                            )}
-                        </button>
-                        <button
-                            onClick={handleBuyNow}
-                            disabled={availableSizes.length === 0}
-                            className="flex-[4] h-16 bg-[#ffd900] text-black font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl flex items-center justify-center gap-3 active:scale-[0.95] transition-all shadow-2xl shadow-[#ffd900]/20"
-                        >
-                            COMPRA FLASH
-                        </button>
-                    </div>
-                </div>
-
+                {/* Mobile Close Button */}
+                <button
+                    onClick={onClose}
+                    className="sm:hidden absolute top-6 right-6 w-12 h-12 rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white z-[80]"
+                >
+                    <X size={20} />
+                </button>
             </motion.div>
         </motion.div>
     );

@@ -124,8 +124,8 @@ eter-store/
 
 ```css
 /* Primary Gold */
---color-primary: #C88A04;
---color-primary-light: #ECA413;
+--color-primary: #00E5FF;
+--color-primary-light: #00B8D9;
 --color-primary-dark: #A67203;
 
 /* Dark Backgrounds */

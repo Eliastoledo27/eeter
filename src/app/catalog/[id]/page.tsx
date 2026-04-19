@@ -7,13 +7,37 @@ import { ProductGallery } from '@/components/product/ProductGallery'
 import { ProductInfo } from '@/components/product/ProductInfo'
 import { FloatingCartButton } from '@/components/cart/FloatingCartButton'
 import { ArchitecturalHeader } from '@/components/product/ArchitecturalHeader'
+import { FloatingShapes } from '@/components/product/FloatingShapes'
+
+import { Metadata } from 'next'
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+    const products = await getProducts()
+    const product = products.find(p => p.id === params.id)
+    
+    if (!product) {
+        return {
+            title: 'Producto no encontrado | ÉTER Store'
+        }
+    }
+
+    return {
+        title: product.name,
+        description: `Adquiere ${product.name} en ÉTER Store. Catálogo premium y logística de primer nivel.`,
+        openGraph: {
+            title: `${product.name} | ÉTER Store`,
+            description: `Descubre ${product.name}. Calzado luxury en stock. Envío express.`,
+            images: product.images.length > 0 ? [{ url: product.images[0] }] : [],
+            type: 'website'
+        }
+    }
+}
 
 export default async function ProductDetailPage({
     params,
 }: {
     params: { id: string }
 }) {
-    // Fetch product desde Supabase
     const allProducts = await getProducts()
     const product = allProducts.find(p => p.id === params.id)
 
@@ -21,25 +45,23 @@ export default async function ProductDetailPage({
         notFound()
     }
 
-    // Related products (misma categoría o aleatorios)
     const relatedProducts = allProducts
         .filter(p => p.id !== product.id && (p.category === product.category || Math.random() > 0.5))
         .slice(0, 8)
 
     return (
         <div className="min-h-screen bg-[#050505] text-white overflow-x-hidden">
-            {/* Background Ambience & Grid */}
+            {/* Floating Geometric Shapes with Parallax */}
+            <FloatingShapes />
+
+            {/* Background texture */}
             <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-[#CA8A04]/10 rounded-full blur-[150px] animate-pulse-slow" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#CA8A04]/5 rounded-full blur-[120px]" />
-
-                {/* Visual Grid */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(200,138,4,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,138,4,0.03)_1px,transparent_1px)] bg-[size:100px_100px] opacity-40" />
-
-                {/* Noise Texture */}
-                <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay" style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-                }} />
+                <div className="absolute inset-0 opacity-[0.015]"
+                    style={{
+                        backgroundImage: 'radial-gradient(circle, #00E5FF 1px, transparent 1px)',
+                        backgroundSize: '32px 32px'
+                    }}
+                />
             </div>
 
             <ArchitecturalHeader
@@ -48,62 +70,81 @@ export default async function ProductDetailPage({
             />
 
             {/* Main Content */}
-            <section className="py-8 lg:py-20 px-4 md:px-6 relative z-10">
+            <section className="py-4 lg:py-6 px-4 md:px-6 relative z-10">
                 <div className="container mx-auto max-w-7xl">
-                    {/* Unified Mobile Globe */}
-                    <div className="bg-white/[0.02] backdrop-blur-3xl rounded-[2.5rem] border border-white/5 lg:bg-transparent lg:backdrop-blur-none lg:rounded-none lg:border-0 overflow-hidden lg:overflow-visible">
-                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-0 lg:gap-16 xl:gap-24">
-                            {/* LEFT: Product Gallery (60% / 3 cols) */}
-                            <div className="lg:col-span-3">
-                                <ProductGallery
-                                    images={product.images.length > 0 ? product.images : ['/placeholder-shoe.png']}
-                                    productName={product.name}
-                                />
-                            </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-20">
+                        {/* LEFT: Product Gallery */}
+                        <div className="lg:col-span-7">
+                            <ProductGallery
+                                images={product.images.length > 0 ? product.images : ['/placeholder-shoe.png']}
+                                productName={product.name}
+                            />
+                        </div>
 
-                            {/* RIGHT: Product Info (40% / 2 cols) */}
-                            <div className="lg:col-span-2">
-                                <ProductInfo product={product} />
-                            </div>
+                        {/* RIGHT: Product Info */}
+                        <div className="lg:col-span-5">
+                            <ProductInfo product={product} />
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Related Products */}
+            {/* Related Products — Flyer Card Style */}
             {relatedProducts.length > 0 && (
-                <section className="py-32 px-6 border-t border-white/5 relative z-10">
-                    <div className="container mx-auto max-w-7xl">
-                        <div className="mb-16">
-                            <span className="text-[#CA8A04] font-mono text-sm tracking-[0.4em] uppercase mb-4 block">Sugerencias Éter</span>
-                            <h2 className="text-5xl md:text-6xl font-black tracking-tighter uppercase whitespace-pre-line">
-                                TAMBIÉN TE <br /> <span className="text-[#CA8A04]">PUEDE INTERESAR</span>
+                <section className="py-24 px-6 relative z-10">
+                    {/* Section divider with accent */}
+                    <div className="container mx-auto max-w-7xl mb-16">
+                        <div className="flex items-center gap-6">
+                            <div className="w-16 h-1 bg-[#00E5FF] rounded-full shadow-[0_0_15px_#00E5FF80]" />
+                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter uppercase leading-none">
+                                TAMBIÉN TE <span className="text-[#00E5FF] drop-shadow-[0_0_10px_#00E5FF40]">INTERESA</span>
                             </h2>
                         </div>
+                        <div className="flex items-center justify-between mt-4">
+                            <p className="text-white/40 text-sm font-light ml-[88px]">
+                                Selección curada para tu colección.
+                            </p>
+                            <Link href="/catalog" className="text-xs font-black uppercase tracking-widest text-[#00E5FF]/70 hover:text-[#00E5FF] transition-colors hover:drop-shadow-[0_0_8px_#00E5FF80]">
+                                Ver Todo →
+                            </Link>
+                        </div>
+                    </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+                    <div className="container mx-auto max-w-7xl">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
                             {relatedProducts.map((item) => (
                                 <Link
                                     key={item.id}
                                     href={`/catalog/${item.id}`}
-                                    className="group relative bg-white/5 rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 border border-white/5 hover:border-[#CA8A04]/30 transition-all duration-700 overflow-hidden"
+                                    className="group relative flex flex-col overflow-hidden rounded-xl bg-[#0A0A0A] border border-white/5 hover:border-[#00E5FF]/40 transition-all duration-500 hover:shadow-[0_0_20px_#00E5FF20]"
                                 >
-                                    <div className="aspect-square relative mb-4 md:mb-8 rounded-xl md:rounded-2xl overflow-hidden bg-black/40">
+                                    {/* Diagonal accent slash */}
+                                    <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden z-20 pointer-events-none">
+                                        <div className="absolute -top-8 -right-8 w-16 h-16 bg-[#00E5FF] rotate-45 group-hover:bg-[#00B3FF] transition-colors shadow-[0_0_10px_#00E5FF80]" />
+                                    </div>
+
+                                    <div className="aspect-square relative bg-gradient-to-br from-[#111] to-[#0A0A0A] overflow-hidden">
+                                        {/* Subtle triangle behind product */}
+                                        <div className="absolute bottom-0 right-0 w-[60%] h-[60%] opacity-10 pointer-events-none">
+                                            <svg viewBox="0 0 100 100" fill="#00E5FF" className="w-full h-full drop-shadow-[0_0_10px_#00E5FF40]">
+                                                <polygon points="100,100 100,0 0,100" />
+                                            </svg>
+                                        </div>
                                         <Image
                                             src={item.images[0] || '/placeholder-shoe.png'}
                                             fill
-                                            className="object-contain p-2 md:p-4 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-1000 ease-out"
+                                            className="object-contain p-4 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-700 ease-out drop-shadow-[0_10px_30px_rgba(0,0,0,0.6)]"
                                             alt={item.name}
                                         />
                                     </div>
 
-                                    <div className="space-y-1.5 md:space-y-3">
-                                        <p className="text-[8px] md:text-[10px] text-[#CA8A04] font-bold uppercase tracking-[0.3em]">{item.category || 'Sneakers'}</p>
-                                        <h3 className="text-sm md:text-xl font-bold text-white group-hover:text-[#CA8A04] transition-colors line-clamp-1 uppercase">
+                                    <div className="p-4 space-y-2">
+                                        <p className="text-[9px] text-[#00E5FF]/60 font-black uppercase tracking-widest">{item.category || 'Sneakers'}</p>
+                                        <h3 className="text-sm font-black text-white group-hover:text-[#00E5FF] transition-colors line-clamp-1 uppercase tracking-wider group-hover:drop-shadow-[0_0_5px_#00E5FF60]">
                                             {item.name}
                                         </h3>
-                                        <p className="text-lg md:text-2xl font-light text-white tracking-tighter">
-                                            ${item.base_price.toLocaleString('es-AR')}
+                                        <p className="text-lg font-black text-white tracking-tight">
+                                            $ {item.base_price.toLocaleString('es-AR')}
                                         </p>
                                     </div>
                                 </Link>
@@ -113,23 +154,30 @@ export default async function ProductDetailPage({
                 </section>
             )}
 
-            {/* Trust Bar */}
-            <section className="py-20 px-6 bg-black/40 backdrop-blur-md border-y border-white/5 relative z-10 overflow-hidden">
+            {/* Trust Bar — Bold & Colorful */}
+            <section className="py-20 px-6 relative z-10 border-t border-white/5 bg-gradient-to-b from-transparent to-[#00E5FF]/[0.02]">
                 <div className="container mx-auto max-w-7xl">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {[
-                            { icon: Shield, label: 'PAGO SEGURO', value: 'PROTOCOLOS DE ENCRIPTACIÓN' },
-                            { icon: Package, label: 'ENVÍO RÁPIDO', value: 'LOGÍSTICA PREVENTIVA' },
-                            { icon: Truck, label: 'GARANTÍA ÉTER', value: 'CALIDAD ASEGURADA' }
+                            { icon: Shield, label: 'Pago Seguro', desc: 'Encriptación de extremo a extremo en todas las transacciones.', color: '#00E5FF' },
+                            { icon: Package, label: 'Envío Express', desc: 'Despacho prioritario en 24hs hábiles a todo el país.', color: '#00B3FF' },
+                            { icon: Truck, label: '100% Original', desc: 'Garantía de autenticidad en todos nuestros productos.', color: '#0088FF' }
                         ].map((item, idx) => (
-                            <div key={idx} className="group flex flex-col items-center">
-                                <div className="h-20 w-20 flex items-center justify-center bg-[#CA8A04]/10 rounded-[1.5rem] border border-[#CA8A04]/20 mb-8 group-hover:bg-[#CA8A04] group-hover:text-black transition-all duration-500">
-                                    <item.icon size={32} />
+                            <div key={idx} className="flex items-start gap-5 p-6 bg-white/[0.02] rounded-xl border border-white/5 hover:border-white/10 transition-all group">
+                                <div 
+                                    className="w-14 h-14 flex items-center justify-center rounded-xl shrink-0 transition-all group-hover:scale-110"
+                                    style={{ backgroundColor: `${item.color}15`, borderColor: `${item.color}30`, borderWidth: 1 }}
+                                >
+                                    <item.icon size={22} style={{ color: item.color }} />
                                 </div>
-                                <h4 className="text-xl font-black tracking-tighter text-white mb-2 uppercase">
-                                    {item.label}
-                                </h4>
-                                <p className="text-gray-500 text-xs font-mono tracking-widest">{item.value}</p>
+                                <div>
+                                    <h4 className="text-sm font-black tracking-wider text-white mb-1 uppercase">
+                                        {item.label}
+                                    </h4>
+                                    <p className="text-white/40 text-xs leading-relaxed font-light">
+                                        {item.desc}
+                                    </p>
+                                </div>
                             </div>
                         ))}
                     </div>

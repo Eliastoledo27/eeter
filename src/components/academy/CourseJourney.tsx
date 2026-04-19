@@ -48,7 +48,7 @@ export function CourseJourney({ courses }: CourseJourneyProps) {
                     <p className="text-gray-300 max-w-xl text-sm">{course.description}</p>
                   </div>
                   <div className="text-right">
-                    <div className="text-3xl font-bold text-accent-gold">{course.progress}%</div>
+                    <div className="text-3xl font-bold text-accent-cyan">{course.progress}%</div>
                     <span className="text-xs text-gray-400 uppercase tracking-wider">Completado</span>
                   </div>
                 </div>

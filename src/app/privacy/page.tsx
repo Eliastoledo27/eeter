@@ -8,12 +8,12 @@ import { ShieldCheck, Lock, Eye, Server, RefreshCw, Smartphone } from 'lucide-re
 
 export default function PrivacyPolicyPage() {
     return (
-        <main className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#C88A04] selection:text-black overflow-x-hidden">
+        <main className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#00E5FF] selection:text-black overflow-x-hidden">
             <Navbar />
 
             {/* Header Section */}
             <section className="relative pt-40 pb-20 px-6 lg:px-12 flex flex-col items-center justify-center">
-                <div className="absolute inset-0 bg-radial-gradient from-[#C88A04]/5 to-transparent blur-[120px] pointer-events-none" />
+                <div className="absolute inset-0 bg-radial-gradient from-[#00E5FF]/5 to-transparent blur-[120px] pointer-events-none" />
 
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -21,12 +21,12 @@ export default function PrivacyPolicyPage() {
                     transition={{ duration: 0.8 }}
                     className="text-center max-w-4xl relative z-10"
                 >
-                    <span className="inline-block px-4 py-1 bg-[#C88A04]/20 border border-[#C88A04]/30 text-[#C88A04] text-[10px] font-black tracking-[0.3em] uppercase rounded-full mb-8">
+                    <span className="inline-block px-4 py-1 bg-[#00E5FF]/20 border border-[#00E5FF]/30 text-[#00E5FF] text-[10px] font-black tracking-[0.3em] uppercase rounded-full mb-8">
                         Legal Protocol v2.1
                     </span>
 
                     <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-none uppercase italic">
-                        Política de <span className="text-[#C88A04]">Privacidad</span>
+                        Política de <span className="text-[#00E5FF]">Privacidad</span>
                     </h1>
 
                     <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 font-light">
@@ -42,18 +42,18 @@ export default function PrivacyPolicyPage() {
 
                     {/* Grid of Principles */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-                        <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-[#C88A04]/30 transition-all group">
-                            <Lock className="text-[#C88A04] mb-6 group-hover:scale-110 transition-transform" size={32} />
+                        <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-[#00E5FF]/30 transition-all group">
+                            <Lock className="text-[#00E5FF] mb-6 group-hover:scale-110 transition-transform" size={32} />
                             <h3 className="font-bold text-lg mb-2 tracking-tight">Encriptación</h3>
                             <p className="text-gray-500 text-sm">Tus datos bancarios y personales se procesan bajo protocolos SSL/TLS de 256 bits.</p>
                         </div>
-                        <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-[#C88A04]/30 transition-all group">
-                            <Eye className="text-[#C88A04] mb-6 group-hover:scale-110 transition-transform" size={32} />
+                        <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-[#00E5FF]/30 transition-all group">
+                            <Eye className="text-[#00E5FF] mb-6 group-hover:scale-110 transition-transform" size={32} />
                             <h3 className="font-bold text-lg mb-2 tracking-tight">Transparencia</h3>
                             <p className="text-gray-500 text-sm">Nunca vendemos tus datos a terceros. Los usamos solo para mejorar tu experiencia.</p>
                         </div>
-                        <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-[#C88A04]/30 transition-all group">
-                            <Smartphone className="text-[#C88A04] mb-6 group-hover:scale-110 transition-transform" size={32} />
+                        <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-[#00E5FF]/30 transition-all group">
+                            <Smartphone className="text-[#00E5FF] mb-6 group-hover:scale-110 transition-transform" size={32} />
                             <h3 className="font-bold text-lg mb-2 tracking-tight">Control</h3>
                             <p className="text-gray-500 text-sm">Tienes el derecho de solicitar la eliminación total de tus datos en cualquier momento.</p>
                         </div>
@@ -81,7 +81,7 @@ export default function PrivacyPolicyPage() {
                     <div className="p-12 bg-white/[0.01] border border-dashed border-white/10 rounded-[3rem] text-center">
                         <h4 className="font-black text-2xl mb-4 italic uppercase tracking-tighter">¿Dudas sobre tus datos?</h4>
                         <p className="text-gray-400 mb-8 max-w-lg mx-auto">Nuestro equipo de soporte legal está disponible para responder cualquier inquietud sobre nuestra política.</p>
-                        <a href="/support" className="inline-block px-10 py-4 bg-[#C88A04] hover:bg-[#ECA413] text-black font-black uppercase tracking-widest text-xs rounded-full transition-all transform hover:scale-105">
+                        <a href="/support" className="inline-block px-10 py-4 bg-[#00E5FF] hover:bg-[#00B8D9] text-black font-black uppercase tracking-widest text-xs rounded-full transition-all transform hover:scale-105">
                             Contactar Soporte
                         </a>
                     </div>
@@ -96,7 +96,7 @@ export default function PrivacyPolicyPage() {
 function Clause({ icon, title, content }: { icon: React.ReactNode, title: string, content: string }) {
     return (
         <div className="flex flex-col md:flex-row gap-8 items-start">
-            <div className="size-14 rounded-2xl bg-white/5 flex items-center justify-center text-[#C88A04] shrink-0 border border-white/10">
+            <div className="size-14 rounded-2xl bg-white/5 flex items-center justify-center text-[#00E5FF] shrink-0 border border-white/10">
                 {icon}
             </div>
             <div className="space-y-4">

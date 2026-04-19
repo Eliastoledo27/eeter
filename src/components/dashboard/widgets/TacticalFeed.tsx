@@ -55,7 +55,7 @@ export function TacticalFeed() {
 
                             <div className="mt-3 w-full bg-gray-800 h-1 rounded-full overflow-hidden">
                                 <div
-                                    className={`h-full ${item.critical ? 'bg-red-500 shadow-[0_0_5px_red]' : 'bg-primary shadow-[0_0_5px_#c88a04]'}`}
+                                    className={`h-full ${item.critical ? 'bg-red-500 shadow-[0_0_5px_red]' : 'bg-primary shadow-[0_0_5px_#00E5FF]'}`}
                                     style={{ width: item.stockFill }}
                                 ></div>
                             </div>

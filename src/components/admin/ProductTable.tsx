@@ -33,7 +33,7 @@ export function ProductTable({ products, onEdit, onDelete, isLoading }: ProductT
 
   const getStockColor = (stock: number) => {
     if (stock === 0) return 'bg-red-500/20 text-red-400 border-red-500/50';
-    if (stock < 10) return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50';
+    if (stock < 10) return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50';
     return 'bg-green-500/20 text-green-400 border-green-500/50';
   };
 
@@ -68,7 +68,7 @@ export function ProductTable({ products, onEdit, onDelete, isLoading }: ProductT
                     <span className="truncate max-w-[200px]">{product.name}</span>
                   </td>
                   <td className="px-4 py-3 text-gray-300">{product.category}</td>
-                  <td className="px-4 py-3 text-right font-mono text-accent-gold">
+                  <td className="px-4 py-3 text-right font-mono text-accent-cyan">
                     ${(product.basePrice || 0).toFixed(2)}
                   </td>
                   <td className="px-4 py-3 text-center">

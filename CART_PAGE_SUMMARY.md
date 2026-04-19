@@ -339,7 +339,7 @@ import { FloatingCartButton } from '@/components/cart/FloatingCartButton'
 ### **Colores:**
 - Background: `bg-black`
 - Text: `text-white`
-- Gold: `from-yellow-500 to-orange-500`
+- Gold: `from-cyan-500 to-orange-500`
 - Gray: `text-gray-400`
 - Green (descuentos): `text-green-400`
 - Red (badges): `bg-red-500`

@@ -25,7 +25,7 @@ export default function RevolutionaryLandingPage() {
             {/* Scroll Progress Bar */}
             <div className="fixed top-0 left-0 w-full h-1 bg-black/50 z-[9999]">
                 <div
-                    className="h-full bg-gradient-to-r from-yellow-500 via-orange-500 to-purple-600 transition-all duration-300"
+                    className="h-full bg-gradient-to-r from-cyan-500 via-orange-500 to-purple-600 transition-all duration-300"
                     style={{ width: `${scrollProgress}%` }}
                 />
             </div>
@@ -36,7 +36,7 @@ export default function RevolutionaryLandingPage() {
             <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
                 {/* Animated Background */}
                 <div className="absolute inset-0 z-0">
-                    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-yellow-500/20 to-orange-600/20 rounded-full blur-3xl animate-pulse"
+                    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-cyan-500/20 to-orange-600/20 rounded-full blur-3xl animate-pulse"
                         style={{ animationDuration: '4s' }}
                     />
                     <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-purple-600/20 to-blue-500/20 rounded-full blur-3xl animate-pulse"
@@ -48,10 +48,10 @@ export default function RevolutionaryLandingPage() {
                 <div className="container relative z-10 px-6 mx-auto">
                     <div className="flex flex-col items-center text-center space-y-12">
                         {/* Badge */}
-                        <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full backdrop-blur-xl bg-white/5 border border-yellow-500/20 text-sm font-bold shadow-[0_0_30px_rgba(234,179,8,0.3)]">
+                        <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full backdrop-blur-xl bg-white/5 border border-cyan-500/20 text-sm font-bold shadow-[0_0_30px_rgba(234,179,8,0.3)]">
                             <span className="relative flex h-3 w-3">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-500 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
                             </span>
                             LA PLATAFORMA #1 PARA REVENDEDORES
                         </div>
@@ -59,7 +59,7 @@ export default function RevolutionaryLandingPage() {
                         {/* Hero Title */}
                         <h1 className="font-black text-7xl md:text-9xl lg:text-[12rem] tracking-tighter leading-[0.85]">
                             <span className="block">ÉTER</span>
-                            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600">
+                            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-orange-500 to-cyan-600">
                                 STORE
                             </span>
                         </h1>
@@ -74,7 +74,7 @@ export default function RevolutionaryLandingPage() {
                         <div className="flex flex-col sm:flex-row gap-6">
                             <Link href="/register">
                                 <button className="group relative px-10 py-5 rounded-full font-bold text-lg overflow-hidden transition-all duration-300 hover:scale-105">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600 animate-gradient-x"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-orange-500 to-cyan-600 animate-gradient-x"></div>
                                     <span className="relative z-10 flex items-center gap-3 text-black">
                                         Empezar Gratis
                                         <ArrowRight className="group-hover:translate-x-2 transition-transform" size={20} />
@@ -83,7 +83,7 @@ export default function RevolutionaryLandingPage() {
                             </Link>
 
                             <Link href="/catalog">
-                                <button className="group px-10 py-5 rounded-full font-bold text-lg backdrop-blur-xl bg-white/5 border-2 border-white/20 hover:border-yellow-500/50 hover:bg-white/10 transition-all duration-300 hover:scale-105">
+                                <button className="group px-10 py-5 rounded-full font-bold text-lg backdrop-blur-xl bg-white/5 border-2 border-white/20 hover:border-cyan-500/50 hover:bg-white/10 transition-all duration-300 hover:scale-105">
                                     Ver Catálogo
                                 </button>
                             </Link>
@@ -99,7 +99,7 @@ export default function RevolutionaryLandingPage() {
                                 ))}
                             </div>
                             <div className="text-sm">
-                                <span className="font-black text-yellow-500 text-lg">+1,200</span>
+                                <span className="font-black text-cyan-500 text-lg">+1,200</span>
                                 <span className="text-gray-400"> revendedores activos</span>
                             </div>
                         </div>
@@ -113,7 +113,7 @@ export default function RevolutionaryLandingPage() {
                     <div className="text-center mb-20 space-y-6">
                         <h2 className="text-5xl md:text-7xl font-black tracking-tight">
                             <span className="text-white">POR QUÉ</span>{' '}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-orange-500 to-cyan-600">
                                 NOSOTROS
                             </span>
                         </h2>
@@ -125,22 +125,22 @@ export default function RevolutionaryLandingPage() {
                     {/* Bento Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-[200px]">
                         {/* Card 1 - CATÁLOGO PREMIUM */}
-                        <div className="md:col-span-2 md:row-span-2 group backdrop-blur-2xl bg-gradient-to-br from-yellow-500/10 to-orange-500/10 rounded-[2.5rem] p-8 border-4 border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-500 overflow-hidden hover:scale-[1.02]">
-                            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="md:col-span-2 md:row-span-2 group backdrop-blur-2xl bg-gradient-to-br from-cyan-500/10 to-orange-500/10 rounded-[2.5rem] p-8 border-4 border-cyan-500/20 hover:border-cyan-500/50 transition-all duration-500 overflow-hidden hover:scale-[1.02]">
+                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                             <div className="relative z-10 h-full flex flex-col">
                                 <div className="flex items-center gap-4 mb-6">
-                                    <div className="p-4 bg-yellow-500/20 rounded-2xl border-2 border-yellow-500/30">
-                                        <ShoppingBag className="text-yellow-400" size={32} />
+                                    <div className="p-4 bg-cyan-500/20 rounded-2xl border-2 border-cyan-500/30">
+                                        <ShoppingBag className="text-cyan-400" size={32} />
                                     </div>
                                     <div>
                                         <h3 className="text-3xl font-black">CATÁLOGO</h3>
-                                        <h3 className="text-3xl font-black text-yellow-500">PREMIUM</h3>
+                                        <h3 className="text-3xl font-black text-cyan-500">PREMIUM</h3>
                                     </div>
                                 </div>
 
                                 <p className="text-gray-300 mb-6 text-lg">
-                                    Más de <span className="text-yellow-500 font-bold">500 modelos</span> de las marcas más buscadas.
+                                    Más de <span className="text-cyan-500 font-bold">500 modelos</span> de las marcas más buscadas.
                                 </p>
 
                                 <div className="grid grid-cols-3 gap-4 mt-auto">
@@ -209,13 +209,13 @@ export default function RevolutionaryLandingPage() {
             <section className="py-32 px-6 relative bg-gradient-to-b from-black via-gray-900 to-black border-y border-white/10">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-20">
-                        <span className="text-yellow-500 font-black tracking-wider uppercase text-sm mb-4 block">
+                        <span className="text-cyan-500 font-black tracking-wider uppercase text-sm mb-4 block">
                             EL ECOSISTEMA ÉTER
                         </span>
                         <h2 className="text-5xl md:text-6xl font-black">
                             De revendedor a empresario
                             <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-orange-500">
                                 en 3 pasos
                             </span>
                         </h2>
@@ -225,10 +225,10 @@ export default function RevolutionaryLandingPage() {
                         {[
                             { step: "01", title: "ELEGÍ", desc: "Seleccioná los mejores modelos de nuestro catálogo curado.", icon: ShoppingBag, color: "from-blue-500 to-purple-500" },
                             { step: "02", title: "PUBLICÁ", desc: "Descargá las fotos HD y subilas a tus redes con un clic.", icon: Globe, color: "from-purple-500 to-pink-500" },
-                            { step: "03", title: "GANÁ", desc: "Nosotros enviamos, vos cobrás la diferencia.", icon: DollarSign, color: "from-pink-500 to-yellow-500" }
+                            { step: "03", title: "GANÁ", desc: "Nosotros enviamos, vos cobrás la diferencia.", icon: DollarSign, color: "from-pink-500 to-cyan-500" }
                         ].map((item, idx) => (
                             <div key={idx} className="group relative">
-                                <div className="absolute -top-6 -right-6 w-16 h-16 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center font-black text-2xl text-black border-4 border-black z-20 group-hover:scale-110 transition-transform">
+                                <div className="absolute -top-6 -right-6 w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-orange-500 flex items-center justify-center font-black text-2xl text-black border-4 border-black z-20 group-hover:scale-110 transition-transform">
                                     {item.step}
                                 </div>
 
@@ -237,7 +237,7 @@ export default function RevolutionaryLandingPage() {
                                         <item.icon className="w-full h-full text-white" />
                                     </div>
 
-                                    <h3 className="text-3xl font-black mb-4 group-hover:text-yellow-500 transition-colors">
+                                    <h3 className="text-3xl font-black mb-4 group-hover:text-cyan-500 transition-colors">
                                         {item.title}
                                     </h3>
 
@@ -252,7 +252,7 @@ export default function RevolutionaryLandingPage() {
             </section>
 
             {/* STATS */}
-            <section className="py-24 px-6 bg-black border-y border-yellow-500/20">
+            <section className="py-24 px-6 bg-black border-y border-cyan-500/20">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                         {[
@@ -261,10 +261,10 @@ export default function RevolutionaryLandingPage() {
                             { value: "+12K", label: "ENVÍOS REALIZADOS", icon: Award }
                         ].map((stat, idx) => (
                             <div key={idx} className="text-center group">
-                                <div className="inline-block p-4 bg-yellow-500/10 rounded-2xl mb-4 group-hover:bg-yellow-500/20 transition-colors">
-                                    <stat.icon className="text-yellow-500" size={40} />
+                                <div className="inline-block p-4 bg-cyan-500/10 rounded-2xl mb-4 group-hover:bg-cyan-500/20 transition-colors">
+                                    <stat.icon className="text-cyan-500" size={40} />
                                 </div>
-                                <div className="text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500 mb-2">
+                                <div className="text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-orange-500 mb-2">
                                     {stat.value}
                                 </div>
                                 <div className="text-sm text-gray-400 font-bold tracking-wider uppercase">
@@ -279,10 +279,10 @@ export default function RevolutionaryLandingPage() {
             {/* TESTIMONIAL */}
             <section className="py-32 px-6">
                 <div className="max-w-4xl mx-auto">
-                    <div className="backdrop-blur-2xl bg-gradient-to-br from-white/10 to-white/5 rounded-[3rem] p-12 border-4 border-white/10 hover:border-yellow-500/30 transition-all duration-500">
+                    <div className="backdrop-blur-2xl bg-gradient-to-br from-white/10 to-white/5 rounded-[3rem] p-12 border-4 border-white/10 hover:border-cyan-500/30 transition-all duration-500">
                         <div className="flex gap-1 mb-6 justify-center">
                             {[1, 2, 3, 4, 5].map((star) => (
-                                <Star key={star} className="fill-yellow-500 text-yellow-500" size={24} />
+                                <Star key={star} className="fill-cyan-500 text-cyan-500" size={24} />
                             ))}
                         </div>
 
@@ -292,14 +292,14 @@ export default function RevolutionaryLandingPage() {
                         </blockquote>
 
                         <div className="flex items-center justify-center gap-4">
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 p-1">
+                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-orange-500 p-1">
                                 <div className="w-full h-full rounded-full overflow-hidden">
                                     <Image src="https://randomuser.me/api/portraits/men/32.jpg" width={64} height={64} alt="Martín" />
                                 </div>
                             </div>
                             <div>
                                 <p className="font-black text-lg">Martín González</p>
-                                <p className="text-yellow-500 text-sm">Reseller Top Tier</p>
+                                <p className="text-cyan-500 text-sm">Reseller Top Tier</p>
                             </div>
                         </div>
                     </div>
@@ -311,21 +311,21 @@ export default function RevolutionaryLandingPage() {
                 <div className="absolute inset-0 bg-gradient-radial from-purple-900/50 via-black to-black" />
 
                 <div className="absolute inset-0">
-                    <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s' }} />
+                    <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s' }} />
                     <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '7s', animationDelay: '1s' }} />
                 </div>
 
                 <div className="relative z-10 text-center max-w-5xl mx-auto space-y-12">
                     <h2 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none">
                         <span className="block">EMPIEZA</span>
-                        <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600">
+                        <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-orange-500 to-cyan-600">
                             AHORA
                         </span>
                     </h2>
 
                     <Link href="/register">
                         <button className="group px-16 py-8 rounded-full font-black text-2xl overflow-hidden transition-all duration-300 hover:scale-110 relative">
-                            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600 animate-gradient-x"></div>
+                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-orange-500 to-cyan-600 animate-gradient-x"></div>
                             <span className="relative z-10 flex items-center gap-4 text-black">
                                 CREAR CUENTA GRATIS
                                 <ArrowRight className="group-hover:translate-x-3 transition-transform" size={28} />
@@ -350,7 +350,7 @@ export default function RevolutionaryLandingPage() {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                         <div>
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-14 h-14 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center text-white font-black text-3xl">
+                                <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-orange-500 rounded-2xl flex items-center justify-center text-white font-black text-3xl">
                                     É
                                 </div>
                                 <span className="font-black text-2xl">ÉTER STORE</span>
@@ -370,7 +370,7 @@ export default function RevolutionaryLandingPage() {
                                 <ul className="space-y-2 text-sm text-gray-600">
                                     {col.links.map((link, i) => (
                                         <li key={i}>
-                                            <Link href={link.href} className="hover:text-yellow-600 transition-colors">
+                                            <Link href={link.href} className="hover:text-cyan-600 transition-colors">
                                                 {link.name}
                                             </Link>
                                         </li>

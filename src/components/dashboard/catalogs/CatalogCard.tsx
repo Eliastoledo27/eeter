@@ -28,7 +28,7 @@ export const CatalogCard = ({ catalog, onDelete }: { catalog: Catalog, onDelete:
 
   const isImage = catalog.file_url.match(/\.(jpeg|jpg|gif|png|webp)$/i) != null;
   const fileTypeLabel = isImage ? 'Imagen' : 'PDF';
-  const accentClass = isImage ? 'text-teal-200 bg-teal-400/10 border-teal-400/20' : 'text-amber-200 bg-amber-400/10 border-amber-400/20';
+  const accentClass = isImage ? 'text-teal-200 bg-teal-400/10 border-teal-400/20' : 'text-amber-200 bg-cyan-400/10 border-cyan-400/20';
   const formattedDate = new Date(catalog.created_at).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
 
   return (

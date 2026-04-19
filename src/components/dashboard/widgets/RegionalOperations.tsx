@@ -27,9 +27,9 @@ export function RegionalOperations() {
 
                 <div className="absolute bottom-[40%] left-[60%] flex flex-col items-center gap-1 group cursor-pointer">
                     <div className="w-1.5 h-16 bg-white/10 rounded-t-sm relative overflow-hidden">
-                        <div className="absolute bottom-0 w-full h-[70%] bg-gradient-to-t from-primary/10 to-primary shadow-[0_0_10px_#c88a04]"></div>
+                        <div className="absolute bottom-0 w-full h-[70%] bg-gradient-to-t from-primary/10 to-primary shadow-[0_0_10px_#00E5FF]"></div>
                     </div>
-                    <div className="w-1 h-1 bg-primary rounded-full animate-pulse shadow-[0_0_5px_#c88a04]"></div>
+                    <div className="w-1 h-1 bg-primary rounded-full animate-pulse shadow-[0_0_5px_#00E5FF]"></div>
                 </div>
 
                 <div className="absolute top-[30%] left-[45%] flex flex-col items-center gap-1 group cursor-pointer">

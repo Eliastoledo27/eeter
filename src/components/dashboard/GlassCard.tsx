@@ -20,7 +20,7 @@ interface BadgeProps {
 export const Badge = ({ children, variant = "default", className }: BadgeProps) => {
   const styles = {
     default: "bg-slate-800 text-slate-300",
-    gold: "bg-amber-500/20 text-amber-500 border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]",
+    gold: "bg-cyan-500/20 text-cyan-500 border border-cyan-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]",
     blue: "bg-sky-500/20 text-sky-500 border border-sky-500/30 shadow-[0_0_10px_rgba(14,165,233,0.2)]",
     orange: "bg-orange-500/20 text-orange-500 border border-orange-500/30 shadow-[0_0_10px_rgba(249,115,22,0.2)]",
   };

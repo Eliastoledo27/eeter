@@ -215,7 +215,7 @@ export const MessagesInbox = ({ isAdmin, refreshToken, currentUserId }: Messages
             'from-purple-500 to-purple-600',
             'from-pink-500 to-pink-600',
             'from-emerald-500 to-emerald-600',
-            'from-amber-500 to-amber-600',
+            'from-cyan-500 to-cyan-600',
             'from-rose-500 to-rose-600',
             'from-indigo-500 to-indigo-600',
             'from-cyan-500 to-cyan-600',

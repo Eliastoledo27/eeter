@@ -70,7 +70,7 @@ export function NotificationsPopover({ className }: { className?: string }) {
   const getIcon = (type: string) => {
     switch (type) {
       case 'success': return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-      case 'warning': return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+      case 'warning': return <AlertTriangle className="h-4 w-4 text-cyan-500" />;
       case 'error': return <XCircle className="h-4 w-4 text-red-500" />;
       default: return <Info className="h-4 w-4 text-blue-500" />;
     }
@@ -91,7 +91,7 @@ export function NotificationsPopover({ className }: { className?: string }) {
         >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-accent-gold ring-2 ring-[#020617]" />
+            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-accent-cyan ring-2 ring-[#020617]" />
           )}
         </Button>
       </DropdownMenuTrigger>

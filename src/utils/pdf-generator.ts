@@ -35,7 +35,7 @@ export const generateOrderPDF = (order: OrderData) => {
     });
 
     // Colors
-    const primaryColor = [202, 138, 4]; // #CA8A04 (Gold/Amber)
+    const primaryColor = [202, 138, 4]; // #00B8D9 (Gold/Amber)
     const textColor = [30, 30, 30];
     const secondaryColor = [100, 100, 100];
 

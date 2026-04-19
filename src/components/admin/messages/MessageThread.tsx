@@ -153,7 +153,7 @@ export const MessageThread = ({ threadId, initialMessages, user, onBack, onRefre
             'from-purple-500 to-purple-600',
             'from-pink-500 to-pink-600',
             'from-emerald-500 to-emerald-600',
-            'from-amber-500 to-amber-600',
+            'from-cyan-500 to-cyan-600',
         ];
         const index = name.charCodeAt(0) % colors.length;
         return colors[index];
@@ -316,7 +316,7 @@ export const MessageThread = ({ threadId, initialMessages, user, onBack, onRefre
                         <motion.button
                             whileHover={{ scale: 1.1, rotate: 5 }}
                             whileTap={{ scale: 0.9 }}
-                            className="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-all"
+                            className="p-2 text-slate-400 hover:text-cyan-500 hover:bg-amber-50 rounded-lg transition-all"
                             title="Emoji"
                         >
                             <Smile size={18} strokeWidth={2} />

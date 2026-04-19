@@ -21,7 +21,7 @@ export default function InventoryPage() {
                         className={cn(
                             "flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
                             activeTab === 'products'
-                                ? "bg-[#C88A04] text-black shadow-lg shadow-[#C88A04]/20"
+                                ? "bg-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/20"
                                 : "text-gray-500 hover:text-white"
                         )}
                     >
@@ -33,7 +33,7 @@ export default function InventoryPage() {
                         className={cn(
                             "flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
                             activeTab === 'coupons'
-                                ? "bg-[#C88A04] text-black shadow-lg shadow-[#C88A04]/20"
+                                ? "bg-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/20"
                                 : "text-gray-500 hover:text-white"
                         )}
                     >

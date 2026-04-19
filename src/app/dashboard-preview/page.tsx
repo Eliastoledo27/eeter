@@ -212,7 +212,7 @@ export default function HegemonicDashboardPreview() {
                                             {i === 0 && <Package size={20} className="text-rose-500" />}
                                             {i === 1 && <CreditCard size={20} className="text-emerald-500" />}
                                             {i === 2 && <Users size={20} className="text-blue-500" />}
-                                            {i === 3 && <LayoutDashboard size={20} className="text-amber-500" />}
+                                            {i === 3 && <LayoutDashboard size={20} className="text-cyan-500" />}
                                             {action}
                                         </button>
                                     ))}
@@ -268,7 +268,7 @@ export default function HegemonicDashboardPreview() {
                                                 <span className={cn(
                                                     "px-2.5 py-1 rounded-full text-[10px] font-bold border",
                                                     order.status === 'Completed' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
-                                                        order.status === 'Processing' ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
+                                                        order.status === 'Processing' ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" :
                                                             order.status === 'Pending' ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
                                                                 "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
                                                 )}>

@@ -18,23 +18,39 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Éter Store',
-    default: 'Éter Store | La Plataforma #1 de Resellers de Sneakers',
+    template: '%s | ÉTER Store',
+    default: 'ÉTER Store | Archivo Premium de Sneakers',
   },
-  description: "Accede al catálogo de sneakers más exclusivo, gestiona tu stock digital y escala tu negocio de dropshipping con Éter Store.",
-  keywords: ["sneakers", "dropshipping", "reseller", "zapatillas", "logística", "emprendimiento", "calzado de lujo"],
-  metadataBase: new URL('https://www.xn--ter-9la.store'),
+  description: "Accede al catálogo de sneakers más exclusivo, gestiona tu stock digital y escala tu negocio de dropshipping con la infraestructura tecnológica de ÉTER.",
+  keywords: ["sneakers", "calzado premium", "reseller", "zapatillas", "logística", "emprendimiento", "calzado de lujo", "dropshipping", "argentina"],
+  metadataBase: new URL('https://www.eter.store'),
   openGraph: {
-    title: 'Éter Store | Tu Imperio de Sneakers',
-    description: 'Vende sneakers exclusivos sin invertir en stock. Nosotros nos encargamos de la logística.',
-    url: 'https://www.xn--ter-9la.store',
-    siteName: 'Éter Store',
+    title: 'ÉTER Store | The New Standard',
+    description: 'Ingeniería de precisión y estética de lujo. Vende calzado premium brasilero con logística automatizada.',
+    url: 'https://www.eter.store',
+    siteName: 'ÉTER Store',
     locale: 'es_AR',
     type: 'website',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'ÉTER Store Premium Archive Node',
+      },
+    ],
+  },
+  twitter: {
+      card: 'summary_large_image',
+      title: 'ÉTER Store | The New Standard',
+      description: 'Ingeniería de precisión y estética de lujo. Vende calzado premium con logística automatizada.',
+      images: ['/og-image.jpg'],
   },
   icons: {
     icon: [
+      { url: '/favicon.ico', type: 'image/x-icon' },
       { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
   },
   verification: {

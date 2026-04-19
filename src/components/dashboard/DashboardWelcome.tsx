@@ -7,7 +7,8 @@ import {
     Users, Package, MessageSquare, BarChart2,
     ClipboardList, Settings, Sparkles, AlertCircle,
     Check, ArrowRight, User as UserIcon, Phone,
-    Globe, Shield, Zap, TrendingUp, Info, Save, Loader2
+    Globe, Shield, Zap, TrendingUp, Info, Save, Loader2,
+    Crown
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { updateProfile } from '@/app/actions/profiles';
@@ -77,8 +78,8 @@ export function DashboardWelcome() {
             desc: 'Explora lanzamientos exclusivos y calzado de alta gama.',
             icon: ShoppingBag,
             href: '/dashboard/catalogue',
-            color: 'text-amber-500',
-            bg: 'bg-amber-500/10'
+            color: 'text-[#00E5FF]',
+            bg: 'bg-[#00E5FF]/10'
         },
         {
             id: 'myshop',
@@ -96,8 +97,8 @@ export function DashboardWelcome() {
             desc: 'Control total sobre tus ventas y envíos activos.',
             icon: ClipboardList,
             href: '/dashboard/orders',
-            color: 'text-emerald-400',
-            bg: 'bg-emerald-400/10'
+            color: 'text-[#00E5FF]',
+            bg: 'bg-[#00E5FF]/10'
         },
         {
             id: 'academy',
@@ -114,15 +115,15 @@ export function DashboardWelcome() {
         <div className="space-y-12 pb-20">
             {/* Header section with Greeting */}
             <div className="relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-[#0A0A0A] to-black border border-white/5 p-10 md:p-14 shadow-2xl">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/5 blur-[120px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#00E5FF]/5 blur-[120px] rounded-full pointer-events-none" />
 
                 <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start justify-between">
                     <div className="space-y-6 max-w-2xl">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                                <Sparkles className="text-amber-500" size={20} />
+                            <div className="w-10 h-10 rounded-xl bg-[#00E5FF]/10 border border-[#00E5FF]/20 flex items-center justify-center">
+                                <Sparkles className="text-[#00E5FF]" size={20} />
                             </div>
-                            <span className="text-amber-500 font-mono text-[10px] tracking-[0.5em] uppercase">Ecosistema Digital</span>
+                            <span className="text-[#00E5FF] font-mono text-[10px] tracking-[0.5em] uppercase">Ecosistema Digital</span>
                         </div>
 
                         <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic leading-none text-white">
@@ -136,10 +137,10 @@ export function DashboardWelcome() {
                     </div>
 
                     <div className="flex flex-col gap-4 min-w-[240px]">
-                        <GlassCard className="p-6 border-amber-500/20">
+                        <GlassCard className="p-6 border-[#00E5FF]/20">
                             <div className="flex items-center justify-between mb-2">
                                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Tu Nivel</span>
-                                <Badge variant="gold">Premium</Badge>
+                                <Badge variant="gold" className="bg-[#00E5FF]/10 text-[#00E5FF] border-[#00E5FF]/20">Premium</Badge>
                             </div>
                             <div className="flex items-baseline gap-2">
                                 <span className="text-3xl font-black text-white">{profile?.points || 0}</span>
@@ -148,7 +149,7 @@ export function DashboardWelcome() {
                         </GlassCard>
 
                         <div className="flex items-center gap-2 px-6 py-3 bg-white/5 rounded-2xl border border-white/10">
-                            <Zap className="text-amber-500" size={14} />
+                            <Zap className="text-[#00E5FF]" size={14} />
                             <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Racha: {profile?.streak_days || 0} Días</span>
                         </div>
                     </div>
@@ -194,7 +195,7 @@ export function DashboardWelcome() {
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-2">WhatsApp Directo</label>
                                         <div className="relative">
-                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-500 font-bold text-xs">+54 9</span>
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#00E5FF] font-bold text-xs">+54 9</span>
                                             <input
                                                 type="text"
                                                 value={whatsapp}
@@ -207,7 +208,7 @@ export function DashboardWelcome() {
                                     <button
                                         onClick={handleRepair}
                                         disabled={isSaving}
-                                        className="sm:col-span-2 h-14 bg-white text-black rounded-xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl hover:bg-amber-500 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                                        className="sm:col-span-2 h-14 bg-white text-black rounded-xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl hover:bg-[#00E5FF] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                                     >
                                         {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
                                         Guardar y Activar ÉTER
@@ -235,13 +236,13 @@ export function DashboardWelcome() {
                                 whileHover={{ y: -5 }}
                                 className="group h-full"
                             >
-                                <GlassCard className="p-8 h-full flex flex-col justify-between border-white/5 hover:border-amber-500/40 transition-all duration-500">
+                                <GlassCard className="p-8 h-full flex flex-col justify-between border-white/5 hover:border-[#00E5FF]/40 transition-all duration-500">
                                     <div className="space-y-6">
                                         <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform duration-500", module.bg)}>
                                             <module.icon className={module.color} size={28} />
                                         </div>
                                         <div className="space-y-2">
-                                            <h4 className="text-xl font-black uppercase tracking-tight group-hover:text-amber-500 transition-colors">
+                                            <h4 className="text-xl font-black uppercase tracking-tight group-hover:text-[#00E5FF] transition-colors">
                                                 {module.title}
                                             </h4>
                                             <p className="text-xs text-gray-500 font-medium leading-relaxed">
@@ -250,7 +251,7 @@ export function DashboardWelcome() {
                                         </div>
                                     </div>
 
-                                    <div className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-amber-500 opacity-0 group-hover:opacity-100 transition-all">
+                                    <div className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#00E5FF] opacity-0 group-hover:opacity-100 transition-all">
                                         Acceder Ahora <ArrowRight size={14} />
                                     </div>
                                 </GlassCard>
@@ -260,24 +261,33 @@ export function DashboardWelcome() {
                 </div>
             </div>
 
-            {/* Quick Utility Section */}
+            {/* Premium Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <GlassCard className="lg:col-span-2 p-10 bg-[#C88A04]/10 border-[#C88A04]/20 relative overflow-hidden group">
-                    <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-amber-500/20 blur-3xl rounded-full" />
-                    <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
-                        <div className="space-y-4">
-                            <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center border border-white/10 group-hover:rotate-6 transition-transform">
-                                <Shield className="text-amber-500" size={24} />
+                <GlassCard className="lg:col-span-2 p-10 bg-[#00E5FF]/10 border-[#00E5FF]/20 relative overflow-hidden group">
+                    <div className="relative z-10 flex flex-col h-full">
+                        <div className="flex justify-between items-start mb-auto">
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-black text-[#00E5FF] tracking-[0.4em] uppercase">Membresía V.I.P</span>
+                                <h3 className="text-4xl font-black tracking-tighter uppercase italic leading-none">Status: Elite</h3>
                             </div>
-                            <h3 className="text-2xl font-black uppercase tracking-tighter text-amber-500 italic">Estatus de Seguridad</h3>
-                            <p className="text-xs text-black/60 max-w-md font-bold uppercase tracking-wider leading-relaxed">
-                                Tu conexión está protegida por encriptación de grado militar. ÉTER garantiza que tus ventas y datos personales están siempre a salvo.
-                            </p>
+                            <div className="w-16 h-16 rounded-full bg-[#00E5FF] flex items-center justify-center text-black shadow-[0_0_30px_rgba(0,229,255,0.4)]">
+                                <Crown size={32} />
+                            </div>
                         </div>
-                        <Link href="/dashboard/settings" className="h-14 px-10 bg-black text-white rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-white hover:text-black transition-all shrink-0 flex items-center justify-center">
-                            Gestionar Seguridad
-                        </Link>
+
+                        <div className="mt-12 flex justify-between items-end">
+                            <div className="space-y-1">
+                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Beneficio Actual</p>
+                                <p className="text-2xl font-black text-white uppercase italic">15% Off Extra en Stock</p>
+                            </div>
+                            <button className="px-6 py-3 bg-white text-black text-[10px] font-black uppercase tracking-widest hover:bg-[#00E5FF] transition-all">
+                                Ver Catálogo Elite
+                            </button>
+                        </div>
                     </div>
+
+                    {/* Background decoration */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#00E5FF]/20 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2" />
                 </GlassCard>
 
                 <GlassCard className="p-10 border-white/5 flex flex-col justify-center items-center text-center space-y-6">
@@ -292,7 +302,7 @@ export function DashboardWelcome() {
                         <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: '45%' }}
-                            className="h-full bg-gradient-to-r from-amber-500 to-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                            className="h-full bg-gradient-to-r from-[#00E5FF] to-emerald-400 shadow-[0_0_10px_rgba(0,229,255,0.3)]"
                         />
                     </div>
                     <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">45% COMPLETADO</span>

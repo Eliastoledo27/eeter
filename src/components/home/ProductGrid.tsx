@@ -2,8 +2,8 @@
 
 import { useMemo, useState, useCallback, type MouseEvent } from 'react';
 import Image from 'next/image';
-import { Heart, ShoppingBag, ShoppingCart } from 'lucide-react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { Heart, ShoppingBag, ShoppingCart, ArrowUpRight } from 'lucide-react';
+import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
 import type { ProductType } from '@/app/actions/products';
 import type { Product } from '@/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -64,7 +64,7 @@ const stockBadgeConfig: Record<StockLevel, { label: string; classes: string }> =
   },
   low: {
     label: 'Últimas unidades',
-    classes: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
+    classes: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/25',
   },
   out: {
     label: 'Agotado',
@@ -75,19 +75,14 @@ const stockBadgeConfig: Record<StockLevel, { label: string; classes: string }> =
 /* ── Skeleton Card ── */
 function SkeletonCard() {
   return (
-    <div className="rounded-xl overflow-hidden border border-white/[0.06] bg-[#141414]">
+    <div className="rounded-[2rem] overflow-hidden border border-white/[0.06] bg-[#050505]">
       {/* Image skeleton */}
-      <div className="aspect-[4/3] bg-[#1a1a1a] skeleton-shimmer" />
+      <div className="aspect-[4/3] bg-white/[0.03] skeleton-shimmer" />
       {/* Content skeleton */}
-      <div className="p-4 space-y-3">
+      <div className="p-6 space-y-4">
         <div className="h-3 w-16 bg-white/[0.06] rounded skeleton-shimmer" />
         <div className="h-4 w-3/4 bg-white/[0.06] rounded skeleton-shimmer" />
         <div className="h-5 w-20 bg-white/[0.06] rounded skeleton-shimmer mt-2" />
-        <div className="flex gap-1.5 mt-2">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-6 w-8 bg-white/[0.06] rounded skeleton-shimmer" />
-          ))}
-        </div>
       </div>
     </div>
   );
@@ -95,7 +90,7 @@ function SkeletonCard() {
 
 export function ProductGridSkeleton({ count = 8 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6 pb-20">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 pb-20">
       {Array.from({ length: count }).map((_, i) => (
         <SkeletonCard key={i} />
       ))}
@@ -106,7 +101,7 @@ export function ProductGridSkeleton({ count = 8 }: { count?: number }) {
 /* ── Main Grid ── */
 export const ProductGrid = ({ products }: ProductGridProps) => {
   const shouldReduceMotion = useReducedMotion();
-  const { addItem } = useCartStore();
+  const { addItem, setIsOpen: setIsCartOpen } = useCartStore();
   const { toggle, has } = useFavoritesStore();
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
   const [selectedSize, setSelectedSize] = useState<string>('');
@@ -122,9 +117,17 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
       event?.stopPropagation();
       const finalSize = size || getDefaultSize(product.stock_by_size || {});
       addItem(mapToCartProduct(product), finalSize);
-      toast.success(`Agregado al carrito: ${product.name}`);
+      setIsCartOpen(true);
+      toast.success(`Agregado: ${product.name}`, {
+          description: `Talle ${finalSize} añadido con éxito.`,
+          style: {
+              background: '#020202',
+              color: '#fff',
+              border: '1px solid rgba(0, 229, 255, 0.2)'
+          }
+      });
     },
-    [addItem]
+    [addItem, setIsCartOpen]
   );
 
   const handleToggleFavorite = useCallback(
@@ -154,8 +157,7 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
 
   return (
     <>
-      {/* ── Product Grid — 4 cols desktop · 2 tablet · 2 mobile ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6 pb-20">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 pb-20">
         {products?.map((product, index) => {
           const stockLevel = getStockLevel(product);
           const badge = stockBadgeConfig[stockLevel];
@@ -175,167 +177,115 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
                   : { duration: 0.35, delay: Math.min(index * 0.03, 0.3) }
               }
               onClick={() => openQuickView(product)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  openQuickView(product);
-                }
-              }}
-              role="button"
-              tabIndex={0}
-              aria-label={`Vista rápida de ${product.name}`}
-              className="outline-none focus-visible:ring-2 focus-visible:ring-[#CA8A04]/60 rounded-xl"
+              className="outline-none group cursor-pointer flex flex-col h-full overflow-hidden rounded-[2rem] border border-white/[0.06] bg-[#050505]/40 backdrop-blur-md transition-all duration-500 hover:border-[#00E5FF]/30 active:scale-[0.98]"
             >
-              <div className="group cursor-pointer flex flex-col h-full overflow-hidden rounded-xl border border-white/[0.06] bg-[#141414] transition-all duration-300 hover:border-[#ffd900]/20 hover:shadow-[0_2px_8px_rgba(0,0,0,0.08),0_8px_32px_rgba(0,0,0,0.24)] active:scale-[0.99]">
-                {/* ── Image — 4:3 aspect ratio with lazy loading ── */}
-                <div className="relative aspect-[4/3] overflow-hidden bg-[#1a1a1a]">
+                {/* Image Section */}
+                <div className="relative aspect-[4/5] overflow-hidden bg-white/[0.02]">
                   {product.images && product.images[0] ? (
                     <Image
                       src={product.images[0]}
                       alt={product.name}
                       fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.04]"
+                      sizes="(max-width: 640px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.1]"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-700">
-                      <ShoppingBag size={28} />
+                    <div className="w-full h-full flex items-center justify-center text-gray-800">
+                      <ShoppingBag size={48} />
                     </div>
                   )}
 
-                  {/* Availability Badge */}
-                  <span
-                    className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border backdrop-blur-sm ${badge.classes}`}
-                  >
-                    {badge.label}
-                  </span>
-
-                  {/* Favorite button */}
-                  <button
-                    type="button"
-                    onClick={(e) => handleToggleFavorite(product.id, e)}
-                    className={`absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm transition-all duration-300 ${isFavorite
-                      ? 'bg-red-500/90 text-white scale-100'
-                      : 'bg-black/30 text-white/60 opacity-0 group-hover:opacity-100 hover:text-red-400 hover:bg-black/50'
-                      }`}
-                  >
-                    <Heart size={13} className={isFavorite ? 'fill-white' : undefined} />
-                  </button>
-
-                  {/* Quick add — appears on hover */}
-                  <button
-                    type="button"
-                    onClick={(e) => handleAddToCart(product, undefined, e)}
-                    disabled={!isAvailable}
-                    aria-label="Agregar al carrito"
-                    className="absolute bottom-3 right-3 flex h-11 w-11 items-center justify-center rounded-full bg-[#ffd900] text-black opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-yellow-300 hover:scale-110 active:scale-95 disabled:opacity-0 shadow-lg shadow-black/30"
-                  >
-                    <ShoppingCart size={15} strokeWidth={2.5} />
-                  </button>
-
-                  {/* Out-of-stock overlay */}
-                  {!isAvailable && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">
-                        Agotado
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* ── Card Info — generous spacing ── */}
-                <div className="p-4 flex flex-col flex-1 gap-2">
-                  {/* Category */}
-                  <span className="text-[9px] sm:text-[10px] font-semibold text-[#ffd900]/70 uppercase tracking-[0.15em]">
-                    {product.category || 'General'}
-                  </span>
-
-                  {/* Name — 16px */}
-                  <h3 className="font-display text-[16px] font-semibold text-white/90 line-clamp-2 leading-snug">
-                    {product.name}
-                  </h3>
-
-                  {/* Price — 18px bold */}
-                  <div className="mt-auto pt-3">
-                    <span
-                      suppressHydrationWarning
-                      className="text-[16px] sm:text-[18px] font-bold text-white font-display"
-                    >
-                      ${Number(product.base_price).toLocaleString('es-AR')}
+                  {/* Badges */}
+                  <div className="absolute top-4 left-4 flex flex-col gap-2">
+                    <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border backdrop-blur-md ${badge.classes}`}>
+                      {badge.label}
                     </span>
                   </div>
 
-                  {/* Sizes preview */}
-                  {sizesAvailable.length > 0 && sizesAvailable[0][0] !== 'Unique' && (
-                    <div className="flex flex-wrap gap-1.5 mt-2">
-                      {sizesAvailable.slice(0, 5).map(([size]) => (
-                        <span
-                          key={size}
-                          className="text-[10px] text-gray-500 bg-white/[0.04] border border-white/[0.06] rounded px-1.5 py-0.5 font-medium"
-                        >
-                          {size}
-                        </span>
-                      ))}
-                      {sizesAvailable.length > 5 && (
-                        <span className="text-[10px] text-gray-600 self-center">
-                          +{sizesAvailable.length - 5}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                  {/* Favorite button */}
+                  <button
+                    onClick={(e) => handleToggleFavorite(product.id, e)}
+                    className={`absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-2xl backdrop-blur-md transition-all duration-300 ${isFavorite
+                      ? 'bg-red-500 text-white'
+                      : 'bg-black/30 text-white/60 opacity-0 group-hover:opacity-100'
+                      }`}
+                  >
+                    <Heart size={16} className={isFavorite ? 'fill-white' : ''} />
+                  </button>
+
+                  {/* Quick Add */}
+                  <button
+                    onClick={(e) => handleAddToCart(product, undefined, e)}
+                    disabled={!isAvailable}
+                    className="absolute bottom-4 right-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#00E5FF] text-black opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:bg-white shadow-[0_0_20px_rgba(0,229,255,0.3)] disabled:hidden"
+                  >
+                    <ShoppingCart size={18} strokeWidth={2.5} />
+                  </button>
                 </div>
-              </div>
+
+                {/* Info Section */}
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="text-[9px] font-black text-[#00E5FF] uppercase tracking-[0.3em] mb-2">
+                    {product.category || 'ÉTER COLLECTION'}
+                  </span>
+
+                  <h3 className="text-lg font-black text-white uppercase tracking-tighter line-clamp-2 mb-4 group-hover:text-[#00E5FF] transition-colors">
+                    {product.name}
+                  </h3>
+
+                  <div className="mt-auto flex items-end justify-between">
+                    <div className="flex flex-col">
+                        <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Inversión</span>
+                        <span className="text-xl font-black text-white font-mono">
+                            <span className="text-xs text-[#00E5FF] mr-1">$</span>
+                            {Number(product.base_price).toLocaleString('es-AR')}
+                        </span>
+                    </div>
+                    <ArrowUpRight size={18} className="text-white/20 group-hover:text-[#00E5FF] group-hover:rotate-45 transition-all" />
+                  </div>
+                </div>
             </motion.div>
           );
         })}
       </div>
 
-      {/* ── Quick View Modal (unchanged) ── */}
+      {/* Quick View Modal */}
       <Dialog open={!!selectedProduct} onOpenChange={(open) => !open && setSelectedProduct(null)}>
-        <DialogContent className="max-w-5xl p-0 overflow-hidden bg-[#0a0a0a]/95 backdrop-blur-3xl border border-white/10 shadow-[0_40px_120px_rgba(0,0,0,0.5)] rounded-[2rem] gap-0 text-white">
+        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-[#020202] border-white/5 rounded-[2.5rem] gap-0 text-white">
           {selectedProduct && (
-            <div className="flex flex-col md:flex-row h-full md:h-auto md:max-h-[85vh]">
-              <div className="w-full md:w-1/2 bg-[#1a1a1a] relative h-64 md:h-auto">
-                {selectedProduct.images && selectedProduct.images[0] ? (
+            <div className="flex flex-col md:flex-row min-h-[500px]">
+              <div className="w-full md:w-1/2 bg-[#0A0A0A] relative h-[400px] md:h-auto">
+                {selectedProduct.images && selectedProduct.images[0] && (
                   <Image
                     src={selectedProduct.images[0]}
                     alt={selectedProduct.name}
                     fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover"
+                    className="object-contain p-12"
                   />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-600">
-                    <ShoppingBag size={64} />
-                  </div>
                 )}
               </div>
 
-              <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col flex-1 overflow-y-auto bg-black/20">
-                <DialogHeader className="mb-6">
-                  <p className="text-[#ffd900] font-semibold text-xs uppercase tracking-widest mb-2">
+              <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col">
+                <div className="mb-8">
+                  <span className="text-[10px] font-black text-[#00E5FF] uppercase tracking-[0.5em] block mb-2">
                     {selectedProduct.category}
-                  </p>
-                  <DialogTitle className="font-display text-2xl md:text-3xl font-bold text-white leading-tight mb-2">
+                  </span>
+                  <DialogTitle className="text-4xl font-black text-white tracking-tighter uppercase leading-none mb-4">
                     {selectedProduct.name}
                   </DialogTitle>
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-2xl md:text-3xl font-bold text-[#ffd900] font-display">
-                      ${selectedProduct.base_price.toLocaleString()}
-                    </span>
-                  </div>
-                </DialogHeader>
+                  <span className="text-3xl font-black text-white font-mono">
+                    <span className="text-sm text-[#00E5FF]">$</span>
+                    {selectedProduct.base_price.toLocaleString()}
+                  </span>
+                </div>
 
-                <div className="space-y-6 flex-1">
-                  <p className="text-gray-400 leading-relaxed text-sm font-body">
-                    {selectedProduct.description ||
-                      'Calidad premium garantizada. Stock limitado disponible para entrega inmediata.'}
+                <div className="space-y-8 flex-1">
+                  <p className="text-gray-500 text-sm leading-relaxed italic uppercase font-mono">
+                    {selectedProduct.description || 'CONSTRUCCIÓN PREMIUM PARA EL ESCENARIO URBANO MODERNO.'}
                   </p>
 
-                  <div className="space-y-3 pt-2">
-                    <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
-                      Talles
-                    </h4>
+                  <div className="space-y-4">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-700">Talles Disponibles</h4>
                     <div className="flex flex-wrap gap-2">
                       {sizeOptions.map(([size, qty]) => {
                         const isSelected = selectedSize === size;
@@ -344,13 +294,15 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
                         return (
                           <button
                             key={size}
-                            type="button"
                             onClick={() => setSelectedSize(size)}
                             disabled={disabled}
-                            className={`w-10 h-10 rounded-lg text-sm font-bold transition-all duration-300 ${isSelected
-                              ? 'bg-[#ffd900] text-black shadow-[0_0_15px_rgba(255,217,0,0.3)]'
-                              : 'bg-white/5 border border-white/10 text-gray-300 hover:border-[#ffd900]/40 hover:text-[#ffd900]'
-                              } ${disabled ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 active:scale-95'}`}
+                            className={cn(
+                                "w-12 h-12 rounded-xl text-xs font-black transition-all",
+                                isSelected 
+                                    ? "bg-[#00E5FF] text-black shadow-[0_0_20px_rgba(0,229,255,0.4)]" 
+                                    : "bg-white/5 text-gray-500 hover:text-white border border-white/5 hover:border-[#00E5FF]/30",
+                                disabled && "opacity-20 cursor-not-allowed"
+                            )}
                           >
                             {size}
                           </button>
@@ -360,13 +312,13 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
                   </div>
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-white/5 flex gap-4">
+                <div className="mt-12">
                   <Button
-                    className="flex-1 h-12 bg-[#ffd900] text-black font-bold uppercase tracking-widest hover:bg-yellow-400"
+                    className="w-full h-16 bg-[#00E5FF] text-black font-black uppercase tracking-widest text-xs hover:bg-white transition-all rounded-2xl shadow-xl shadow-[#00E5FF]/20"
                     onClick={() => handleAddToCart(selectedProduct, selectedSize)}
                     disabled={!modalAvailability.canAdd}
                   >
-                    {modalAvailability.canAdd ? 'Agregar al Carrito' : 'Sin Stock'}
+                    {modalAvailability.canAdd ? 'AGREGAR AL ECOSISTEMA' : 'AGOTADO'}
                   </Button>
                 </div>
               </div>

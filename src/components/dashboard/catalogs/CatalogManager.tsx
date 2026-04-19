@@ -56,17 +56,17 @@ export const CatalogManager = () => {
   return (
     <div className="space-y-10 pb-20">
       <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-slate-950/70 shadow-2xl shadow-black/40">
-        <div className="absolute -top-32 right-[-10%] h-64 w-64 rounded-full bg-gradient-to-br from-amber-400/20 via-orange-500/10 to-transparent blur-3xl" />
+        <div className="absolute -top-32 right-[-10%] h-64 w-64 rounded-full bg-gradient-to-br from-cyan-400/20 via-orange-500/10 to-transparent blur-3xl" />
         <div className="absolute -bottom-28 left-[-6%] h-56 w-56 rounded-full bg-gradient-to-br from-teal-400/20 via-sky-500/10 to-transparent blur-3xl" />
         <div className="relative p-8 md:p-10 lg:p-12">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.3em] text-slate-300">
-                <Sparkles size={14} className="text-amber-300" />
+                <Sparkles size={14} className="text-cyan-300" />
                 Gestión de Catálogo
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight">
-                Control total de tus <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400">materiales de venta</span>
+                Control total de tus <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-orange-400 to-rose-400">materiales de venta</span>
               </h1>
               <p className="text-slate-300 text-lg max-w-2xl">
                 Centraliza PDFs e imágenes en un solo lugar. Compartí tu catálogo con estética premium y actualizaciones rápidas.
@@ -96,7 +96,7 @@ export const CatalogManager = () => {
           <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <div className="flex items-center gap-3 text-slate-300">
-                <Files size={18} className="text-amber-300" />
+                <Files size={18} className="text-cyan-300" />
                 <span className="text-xs font-bold uppercase tracking-[0.25em]">Total</span>
               </div>
               <div className="mt-3 text-3xl font-black text-white">{stats.total}</div>
@@ -171,7 +171,7 @@ export const CatalogManager = () => {
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-32 rounded-[2.5rem] border border-white/5 bg-slate-950/60">
-          <Loader2 className="mb-4 animate-spin text-amber-300" size={48} />
+          <Loader2 className="mb-4 animate-spin text-cyan-300" size={48} />
           <p className="text-slate-400 text-sm font-bold uppercase tracking-[0.3em]">Cargando catálogos...</p>
         </div>
       ) : catalogs.length === 0 ? (

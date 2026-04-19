@@ -10,7 +10,7 @@ import { toast } from 'sonner'
 const TYPE_CONFIG: Record<string, { icon: React.ElementType; color: string }> = {
     info: { icon: Info, color: 'text-blue-400' },
     success: { icon: Check, color: 'text-emerald-400' },
-    warning: { icon: AlertTriangle, color: 'text-amber-400' },
+    warning: { icon: AlertTriangle, color: 'text-cyan-400' },
     error: { icon: AlertTriangle, color: 'text-red-400' },
     order: { icon: ShoppingBag, color: 'text-purple-400' },
     stock: { icon: Database, color: 'text-orange-400' },
@@ -117,7 +117,7 @@ export function NotificationBell() {
                         {unread > 0 && (
                             <button
                                 onClick={handleMarkAllAsRead}
-                                className="text-[10px] text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1"
+                                className="text-[10px] text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1"
                             >
                                 <CheckCheck className="w-3 h-3" />
                                 Marcar todo leído
@@ -163,7 +163,7 @@ export function NotificationBell() {
                                                 )}
                                             </div>
                                             {!notif.is_read && (
-                                                <div className="w-2 h-2 bg-amber-500 rounded-full flex-shrink-0 mt-1" />
+                                                <div className="w-2 h-2 bg-cyan-500 rounded-full flex-shrink-0 mt-1" />
                                             )}
                                         </div>
                                     </div>

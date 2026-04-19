@@ -106,7 +106,7 @@ from-white via-slate-50 to-blue-50/30
 /* Widgets */
 from-blue-50 to-blue-100       // Icons backgrounds
 from-emerald-500 to-emerald-600 // Success states
-from-amber-500 to-amber-600     // Warning states
+from-cyan-500 to-cyan-600     // Warning states
 ```
 
 ## Estructura de Layout

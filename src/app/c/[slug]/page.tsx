@@ -27,11 +27,11 @@ export default async function ResellerPublicCatalog({ params }: { params: { slug
 
             <div className="pt-32 pb-20 container mx-auto px-6">
                 <div className="mb-12">
-                    <span className="text-[#C88A04] font-mono text-sm tracking-[0.4em] uppercase mb-4 block">
+                    <span className="text-[#00E5FF] font-mono text-sm tracking-[0.4em] uppercase mb-4 block">
                         Catálogo Exclusivo por
                     </span>
                     <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic">
-                        {reseller.full_name} <span className="text-white/20">/</span> <span className="text-[#C88A04]">ÉTER</span>
+                        {reseller.full_name} <span className="text-white/20">/</span> <span className="text-[#00E5FF]">ÉTER</span>
                     </h1>
                     <p className="text-gray-500 mt-4 max-w-2xl font-light">
                         Bienvenido a mi selección curada de calzado premium. Todos los productos cuentan con la garantía de calidad de ÉTER.

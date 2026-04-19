@@ -7,7 +7,7 @@ import { usePermissions } from '@/hooks/usePermissions'
 import Image from 'next/image'
 
 const POSITION_STYLES: Record<number, { icon: React.ElementType; color: string; bg: string }> = {
-    1: { icon: Crown, color: 'text-amber-400', bg: 'bg-gradient-to-r from-amber-500/10 to-amber-600/5 border-amber-500/30' },
+    1: { icon: Crown, color: 'text-cyan-400', bg: 'bg-gradient-to-r from-cyan-500/10 to-cyan-600/5 border-cyan-500/30' },
     2: { icon: Medal, color: 'text-gray-300', bg: 'bg-gradient-to-r from-gray-400/10 to-gray-500/5 border-gray-400/30' },
     3: { icon: Medal, color: 'text-orange-400', bg: 'bg-gradient-to-r from-orange-500/10 to-orange-600/5 border-orange-500/30' },
 }
@@ -48,8 +48,8 @@ export default function RankingPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-gradient-to-br from-amber-500/20 to-yellow-500/10 rounded-xl border border-amber-500/20">
-                        <Trophy className="w-6 h-6 text-amber-400" />
+                    <div className="p-2.5 bg-gradient-to-br from-cyan-500/20 to-cyan-500/10 rounded-xl border border-cyan-500/20">
+                        <Trophy className="w-6 h-6 text-cyan-400" />
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold text-white tracking-tight">Ranking Global</h1>
@@ -60,7 +60,7 @@ export default function RankingPage() {
                 <select
                     value={period}
                     onChange={e => setPeriod(e.target.value)}
-                    className="px-4 py-2 bg-white/[0.03] border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-amber-500/30"
+                    className="px-4 py-2 bg-white/[0.03] border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-cyan-500/30"
                 >
                     {periods.map(p => (
                         <option key={p} value={p}>
@@ -72,15 +72,15 @@ export default function RankingPage() {
 
             {/* Personal Stats (for resellers) */}
             {(isReseller || isAdmin) && personalStats?.current && (
-                <div className="bg-gradient-to-r from-amber-500/5 to-transparent border border-amber-500/20 rounded-2xl p-6">
-                    <h3 className="text-sm font-semibold text-amber-300 flex items-center gap-2 mb-4">
+                <div className="bg-gradient-to-r from-cyan-500/5 to-transparent border border-cyan-500/20 rounded-2xl p-6">
+                    <h3 className="text-sm font-semibold text-cyan-300 flex items-center gap-2 mb-4">
                         <Star className="w-4 h-4" />
                         Tu Rendimiento
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                             <p className="text-[10px] uppercase tracking-wider text-gray-500 font-mono">Posición</p>
-                            <p className="text-2xl font-bold text-amber-400">#{personalStats.current.position || '—'}</p>
+                            <p className="text-2xl font-bold text-cyan-400">#{personalStats.current.position || '—'}</p>
                         </div>
                         <div>
                             <p className="text-[10px] uppercase tracking-wider text-gray-500 font-mono">Ventas</p>
@@ -105,7 +105,7 @@ export default function RankingPage() {
             <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden backdrop-blur-sm">
                 {loading ? (
                     <div className="flex items-center justify-center py-20">
-                        <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+                        <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
                     </div>
                 ) : ranking.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-gray-500">

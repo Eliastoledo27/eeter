@@ -62,7 +62,7 @@ He implementado exitosamente el **diseño revolucionario** generado en Stitch di
 Card 1 (2x2): CATÁLOGO PREMIUM
 - Slideshow automático con Ken Burns
 - 500+ modelos destacados
-- Border de 4px en yellow-500
+- Border de 4px en cyan-500
 
 Card 2: 0% INVERSIÓN  
 - Número gigante "0%" con gradient purple

@@ -14,9 +14,9 @@ Se han mejorado completamente las product cards del catálogo y se ha implementa
 
 **Ambient Glow Effect:**
 - ✅ Gradient overlay sutil en hover
-- ✅ Transición de `from-yellow-500/0` a `from-yellow-500/5`
+- ✅ Transición de `from-cyan-500/0` a `from-cyan-500/5`
 - ✅ Duración 700ms smooth
-- ✅ Border glow matching (de white/10 a yellow-500/50)
+- ✅ Border glow matching (de white/10 a cyan-500/50)
 
 **Quick Actions Overlay:**
 ```
@@ -65,7 +65,7 @@ NUEVO     → ⭐ Green/Emerald + Star icon
 - ✅ **Low stock badge**: "Solo X unidades" (cuando < 10)
 
 **Enhanced Info Section:**
-- ✅ Category en yellow-500 uppercase tracked
+- ✅ Category en cyan-500 uppercase tracked
 - ✅ Stock dot + status inline
 - ✅ Name con hover yellow transition
 - ✅ Description en featured cards (isFeatured)
@@ -120,7 +120,7 @@ NUEVO     → ⭐ Green/Emerald + Star icon
 **Image Navigation:**
 - ✅ **Dots indicator** bottom-center
 - ✅ Glassmorphic container
-- ✅ Active dot: yellow-500 + wider (w-8)
+- ✅ Active dot: cyan-500 + wider (w-8)
 - ✅ Inactive: white/30
 - ✅ Click para cambiar imagen
 
@@ -128,7 +128,7 @@ NUEVO     → ⭐ Green/Emerald + Star icon
 - ✅ Grid 4 columns
 - ✅ Aspect-square
 - ✅ Border-2 conditional:
-  - Selected: yellow-500 + scale-105
+  - Selected: cyan-500 + scale-105
   - Other: white/10 hover white/30
 - ✅ Click to select
 
@@ -146,7 +146,7 @@ NUEVO     → ⭐ Green/Emerald + Star icon
 #### **Product Info Section (Right):**
 
 **Header:**
-- ✅ Category badge (yellow-500 uppercase)
+- ✅ Category badge (cyan-500 uppercase)
 - ✅ Product name (4xl-5xl font-black)
 - ✅ **Stock warning** (si lowStock):
   - Red badge con border
@@ -165,7 +165,7 @@ NUEVO     → ⭐ Green/Emerald + Star icon
 - ✅ **Grid 4x4** de talles
 - ✅ Aspect-square buttons
 - ✅ Estados:
-  - **Selected**: yellow-500 bg, black text, scale-105, shadow-glow
+  - **Selected**: cyan-500 bg, black text, scale-105, shadow-glow
   - **Available**: white/5 bg, hover border
 - ✅ Footer: "X talles disponibles" con icon
 
@@ -180,7 +180,7 @@ NUEVO     → ⭐ Green/Emerald + Star icon
   └─────────────────────────┘
   ```
 - ✅ Minus/Plus buttons (12x12)
-  - Hover: yellow-500 background
+  - Hover: cyan-500 background
   - Active: scale animation
   - Min quantity: 1
 - ✅ **Subtotal**: dynamic calculation
@@ -210,8 +210,8 @@ NUEVO     → ⭐ Green/Emerald + Star icon
 
 **Secondary CTA - Buy Now:**
 - ✅ Full width py-6
-- ✅ Border-4 yellow-500
-- ✅ Hover: filled yellow-500 bg
+- ✅ Border-4 cyan-500
+- ✅ Hover: filled cyan-500 bg
 - ✅ Text color swap (white → black)
 - ✅ Same scale animations
 - ✅ **Action**: Add to cart + open cart automatically
@@ -224,7 +224,7 @@ NUEVO     → ⭐ Green/Emerald + Star icon
 
 **Link to Full Page:**
 - ✅ Text-center
-- ✅ Yellow-500 hover yellow-400
+- ✅ Yellow-500 hover cyan-400
 - ✅ "Ver página completa del producto →"
 - ✅ Link a `/catalog/[id]`
 
@@ -381,7 +381,7 @@ hover:scale-105 duration-300
 selected:scale-105 + shadow-lg
 
 /* Quantity buttons */
-hover:bg-yellow-500 duration-300
+hover:bg-cyan-500 duration-300
 active:scale-95
 
 /* Add to Cart */

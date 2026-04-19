@@ -24,7 +24,7 @@ function getPasswordStrength(pw: string) {
   if (pw.length >= 12) score++
   if (score <= 1) return { label: 'Débil', score, color: 'bg-red-500' }
   if (score <= 2) return { label: 'Regular', score, color: 'bg-orange-500' }
-  if (score <= 3) return { label: 'Buena', score, color: 'bg-yellow-500' }
+  if (score <= 3) return { label: 'Buena', score, color: 'bg-cyan-500' }
   return { label: 'Fuerte', score, color: 'bg-emerald-500' }
 }
 
@@ -149,8 +149,8 @@ export function AuthModal() {
 
         {/* Logo */}
         <div className="flex items-center gap-2 mb-6">
-          <div className="w-9 h-9 border border-[#CA8A04] flex items-center justify-center rounded-lg">
-            <span className="text-xl font-bold text-[#CA8A04]">É</span>
+          <div className="w-9 h-9 border border-[#00B8D9] flex items-center justify-center rounded-lg">
+            <span className="text-xl font-bold text-[#00B8D9]">É</span>
           </div>
           <span className="text-sm font-bold text-white tracking-tight">ÉTER STORE</span>
         </div>
@@ -158,9 +158,9 @@ export function AuthModal() {
         {/* Header */}
         <h2 id="auth-modal-title" className="text-2xl font-black text-white mb-1">
           {authView === 'login' ? (
-            <>Bienvenido de <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-300 to-amber-500">vuelta</span></>
+            <>Bienvenido de <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 to-cyan-500">vuelta</span></>
           ) : (
-            <>Crea tu <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-300 to-amber-500">cuenta</span></>
+            <>Crea tu <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 to-cyan-500">cuenta</span></>
           )}
         </h2>
         <p className="text-xs text-gray-400 mb-5">
@@ -194,13 +194,13 @@ export function AuthModal() {
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                   <input type="text" placeholder="Nombre completo" value={regName} onChange={(e) => setRegName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#CA8A04]/40 focus:border-[#CA8A04]/60 hover:border-white/20 transition-all" />
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 hover:border-white/20 transition-all" />
                 </div>
                 {/* Phone */}
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                   <input type="tel" placeholder="Teléfono (opcional)" value={regPhone} onChange={(e) => setRegPhone(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#CA8A04]/40 focus:border-[#CA8A04]/60 hover:border-white/20 transition-all" />
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 hover:border-white/20 transition-all" />
                 </div>
               </>
             )}
@@ -211,7 +211,7 @@ export function AuthModal() {
               <input type="email" placeholder="tu@email.com"
                 value={authView === 'login' ? loginEmail : regEmail}
                 onChange={(e) => authView === 'login' ? setLoginEmail(e.target.value) : setRegEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#CA8A04]/40 focus:border-[#CA8A04]/60 hover:border-white/20 transition-all" />
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 hover:border-white/20 transition-all" />
             </div>
 
             {/* Password */}
@@ -220,7 +220,7 @@ export function AuthModal() {
               <input type={showPassword ? 'text' : 'password'} placeholder="••••••••"
                 value={authView === 'login' ? loginPassword : regPassword}
                 onChange={(e) => authView === 'login' ? setLoginPassword(e.target.value) : setRegPassword(e.target.value)}
-                className="w-full pl-10 pr-11 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#CA8A04]/40 focus:border-[#CA8A04]/60 hover:border-white/20 transition-all" />
+                className="w-full pl-10 pr-11 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 hover:border-white/20 transition-all" />
               <button type="button" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
                 aria-label={showPassword ? 'Ocultar' : 'Mostrar'}>
@@ -244,13 +244,13 @@ export function AuthModal() {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                 <input type="password" placeholder="Confirmar contraseña" value={regConfirm} onChange={(e) => setRegConfirm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#CA8A04]/40 focus:border-[#CA8A04]/60 hover:border-white/20 transition-all" />
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 hover:border-white/20 transition-all" />
               </div>
             )}
 
             {/* Submit */}
             <button type="submit" disabled={isLoading}
-              className="w-full py-3 rounded-xl font-bold text-sm text-black bg-gradient-to-r from-amber-500 via-[#CA8A04] to-amber-600 hover:from-amber-400 hover:to-amber-500 shadow-[0_0_20px_rgba(200,138,4,0.2)] hover:shadow-[0_0_30px_rgba(200,138,4,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all">
+              className="w-full py-3 rounded-xl font-bold text-sm text-black bg-gradient-to-r from-cyan-500 via-[#00B8D9] to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 shadow-[0_0_20px_rgba(200,138,4,0.2)] hover:shadow-[0_0_30px_rgba(200,138,4,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all">
               {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : authView === 'login' ? <><span>Ingresar</span><LogIn className="w-4 h-4" /></> : <><span>Crear Cuenta</span><UserPlus className="w-4 h-4" /></>}
             </button>
           </motion.form>
@@ -288,9 +288,9 @@ export function AuthModal() {
         {/* Toggle */}
         <p className="mt-5 text-center text-xs text-gray-500">
           {authView === 'login' ? (
-            <>¿No tienes cuenta? <button type="button" onClick={() => { setError(''); toggleAuthView() }} className="text-[#CA8A04] hover:text-amber-300 font-semibold transition-colors">Regístrate</button></>
+            <>¿No tienes cuenta? <button type="button" onClick={() => { setError(''); toggleAuthView() }} className="text-[#00B8D9] hover:text-cyan-300 font-semibold transition-colors">Regístrate</button></>
           ) : (
-            <>¿Ya tienes cuenta? <button type="button" onClick={() => { setError(''); toggleAuthView() }} className="text-[#CA8A04] hover:text-amber-300 font-semibold transition-colors">Inicia sesión</button></>
+            <>¿Ya tienes cuenta? <button type="button" onClick={() => { setError(''); toggleAuthView() }} className="text-[#00B8D9] hover:text-cyan-300 font-semibold transition-colors">Inicia sesión</button></>
           )}
         </p>
       </motion.div>

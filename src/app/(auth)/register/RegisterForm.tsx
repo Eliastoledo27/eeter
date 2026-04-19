@@ -20,7 +20,7 @@ function getPasswordStrength(pw: string): { label: string; score: number; color:
 
     if (score <= 1) return { label: 'Débil', score, color: 'bg-red-500' }
     if (score <= 2) return { label: 'Regular', score, color: 'bg-orange-500' }
-    if (score <= 3) return { label: 'Buena', score, color: 'bg-yellow-500' }
+    if (score <= 3) return { label: 'Buena', score, color: 'bg-cyan-500' }
     return { label: 'Fuerte', score, color: 'bg-emerald-500' }
 }
 
@@ -157,7 +157,7 @@ export default function RegisterForm() {
                 <div className="mb-6">
                     <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">
                         Crea tu{' '}
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500">
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-cyan-400 to-cyan-500">
                             tienda
                         </span>
                     </h2>
@@ -198,7 +198,7 @@ export default function RegisterForm() {
                                 placeholder="Tu nombre completo"
                                 aria-invalid={!!errors.fullName}
                                 className={`w-full pl-11 pr-10 py-3 rounded-xl bg-white/[0.04] border text-white text-sm placeholder:text-gray-600
-                  focus:outline-none focus:ring-2 focus:ring-[#CA8A04]/40 focus:border-[#CA8A04]/60 transition-all duration-200
+                  focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 transition-all duration-200
                   ${errors.fullName ? 'border-red-500/50' : 'border-white/10 hover:border-white/20'}`}
                             />
                             {fieldValid('fullName') && (
@@ -226,7 +226,7 @@ export default function RegisterForm() {
                                 placeholder="+54 223 502 5196"
                                 aria-invalid={!!errors.phone}
                                 className={`w-full pl-11 pr-10 py-3 rounded-xl bg-white/[0.04] border text-white text-sm placeholder:text-gray-600
-                  focus:outline-none focus:ring-2 focus:ring-[#CA8A04]/40 focus:border-[#CA8A04]/60 transition-all duration-200
+                  focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 transition-all duration-200
                   ${errors.phone ? 'border-red-500/50' : 'border-white/10 hover:border-white/20'}`}
                             />
                             {fieldValid('phone') && (
@@ -254,7 +254,7 @@ export default function RegisterForm() {
                                 placeholder="tu@email.com"
                                 aria-invalid={!!errors.email}
                                 className={`w-full pl-11 pr-10 py-3 rounded-xl bg-white/[0.04] border text-white text-sm placeholder:text-gray-600
-                  focus:outline-none focus:ring-2 focus:ring-[#CA8A04]/40 focus:border-[#CA8A04]/60 transition-all duration-200
+                  focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 transition-all duration-200
                   ${errors.email ? 'border-red-500/50' : 'border-white/10 hover:border-white/20'}`}
                             />
                             {fieldValid('email') && (
@@ -281,7 +281,7 @@ export default function RegisterForm() {
                                 placeholder="••••••••"
                                 aria-invalid={!!errors.password}
                                 className={`w-full pl-11 pr-12 py-3 rounded-xl bg-white/[0.04] border text-white text-sm placeholder:text-gray-600
-                  focus:outline-none focus:ring-2 focus:ring-[#CA8A04]/40 focus:border-[#CA8A04]/60 transition-all duration-200
+                  focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 transition-all duration-200
                   ${errors.password ? 'border-red-500/50' : 'border-white/10 hover:border-white/20'}`}
                             />
                             <button
@@ -330,7 +330,7 @@ export default function RegisterForm() {
                                 placeholder="••••••••"
                                 aria-invalid={!!errors.confirmPassword}
                                 className={`w-full pl-11 pr-12 py-3 rounded-xl bg-white/[0.04] border text-white text-sm placeholder:text-gray-600
-                  focus:outline-none focus:ring-2 focus:ring-[#CA8A04]/40 focus:border-[#CA8A04]/60 transition-all duration-200
+                  focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 transition-all duration-200
                   ${errors.confirmPassword ? 'border-red-500/50' : 'border-white/10 hover:border-white/20'}`}
                             />
                             <button
@@ -358,15 +358,15 @@ export default function RegisterForm() {
                                 type="checkbox"
                                 checked={acceptTerms}
                                 onChange={(e) => setAcceptTerms(e.target.checked)}
-                                className="w-4 h-4 mt-0.5 rounded border-white/20 bg-white/5 text-[#CA8A04] focus:ring-[#CA8A04]/40 focus:ring-offset-0"
+                                className="w-4 h-4 mt-0.5 rounded border-white/20 bg-white/5 text-[#00B8D9] focus:ring-[#00B8D9]/40 focus:ring-offset-0"
                             />
                             <span className="text-xs leading-relaxed">
                                 Acepto los{' '}
-                                <Link href="/about" className="text-[#CA8A04] hover:text-amber-300 underline transition-colors">
+                                <Link href="/about" className="text-[#00B8D9] hover:text-cyan-300 underline transition-colors">
                                     términos y condiciones
                                 </Link>{' '}
                                 y la{' '}
-                                <Link href="/about" className="text-[#CA8A04] hover:text-amber-300 underline transition-colors">
+                                <Link href="/about" className="text-[#00B8D9] hover:text-cyan-300 underline transition-colors">
                                     política de privacidad
                                 </Link>
                             </span>
@@ -378,8 +378,8 @@ export default function RegisterForm() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full py-3.5 rounded-xl font-bold text-sm text-black bg-gradient-to-r from-amber-500 via-[#CA8A04] to-amber-600
-              hover:from-amber-400 hover:via-amber-500 hover:to-amber-500 transition-all duration-300
+                        className="w-full py-3.5 rounded-xl font-bold text-sm text-black bg-gradient-to-r from-cyan-500 via-[#00B8D9] to-cyan-600
+              hover:from-cyan-400 hover:via-cyan-500 hover:to-cyan-500 transition-all duration-300
               shadow-[0_0_30px_rgba(200,138,4,0.2)] hover:shadow-[0_0_40px_rgba(200,138,4,0.35)]
               disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none
               flex items-center justify-center gap-2 mt-2"
@@ -439,7 +439,7 @@ export default function RegisterForm() {
                 {/* Login link */}
                 <p className="mt-6 text-center text-sm text-gray-500">
                     ¿Ya tienes una cuenta?{' '}
-                    <Link href="/login" className="text-[#CA8A04] hover:text-amber-300 transition-colors font-semibold">
+                    <Link href="/login" className="text-[#00B8D9] hover:text-cyan-300 transition-colors font-semibold">
                         Inicia sesión
                     </Link>
                 </p>
