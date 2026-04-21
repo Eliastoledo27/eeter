@@ -9,6 +9,7 @@ import { AuthModal } from '@/components/auth/AuthModal';
 import { CartSidebar } from '@/components/cart/CartSidebar';
 import { AiConcierge } from '@/components/ai/AiConcierge';
 import { AudioProvider } from '@/providers/AudioProvider';
+import { PulseManager } from '@/components/pulse/PulseManager';
 
 
 const manrope = Manrope({
@@ -107,7 +108,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} className="dark">
       <body
-        className={`${manrope.variable} font-sans antialiased bg-[#0A0A0A] text-white`}
+        className={`${manrope.variable} font-sans antialiased bg-[#0A0A0A] text-white overflow-x-hidden`}
       >
         <script
           type="application/ld+json"
@@ -120,6 +121,7 @@ export default async function RootLayout({
               <AuthModal />
               <CartSidebar />
               <AiConcierge />
+              <PulseManager />
             </AudioProvider>
           </AuthInitializer>
           <Toaster position="top-center" theme="dark" richColors />

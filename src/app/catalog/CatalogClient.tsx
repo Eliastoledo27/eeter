@@ -4,6 +4,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { CatalogHero } from '@/components/catalog/CatalogHero';
+import { PulseTicker } from '@/components/pulse/PulseTicker';
 import { Filter, Search, Loader2, X, ShoppingCart, SlidersHorizontal, ChevronDown, LayoutGrid, List } from 'lucide-react';
 import { useCatalog } from '@/hooks/useCatalog';
 import { useState, useMemo, useDeferredValue } from 'react';
@@ -87,6 +88,7 @@ export default function CatalogPage() {
         <div className="min-h-screen bg-[#050505] text-white selection:bg-[#00E5FF] selection:text-black overflow-x-hidden font-sans">
             <Navbar />
             <CatalogHero />
+            <PulseTicker />
 
             <div className="container mx-auto px-4 md:px-6 pb-24 relative z-10">
                 {/* ── High Impact Floating Toolbar ────────────────── */}

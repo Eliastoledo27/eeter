@@ -7,6 +7,7 @@ import { Volume2, VolumeX, SlidersHorizontal } from 'lucide-react'
 
 type AudioContextType = {
     triggerAuraSound: () => void
+    playAuraNotification: () => void
     isMuted: boolean
     toggleMute: () => void
     volume: number
@@ -15,6 +16,7 @@ type AudioContextType = {
 
 const AudioContext = createContext<AudioContextType>({
     triggerAuraSound: () => {},
+    playAuraNotification: () => {},
     isMuted: true,
     toggleMute: () => {},
     volume: 0.15,
@@ -85,6 +87,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
+    const lastIndexRef = useRef<Record<string, number>>({ index: -1, catalog: -1 });
+    
     const stopAll = useCallback(() => {
         if (sourceNodeRef.current) {
             try { sourceNodeRef.current.onended = null; sourceNodeRef.current.stop(); } catch(e){}
@@ -97,17 +101,21 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         setIsPlaying(false);
     }, []);
 
-    const playCategory = async (category: 'index' | 'catalog', fadeDuration = 2) => {
+    const playCategory = async (category: 'index' | 'catalog', fadeDuration = 3) => {
         if (!audioCtxRef.current || !gainNodeRef.current || isMuted) return;
         
         const ctx = audioCtxRef.current;
         const tracks = TRACKS[category];
-        const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
+        
+        // Alternar pistas (saxo -> saxo1 -> saxo ...)
+        const nextIndex = (lastIndexRef.current[category] + 1) % tracks.length;
+        lastIndexRef.current[category] = nextIndex;
+        const selectedTrack = tracks[nextIndex];
 
         // Force stop ANY previous playback before starting loading
         stopAll();
 
-        const buffer = await loadBuffer(randomTrack);
+        const buffer = await loadBuffer(selectedTrack);
         if (!buffer || isMuted) return;
 
         // Ensure we didn't start another playback while loading
@@ -119,7 +127,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         
         source.onended = () => {
             if (!isMuted && currentCategoryRef.current === category) {
-                playCategory(category, 3);
+                playCategory(category, 5); // Longer crossfade for loop
             }
         };
 
@@ -203,7 +211,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <AudioContext.Provider value={{ triggerAuraSound, isMuted, toggleMute, volume, setVolume }}>
+        <AudioContext.Provider value={{ triggerAuraSound, playAuraNotification: triggerAuraSound, isMuted, toggleMute, volume, setVolume }}>
             {children}
             
             {/* Center Right Vertical Tab UI */}

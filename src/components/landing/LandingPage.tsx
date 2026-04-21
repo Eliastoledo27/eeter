@@ -26,6 +26,7 @@ import { DropCalendarSection } from '@/components/landing/DropCalendarSection';
 import { FAQSection } from '@/components/landing/FAQSection';
 import { Product } from '@/domain/entities/Product';
 import { useCatalog } from '@/hooks/useCatalog';
+import { PulseTicker } from '@/components/pulse/PulseTicker';
 
 const CURATED_PRODUCTS: Product[] = [
     {
@@ -158,15 +159,16 @@ function TrustStrip() {
 // --- HERO SECTION ---
 const HeroSection = ({ products }: { products: Product[] }) => {
     return (
-        <section className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#020202]">
-            {/* Massive background text */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none overflow-hidden">
-                <span className="text-[40vw] font-black tracking-tighter leading-none translate-y-20">ÉTER</span>
+        <section className="relative min-h-[100dvh] w-screen flex flex-col items-center justify-center overflow-hidden bg-[#020202] max-w-full">
+            {/* Massive background text - Hidden or reduced on mobile */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.02] select-none overflow-hidden max-w-full">
+                <span className="hidden sm:block text-[40vw] font-black tracking-tighter leading-none translate-y-20">ÉTER</span>
+                <span className="sm:hidden text-[45vw] font-black tracking-tighter leading-none translate-y-10 opacity-30">ÉTER</span>
             </div>
 
             {/* Glowing Orbs */}
-            <div className="absolute top-1/4 -left-20 w-[600px] h-[600px] bg-[#8B5CF6]/10 blur-[160px] rounded-full pointer-events-none animate-pulse" />
-            <div className="absolute bottom-1/4 -right-20 w-[600px] h-[600px] bg-[#00E5FF]/10 blur-[160px] rounded-full pointer-events-none animate-pulse-slow" />
+            <div className="absolute top-1/4 -left-20 sm:-left-40 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-[#8B5CF6]/10 blur-[80px] sm:blur-[160px] rounded-full pointer-events-none animate-pulse" />
+            <div className="absolute bottom-1/4 -right-20 sm:-right-40 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-[#00E5FF]/10 blur-[80px] sm:blur-[160px] rounded-full pointer-events-none animate-pulse-slow" />
 
             {/* Mesh Gradient / Grain */}
             <GrainOverlay />
@@ -178,7 +180,7 @@ const HeroSection = ({ products }: { products: Product[] }) => {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 1, ease: 'backOut' }}
                 >
-                    <span className="inline-flex items-center gap-2.5 px-6 py-2.5 bg-white/[0.03] border border-white/10 text-[#00E5FF] text-[10px] font-black tracking-[0.5em] uppercase rounded-full mb-10 backdrop-blur-3xl shadow-[0_0_30px_rgba(0,229,255,0.1)]">
+                    <span className="inline-flex items-center gap-2.5 px-4 sm:px-6 py-2.5 bg-white/[0.03] border border-white/10 text-[#00E5FF] text-[9px] sm:text-[10px] font-black tracking-[0.2em] sm:tracking-[0.5em] uppercase rounded-full mb-10 backdrop-blur-3xl shadow-[0_0_30px_rgba(0,229,255,0.1)]">
                         <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00E5FF] opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00E5FF]"></span>
@@ -188,14 +190,14 @@ const HeroSection = ({ products }: { products: Product[] }) => {
                 </motion.div>
 
                 {/* Main title with clip text gradient */}
-                <div className="relative mb-6">
+                <div className="relative mb-6 max-w-full overflow-hidden">
                     <motion.h1
                         initial={{ opacity: 0, y: 100 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                        className="text-[clamp(4.5rem,18vw,16rem)] font-black tracking-tighter text-white leading-[0.75] select-none"
+                        className="text-[clamp(2.5rem,15vw,16rem)] sm:text-[clamp(3rem,18vw,16rem)] font-black tracking-tighter text-white leading-[0.75] select-none flex items-baseline justify-center"
                     >
-                        ÉTER<span className="text-[#00E5FF] italic font-light drop-shadow-[0_0_20px_rgba(0,229,255,0.5)]">.</span>
+                        ÉTER<span className="text-[#00E5FF] italic font-light drop-shadow-[0_0_20px_rgba(0,229,255,0.5)] translate-x-1 sm:translate-x-2">.</span>
                     </motion.h1>
                     
                     <motion.div 
@@ -210,23 +212,23 @@ const HeroSection = ({ products }: { products: Product[] }) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1.2, delay: 0.8 }}
-                    className="text-[12px] font-black tracking-[0.5em] uppercase text-white/50 mb-12 flex items-center gap-4 justify-center"
+                    className="text-[10px] sm:text-[12px] font-black tracking-[0.1em] sm:tracking-[0.5em] uppercase text-white/50 mb-12 flex items-center gap-4 justify-center"
                 >
-                    <span className="w-8 h-px bg-white/20" />
+                    <span className="hidden sm:block w-8 h-px bg-white/20" />
                     Archive of Premium Brazilian Footwear
-                    <span className="w-8 h-px bg-white/20" />
+                    <span className="hidden sm:block w-8 h-px bg-white/20" />
                 </motion.p>
 
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, delay: 1 }}
-                    className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20 w-full"
+                    className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20 w-full max-w-xs sm:max-w-none mx-auto"
                 >
                     <Link href="/catalog" className="w-full sm:w-auto overflow-hidden group relative">
                         <div className="absolute inset-0 bg-gradient-to-r from-[#00E5FF] to-[#8B5CF6] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         <button
-                            className="bg-[#00E5FF] group-hover:bg-transparent text-black group-hover:text-white font-black uppercase tracking-[0.2em] shadow-[0_0_40px_rgba(0,229,255,0.3)] hover:shadow-[0_0_60px_rgba(0,229,255,0.6)] transition-all w-full sm:w-auto h-20 px-14 text-sm relative z-10"
+                            className="bg-[#00E5FF] group-hover:bg-transparent text-black group-hover:text-white font-black uppercase tracking-[0.1em] sm:tracking-[0.2em] shadow-[0_0_40px_rgba(0,229,255,0.3)] hover:shadow-[0_0_60px_rgba(0,229,255,0.6)] transition-all w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-14 text-xs sm:text-sm relative z-10"
                         >
                             Ver el Catálogo
                         </button>
@@ -235,20 +237,19 @@ const HeroSection = ({ products }: { products: Product[] }) => {
                     <Link href="/register" className="w-full sm:w-auto">
                         <Button
                             variant="outline"
-                            className="w-full sm:w-auto h-20 px-14 bg-white/[0.02] hover:bg-white/5 text-white border-white/10 font-black tracking-[0.2em] uppercase text-sm rounded-none backdrop-blur-xl group"
+                            className="w-full sm:w-auto h-16 sm:h-20 px-6 sm:px-14 bg-white/[0.02] hover:bg-white/5 text-white border-white/10 font-black tracking-[0.05em] sm:tracking-[0.2em] uppercase text-[10px] sm:text-sm rounded-none backdrop-blur-xl group"
                         >
                             Unirme como Revendedor
-                            <ArrowRight size={16} className="ml-3 group-hover:translate-x-2 transition-transform" />
+                            <ArrowRight size={14} className="ml-2 sm:ml-3 group-hover:translate-x-2 transition-transform" />
                         </Button>
                     </Link>
                 </motion.div>
 
-                {/* Performance Stats Overlay */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1.5, delay: 1.2 }}
-                    className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-16 border-t border-white/5 pt-12 text-left"
+                    className="w-full grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-16 border-t border-white/5 pt-12 text-left pr-12 sm:pr-0"
                 >
                     {[
                         { label: 'Stock Total', value: '4.7k+', detail: 'Unidades listas' },
@@ -258,7 +259,7 @@ const HeroSection = ({ products }: { products: Product[] }) => {
                     ].map((s, i) => (
                         <div key={s.label} className="group cursor-default">
                             <div className="text-[9px] font-black text-[#00E5FF] uppercase tracking-[0.3em] mb-1 group-hover:translate-x-1 transition-transform">{s.label}</div>
-                            <div className="text-3xl font-black text-white whitespace-nowrap">{s.value}</div>
+                            <div className="text-xl sm:text-3xl font-black text-white whitespace-nowrap">{s.value}</div>
                             <div className="text-[10px] text-white/30 uppercase tracking-widest mt-1">{s.detail}</div>
                         </div>
                     ))}
@@ -837,6 +838,7 @@ export default function LandingPage() {
             <Navbar />
 
             <HeroSection products={products} />
+            <PulseTicker />
             <TrustStrip />
             <BrandMarquee />
             <StatsSection />

@@ -22,7 +22,7 @@ export function AiConcierge() {
         {
             id: 'welcome',
             role: 'assistant',
-            content: 'Soy **Aura**, tu curadora de estilo en ÉTER. Contame qué vibra buscás y tu talle — te armo el match perfecto.'
+            content: 'Hola, soy **Aura**, la solución a tus problemas en ÉTER Store. Decime qué estás buscando o qué situación tenés y te ayudo a resolverlo con estilo y rapidez. Mi misión es cambiarte el día ✨'
         }
     ]);
     const [isLoading, setIsLoading] = useState(false);
@@ -82,15 +82,35 @@ export function AiConcierge() {
         }
     }, [isOpen]);
 
-    // Teaser timer
+    // Teaser loop: 10s shown, 60s hidden
     useEffect(() => {
-        let timer: NodeJS.Timeout;
-        if (!isOpen) {
-            timer = setTimeout(() => setShowTeaser(true), 5000);
-        } else {
+        if (isOpen) {
             setShowTeaser(false);
+            return;
         }
-        return () => clearTimeout(timer);
+
+        const runLoop = () => {
+            setShowTeaser(true);
+            const hideTimer = setTimeout(() => {
+                setShowTeaser(false);
+            }, 10000); // Shown for 10 seconds
+
+            return hideTimer;
+        };
+
+        const loopInterval = setInterval(() => {
+            if (!isOpen) {
+                runLoop();
+            }
+        }, 70000); // 10s shown + 60s hidden = 70s cycle
+
+        // Initial trigger
+        const initialTimer = setTimeout(runLoop, 5000);
+
+        return () => {
+            clearInterval(loopInterval);
+            clearTimeout(initialTimer);
+        };
     }, [isOpen]);
 
     // Auto-focus input on open
@@ -104,7 +124,7 @@ export function AiConcierge() {
         setMessages([{
             id: 'welcome',
             role: 'assistant',
-            content: 'Soy **Aura**, tu curadora de estilo en ÉTER. Contame qué vibra buscás y tu talle — te armo el match perfecto.'
+            content: 'Hola, soy **Aura**, la solución a tus problemas en ÉTER. Decime qué estás buscando o qué situación tenés y te ayudo a resolverlo con estilo y rapidez. Mi misión es cambiarte el día ✨'
         }]);
         localStorage.removeItem('aura-session');
         sessionStorage.setItem('aura-visit-count', '1');
@@ -188,7 +208,7 @@ export function AiConcierge() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 8, scale: 0.92 }}
                         transition={{ type: 'spring', damping: 20 }}
-                        className="relative max-w-[260px]"
+                        className="relative max-w-[170px] sm:max-w-[260px]"
                     >
                         <div className="relative bg-[#0A0A0A]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl p-4 shadow-[0_16px_48px_rgba(0,0,0,0.6)]">
                             {/* Top accent line */}
@@ -203,8 +223,8 @@ export function AiConcierge() {
                                     <Sparkles size={14} className="text-white" />
                                 </div>
                                 <div>
-                                    <p className="text-white/80 text-[13px] leading-relaxed">
-                                        ¿Buscás algo <span className="text-[#00FFFF] font-semibold">exclusivo</span>? Te ayudo a encontrarlo.
+                                    <p className="text-white/80 text-[11px] sm:text-[13px] leading-relaxed">
+                                        ¿Buscás la <span className="text-[#00FFFF] font-semibold">solución</span> a tus problemas? Estoy acá para ayudarte.
                                     </p>
                                 </div>
                             </div>
@@ -260,7 +280,7 @@ export function AiConcierge() {
                                         <h3 className="text-white font-bold text-sm tracking-tight">Aura</h3>
                                         <span className="text-[8px] font-bold bg-gradient-to-r from-[#8B5CF6] to-[#00FFFF] text-transparent bg-clip-text uppercase tracking-widest">AI</span>
                                     </div>
-                                    <span className="text-[10px] text-white/30 font-medium">Style Curator · En línea</span>
+                                    <span className="text-[10px] text-white/30 font-medium">La solución a tus problemas · En línea</span>
                                 </div>
                             </div>
 
