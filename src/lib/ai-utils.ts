@@ -26,7 +26,7 @@ export const analyzeImageWithName = async (imageUrl: string, geminiApiKey: strin
         // 2. Call Gemini
         const prompt = "Analiza esta imagen de calzado y dime un nombre real, comercial y atractivo para este modelo. Responde únicamente con el nombre, sin puntos finales ni texto adicional. Ejemplos: Nike Air Max 270, Éter Quantum Ultra, Adidas Ultraboost V4.";
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

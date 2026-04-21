@@ -11,7 +11,7 @@ export async function processAITool(tool: string, input: any, apiKey?: string) {
         }
 
         const genAI = new GoogleGenerativeAI(finalKey.trim());
-        // Usando gemini-2.5-flash para máxima velocidad y precisión (Feb 2026)
+        // Usando gemini-1.5-flash-latest para estabilidad de conexión y velocidad.
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.5-flash',
             generationConfig: {

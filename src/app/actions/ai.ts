@@ -2,7 +2,7 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const apiKey = process.env.GOOGLE_API_KEY;
+const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GOOGLE_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 export async function generateProductDescription(name: string, category: string, price: number) {
@@ -15,7 +15,7 @@ export async function generateProductDescription(name: string, category: string,
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
       Actúa como un experto redactor de productos para e-commerce y un investigador de mercado.
@@ -56,7 +56,7 @@ export async function generateDashboardInsights(metrics: { label: string; value:
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const metricsStr = metrics.map(m => `- ${m.label}: ${m.value} (Objetivo: ${m.target})`).join('\n');
 

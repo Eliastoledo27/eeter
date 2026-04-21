@@ -166,39 +166,74 @@ export function Footer() {
 
 
                     {/* Divider */}
-                    <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-10" />
+                    <div className="h-px bg-white/[0.03] mb-10" />
 
-                    {/* Certified bar */}
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-                        <div className="flex items-center gap-3">
-                            <Image
-                                src="https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Brazil.svg"
-                                alt="Calzado brasilero"
-                                width={24}
-                                height={18}
-                                className="opacity-60"
-                            />
-                            <span className="text-[10px] text-gray-600 uppercase tracking-widest">
-                                Calzado de origen brasilero — verificado y certificado por ÉTER
-                            </span>
+                    {/* Certified & Trust Bar */}
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 p-5 bg-white/[0.02] border border-white/[0.05] rounded-2xl backdrop-blur-sm">
+                        <div className="flex items-center gap-4">
+                            {/* Argentina Flag */}
+                            <div className="relative w-10 h-7 rounded-sm overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/10">
+                                <Image
+                                    src="https://flagcdn.com/ar.svg"
+                                    alt="Argentina"
+                                    fill
+                                    sizes="40px"
+                                    className="object-cover"
+                                />
+                            </div>
+
+                            {/* ÉTER Brand Logo */}
+                            <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-white/10 bg-black shadow-lg">
+                                <Image
+                                    src="/icon.svg"
+                                    alt="ÉTER Certified"
+                                    fill
+                                    sizes="40px"
+                                    className="object-contain p-1.5"
+                                />
+                            </div>
+
+                            {/* Brazil Flag */}
+                            <div className="relative w-10 h-7 rounded-sm overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/10">
+                                <Image
+                                    src="https://flagcdn.com/br.svg"
+                                    alt="Brasil"
+                                    fill
+                                    sizes="40px"
+                                    className="object-cover"
+                                />
+                            </div>
+
+                            <div className="ml-2">
+                                <h4 className="text-white font-black text-[11px] uppercase tracking-widest mb-1 shadow-black drop-shadow-md">Calzado 100% Brasilero</h4>
+                                <span className="text-[9px] text-[#00E5FF] uppercase tracking-[0.2em] block">
+                                    Verificado y Certificado por ÉTER
+                                </span>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2 text-[10px] text-gray-600 uppercase tracking-widest">
-                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                            Plataforma operativa 24/7
+                        
+                        <div className="flex items-center gap-3 px-4 py-2 bg-[#00E5FF]/10 border border-[#00E5FF]/20 rounded-full">
+                            <span className="relative flex h-2.5 w-2.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00E5FF] opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00E5FF]"></span>
+                            </span>
+                            <span className="text-[10px] text-[#00E5FF] font-black uppercase tracking-[0.2em]">
+                                Plataforma Operativa 24/7
+                            </span>
                         </div>
                     </div>
 
                     {/* Bottom Bar */}
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-gray-700">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] text-gray-500 font-medium tracking-widest uppercase pb-6">
                         <p>© {currentYear} ÉTER STORE. Todos los derechos reservados.</p>
-                        <div className="flex gap-8">
-                            <Link href="/privacy" className="hover:text-gray-400 transition-colors">
+                        <div className="flex flex-wrap justify-center gap-x-8 gap-y-4">
+                            <Link href="/privacy" className="hover:text-[#00E5FF] transition-colors">
                                 Política de Privacidad
                             </Link>
-                            <Link href="/terms" className="hover:text-gray-400 transition-colors">
+                            <Link href="/terms" className="hover:text-[#00E5FF] transition-colors">
                                 Términos de Servicio
                             </Link>
-                            <Link href="/cookies" className="hover:text-gray-400 transition-colors">
+                            <Link href="/cookies" className="hover:text-[#00E5FF] transition-colors">
                                 Cookies
                             </Link>
                         </div>

@@ -51,6 +51,32 @@ export default async function ProductDetailPage({
 
     return (
         <div className="min-h-screen bg-[#050505] text-white overflow-x-hidden">
+            {/* Structured Data for SEO */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Product",
+                        "name": product.name,
+                        "image": product.images,
+                        "description": `Adquiere ${product.name} en ÉTER Store. Calzado premium importado con calidad G5/OG.`,
+                        "brand": {
+                            "@type": "Brand",
+                            "name": "ÉTER"
+                        },
+                        "offers": {
+                            "@type": "Offer",
+                            "priceCurrency": "ARS",
+                            "price": product.base_price,
+                            "availability": "https://schema.org/InStock",
+                            "url": `https://eter-store.vercel.app/catalog/${product.id}`,
+                            "priceValidUntil": "2026-12-31"
+                        }
+                    })
+                }}
+            />
+
             {/* Floating Geometric Shapes with Parallax */}
             <FloatingShapes />
 

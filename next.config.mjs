@@ -25,6 +25,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'tolzrvsykzmvndvomllt.supabase.co',
+      },
       ...(process.env.NEXT_PUBLIC_SUPABASE_URL
         ? [{
           protocol: 'https',

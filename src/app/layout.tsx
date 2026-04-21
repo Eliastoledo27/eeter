@@ -8,6 +8,7 @@ import { AuthInitializer } from '@/components/auth/AuthInitializer';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { CartSidebar } from '@/components/cart/CartSidebar';
 import { AiConcierge } from '@/components/ai/AiConcierge';
+import { AudioProvider } from '@/providers/AudioProvider';
 
 
 const manrope = Manrope({
@@ -19,14 +20,24 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: {
     template: '%s | ÉTER Store',
-    default: 'ÉTER Store | Archivo Premium de Sneakers',
+    default: 'ÉTER Store | Calzado Brasilero Premium & Sneakers de Lujo',
   },
-  description: "Accede al catálogo de sneakers más exclusivo, gestiona tu stock digital y escala tu negocio de dropshipping con la infraestructura tecnológica de ÉTER.",
-  keywords: ["sneakers", "calzado premium", "reseller", "zapatillas", "logística", "emprendimiento", "calzado de lujo", "dropshipping", "argentina"],
+  description: "La tienda N°1 de calzado premium brasilero en Argentina. Accede a stock exclusivo, precios mayoristas y convertite en revendedor de ÉTER. Calidad certificada y envíos a todo el país.",
+  keywords: [
+    "sneakers argentina", "calzado brasilero", "zapatillas por mayor", 
+    "revendedor de calzado", "eter store", "sneakers premium", 
+    "calzado de lujo", "dropshipping argentina", "zapatillas importadas"
+  ],
+  authors: [{ name: "ÉTER Store Engineering" }],
+  creator: "ÉTER Store",
+  publisher: "ÉTER Store",
   metadataBase: new URL('https://www.eter.store'),
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
-    title: 'ÉTER Store | The New Standard',
-    description: 'Ingeniería de precisión y estética de lujo. Vende calzado premium brasilero con logística automatizada.',
+    title: 'ÉTER Store | The New Standard in Premium Footwear',
+    description: 'Ingeniería de precisión y estética de lujo. Vende calzado premium brasilero con logística automatizada y los mejores márgenes del mercado.',
     url: 'https://www.eter.store',
     siteName: 'ÉTER Store',
     locale: 'es_AR',
@@ -42,23 +53,46 @@ export const metadata: Metadata = {
   },
   twitter: {
       card: 'summary_large_image',
-      title: 'ÉTER Store | The New Standard',
+      title: 'ÉTER Store | Calzado Premium & Dropshipping',
       description: 'Ingeniería de precisión y estética de lujo. Vende calzado premium con logística automatizada.',
       images: ['/og-image.jpg'],
+      creator: '@eterstore',
   },
   icons: {
     icon: [
-      { url: '/favicon.ico', type: 'image/x-icon' },
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/icon.svg?v=2', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/icon.svg?v=2', type: 'image/svg+xml' },
     ],
   },
   verification: {
+    google: 'your-google-verification-code', // Recommended to add
     other: {
       'nave-verification': 'P-69AF-88A4-X',
       'nave-domain-verification': 'P-69AF-88A4-X',
       'nave': 'P-69AF-88A4-X'
     }
+  }
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "ÉTER Store",
+  "url": "https://www.eter.store",
+  "logo": "https://www.eter.store/icon.svg",
+  "description": "Distribuidora líder de calzado premium brasilero y plataforma para revendedores.",
+  "sameAs": [
+    "https://facebook.com/eterstore",
+    "https://instagram.com/eterstore"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+5492236204002",
+    "contactType": "customer service",
+    "areaServed": "AR",
+    "availableLanguage": "Spanish"
   }
 };
 
@@ -75,12 +109,18 @@ export default async function RootLayout({
       <body
         className={`${manrope.variable} font-sans antialiased bg-[#0A0A0A] text-white`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <NextIntlClientProvider messages={messages}>
           <AuthInitializer>
-            {children}
-            <AuthModal />
-            <CartSidebar />
-            <AiConcierge />
+            <AudioProvider>
+              {children}
+              <AuthModal />
+              <CartSidebar />
+              <AiConcierge />
+            </AudioProvider>
           </AuthInitializer>
           <Toaster position="top-center" theme="dark" richColors />
         </NextIntlClientProvider>

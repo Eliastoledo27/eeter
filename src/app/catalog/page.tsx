@@ -4,8 +4,8 @@ import CatalogClient from './CatalogClient';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Catálogo | Éter Store',
-    description: 'Explora nuestra colección exclusiva de sneakers y accesorios de lujo.',
+    title: 'Catálogo Oficial Éter Store | Zapatillas Importadas y Stock Inmediato',
+    description: 'Comprá las mejores zapatillas premium de Brasil en Mar del Plata. Modelos exclusivos, calidad G5/Espejo y envíos express a toda Argentina. ¡Entrá y llevate las tuyas!',
 };
 
 export const revalidate = 0; // Fresh stock for bots
@@ -21,7 +21,6 @@ export default async function CatalogPage({
     // Detect typical bot agents or explicit text request
     const isBot = /Chatfuel|ManyChat|curl|bot|googlebot|crawler/i.test(userAgent) || searchParams.format === 'text';
 
-    // If it's a bot, we serve the "Green Letters" text version directly for better indexing/parsing
     if (isBot) {
         const repository = new SupabaseProductRepository();
         const products = await repository.findAll();
@@ -40,7 +39,7 @@ export default async function CatalogPage({
 - **Precio**: $${product.basePrice}
 - **Stock Total**: ${product.totalStock}
 - **Talles**: ${sizesStr}
-- **Link**: https://eter.store/c/${product.category?.toLowerCase() || 'shoes'}/${product.id}
+- **Link**: https://eter.store/catalog/${product.id}
 - **Imagen**: ${product.images?.[0] || ''}`;
         }).join('\n\n---\n\n');
 
@@ -61,6 +60,24 @@ export default async function CatalogPage({
         );
     }
 
+    // JSON-LD for rich snippets globally in Catalog
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "Catálogo Oficial Éter Store",
+        "description": "Comprá las mejores zapatillas premium de Brasil en Mar del Plata. Modelos exclusivos, calidad G5/Espejo y envíos express a toda Argentina.",
+        "url": "https://eter.store/catalog"
+    };
+
     // For normal users, we serve the premium visual experience
-    return <CatalogClient />;
+    return (
+        <>
+            <h1 className="sr-only">Catálogo Oficial Éter Store | Zapatillas Importadas y Stock Inmediato</h1>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <CatalogClient />
+        </>
+    );
 }

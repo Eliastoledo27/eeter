@@ -6,7 +6,8 @@ import {
   X, Plus, Minus, ShoppingBag, Trash2, ArrowRight, ArrowLeft,
   ShieldCheck, RefreshCw, User, Phone, MapPin,
   CheckCircle2, Building2, Tag, Percent, Loader2, Wallet,
-  CreditCard, Banknote, Copy, MessageCircle, ExternalLink
+  CreditCard, Banknote, Copy, MessageCircle, ExternalLink,
+  Sparkles, Target, Shield, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
@@ -259,13 +260,21 @@ _Gracias por elegir ÉTER_ 🖤`;
             className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200]"
           />
 
-          <motion.div
+            <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             className="fixed right-0 top-0 bottom-0 w-full sm:w-[500px] bg-[#050505] border-l border-white/5 z-[210] shadow-2xl flex flex-col overflow-hidden"
           >
+            {/* Scanline / Grain Overlay for Premium Feel */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-[0]">
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 contrast-150 mix-blend-overlay" />
+                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] via-transparent to-transparent animate-scanline" />
+            </div>
+
+            {/* Glowing Accent */}
+            <div className="absolute -top-[10%] -right-[10%] w-[300px] h-[300px] bg-[#00E5FF]/5 blur-[100px] rounded-full pointer-events-none" />
             {/* ── Header ── */}
             <header className="flex items-center justify-between px-6 md:px-8 py-5 border-b border-white/5 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
               <div className="flex items-center gap-3">
@@ -586,49 +595,75 @@ _Gracias por elegir ÉTER_ 🖤`;
 
               {/* ════════════════════ STEP: TRANSFERENCIA ════════════════════ */}
               {cartStep === 'transferencia' && (
-                <div className="px-6 md:px-8 py-8 animate-in slide-in-from-right-10 duration-500">
-                  {/* Ticket */}
-                  <div className="bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10 rounded-[2rem] p-8 relative overflow-hidden mb-8">
-                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 to-emerald-400" />
-
-                    <div className="text-center mb-6">
-                      <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Banknote className="text-emerald-400" size={28} />
-                      </div>
-                      <h3 className="text-lg font-black text-white uppercase tracking-tight">Datos para Transferir</h3>
-                      <p className="text-[10px] text-gray-500 mt-1">Realizá tu transferencia y envianos el comprobante</p>
+                <div className="px-6 md:px-8 py-8 animate-in slide-in-from-right-10 duration-500 flex-1 overflow-y-auto">
+                  {/* Digital Holographic Ticket */}
+                  <div className="bg-[#0A0A0A] border border-emerald-500/30 rounded-[2.5rem] p-8 relative overflow-hidden mb-8 shadow-[0_0_50px_rgba(16,185,129,0.1)] group">
+                    {/* Scanlines for the ticket */}
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay" />
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-600 via-emerald-400 to-emerald-600 animate-pulse" />
+                    
+                    {/* Watermark Logo */}
+                    <div className="absolute -bottom-10 -right-10 opacity-[0.03] rotate-12 pointer-events-none">
+                      <Sparkles size={200} className="text-emerald-500" />
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="text-center mb-8 relative z-10">
+                      <div className="w-20 h-20 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-5 rotate-3 hover:rotate-0 transition-transform duration-500 shadow-[0_10px_30px_rgba(16,185,129,0.2)]">
+                        <Banknote className="text-emerald-400" size={32} />
+                      </div>
+                      <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">Orden de <span className="text-emerald-400">Transferencia</span></h3>
+                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest leading-none">Beneficio VIP: 10% OFF Aplicado</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 relative z-10">
                       {[
-                        { label: 'ALIAS', value: BANK_DATA.alias, key: 'alias' },
-                        { label: 'TITULAR', value: BANK_DATA.titular, key: 'titular' },
-                        { label: 'BANCO', value: BANK_DATA.banco, key: 'banco' },
-                      ].map(({ label, value, key }) => (
-                        <div key={key} className="flex items-center justify-between bg-black/50 border border-white/5 rounded-xl px-4 py-3">
-                          <div>
-                            <span className="text-[7px] font-black text-gray-600 uppercase tracking-[0.3em] block">{label}</span>
-                            <span className="text-sm font-bold text-white">{value}</span>
+                        { label: 'ALIAS DE CUENTA', value: BANK_DATA.alias, key: 'alias', icon: Target },
+                        { label: 'TITULAR REGISTRADO', value: BANK_DATA.titular, key: 'titular', icon: Shield },
+                        { label: 'ENTIDAD BANCARIA', value: BANK_DATA.banco, key: 'banco', icon: Zap },
+                      ].map(({ label, value, key, icon: Icon }) => (
+                        <div key={key} className="group/item relative overflow-hidden">
+                          <div className="flex items-center justify-between bg-white/[0.03] hover:bg-white/[0.05] border border-white/[0.06] rounded-2xl px-5 py-4 transition-all group-hover/item:border-emerald-500/30">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-xl bg-white/[0.03] flex items-center justify-center text-gray-500 group-hover/item:text-emerald-400 transition-colors">
+                                <Icon size={18} />
+                              </div>
+                              <div>
+                                <span className="text-[8px] font-black text-gray-500 uppercase tracking-[0.2em] block mb-0.5">{label}</span>
+                                <span className="text-sm font-bold text-white tracking-tight">{value}</span>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => copyToClipboard(value, key)}
+                              className={cn(
+                                "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
+                                copiedField === key 
+                                  ? "bg-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.5)]" 
+                                  : "bg-white/[0.05] text-gray-400 hover:text-white"
+                              )}
+                            >
+                              {copiedField === key ? <CheckCircle2 size={16} /> : <Copy size={16} />}
+                            </button>
                           </div>
-                          <button
-                            onClick={() => copyToClipboard(value, key)}
-                            className={cn(
-                              "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
-                              copiedField === key ? "bg-emerald-500/20 text-emerald-400" : "bg-white/5 text-gray-500 hover:text-white"
-                            )}
-                          >
-                            {copiedField === key ? <CheckCircle2 size={14} /> : <Copy size={14} />}
-                          </button>
                         </div>
                       ))}
                     </div>
 
-                    <div className="mt-6 bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Monto a Transferir</span>
-                        <span className="text-2xl font-black text-emerald-400">${orderedTotal.toLocaleString('es-AR')}</span>
+                    <div className="mt-8 bg-emerald-500/10 border border-emerald-500/20 rounded-[1.5rem] p-6 relative overflow-hidden shadow-inner">
+                      <div className="flex justify-between items-end relative z-10">
+                        <div>
+                          <span className="text-[10px] font-black text-emerald-400/60 uppercase tracking-[0.2em] block mb-1">Monto Total Final</span>
+                          <span className="text-4xl font-black text-emerald-400 tracking-tighter italic">${orderedTotal.toLocaleString('es-AR')}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[8px] font-bold text-gray-500 uppercase block">Ref Code</span>
+                          <span className="text-xs font-black text-white font-mono">{referenceCode}</span>
+                        </div>
                       </div>
-                      <p className="text-[8px] text-gray-500 mt-1">Ref: {referenceCode}</p>
+                      {/* Grid effect inside amount box */}
+                      <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #10b981 0.5px, transparent 0.5px)', backgroundSize: '10px 10px' }} />
                     </div>
                   </div>
 

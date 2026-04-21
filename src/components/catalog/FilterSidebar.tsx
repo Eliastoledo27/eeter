@@ -6,6 +6,9 @@ interface FilterSidebarProps {
     categories: string[];
     activeCategory: string;
     onCategoryChange: (category: string) => void;
+    occasions: string[];
+    activeOccasion: string;
+    onOccasionChange: (occasion: string) => void;
     priceRange: [number, number];
     onPriceChange: (range: [number, number]) => void;
     selectedSizes: string[];
@@ -19,6 +22,9 @@ export function FilterSidebar({
     categories,
     activeCategory,
     onCategoryChange,
+    occasions,
+    activeOccasion,
+    onOccasionChange,
     priceRange,
     onPriceChange,
     selectedSizes,
@@ -36,7 +42,7 @@ export function FilterSidebar({
         onSizesChange(newSizes);
     };
 
-    const hasFilters = activeCategory !== 'Todos' || selectedSizes.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000000;
+    const hasFilters = activeCategory !== 'Todos' || activeOccasion !== 'Todos' || selectedSizes.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000000;
 
     return (
         <aside className="w-full space-y-6 pb-8">
@@ -79,6 +85,26 @@ export function FilterSidebar({
                             }`}
                         >
                             {category}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Occasions */}
+            <div className="space-y-3 pt-4 border-t border-white/[0.06]">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-white/30">Ocasión</span>
+                <div className="flex flex-wrap gap-2">
+                    {['Todos', ...occasions].map((occ) => (
+                        <button
+                            key={occ}
+                            onClick={() => onOccasionChange(occ)}
+                            className={`px-3 py-1.5 rounded-full text-[10px] font-bold transition-all border ${
+                                activeOccasion === occ
+                                    ? 'bg-[#00E5FF] border-[#00E5FF] text-black shadow-[0_2px_10px_rgba(0,229,255,0.2)]'
+                                    : 'border-white/10 text-white/40 hover:border-white/20 hover:text-white/60'
+                            }`}
+                        >
+                            {occ}
                         </button>
                     ))}
                 </div>

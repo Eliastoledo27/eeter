@@ -157,143 +157,124 @@ function TrustStrip() {
 
 // --- HERO SECTION ---
 const HeroSection = ({ products }: { products: Product[] }) => {
-    const heroProduct = useMemo(() => {
-        if (!products || !products.length) return null;
-        return [...products].sort((a, b) => b.basePrice - a.basePrice)[0];
-    }, [products]);
-    void heroProduct;
-
-    const videoUrl = "https://assets.mixkit.co/videos/preview/mixkit-shoes-on-the-shelves-of-a-fashion-store-14072-large.mp4";
-    const stableVideoUrl = videoUrl; 
-
     return (
-        <section className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden">
-            {/* Background video */}
-            <motion.div
-                initial={{ scale: 1.08 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 3, ease: 'easeOut' }}
-                className="absolute inset-0 -z-10"
-            >
-                <video
-                    src={stableVideoUrl}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover opacity-50"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black" />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/50" />
-            </motion.div>
+        <section className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#020202]">
+            {/* Massive background text */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none overflow-hidden">
+                <span className="text-[40vw] font-black tracking-tighter leading-none translate-y-20">ÉTER</span>
+            </div>
+
+            {/* Glowing Orbs */}
+            <div className="absolute top-1/4 -left-20 w-[600px] h-[600px] bg-[#8B5CF6]/10 blur-[160px] rounded-full pointer-events-none animate-pulse" />
+            <div className="absolute bottom-1/4 -right-20 w-[600px] h-[600px] bg-[#00E5FF]/10 blur-[160px] rounded-full pointer-events-none animate-pulse-slow" />
+
+            {/* Mesh Gradient / Grain */}
+            <GrainOverlay />
 
             {/* Content */}
-            <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-7xl mx-auto pt-24 pb-12">
-                {/* Label */}
+            <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-7xl mx-auto pt-20 pb-12">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 1, ease: 'backOut' }}
                 >
-                    <span className="inline-flex items-center gap-2 px-5 py-2 bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF] text-[10px] font-black tracking-[0.4em] uppercase rounded-full mb-8 backdrop-blur-xl">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-                        Cyan Neon Edition 2026 — Live Drop
+                    <span className="inline-flex items-center gap-2.5 px-6 py-2.5 bg-white/[0.03] border border-white/10 text-[#00E5FF] text-[10px] font-black tracking-[0.5em] uppercase rounded-full mb-10 backdrop-blur-3xl shadow-[0_0_30px_rgba(0,229,255,0.1)]">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00E5FF] opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00E5FF]"></span>
+                        </span>
+                        Eter Archive • 2026 Edition
                     </span>
                 </motion.div>
 
-                {/* Main title */}
-                <motion.h1
-                    initial={{ opacity: 0, y: 40 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, delay: 0.35, ease: [0.19, 1, 0.22, 1] }}
-                    className="text-[clamp(5rem,18vw,15rem)] font-black tracking-tighter text-white leading-[0.8] select-none mb-2"
-                >
-                    ÉTER<span className="text-[#00E5FF] italic">.</span>
-                </motion.h1>
+                {/* Main title with clip text gradient */}
+                <div className="relative mb-6">
+                    <motion.h1
+                        initial={{ opacity: 0, y: 100 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                        className="text-[clamp(4.5rem,18vw,16rem)] font-black tracking-tighter text-white leading-[0.75] select-none"
+                    >
+                        ÉTER<span className="text-[#00E5FF] italic font-light drop-shadow-[0_0_20px_rgba(0,229,255,0.5)]">.</span>
+                    </motion.h1>
+                    
+                    <motion.div 
+                        initial={{ opacity: 0, width: 0 }}
+                        animate={{ opacity: 1, width: '100%' }}
+                        transition={{ duration: 1.5, delay: 0.5 }}
+                        className="h-px bg-gradient-to-r from-transparent via-[#00E5FF]/50 to-transparent mt-4"
+                    />
+                </div>
 
-                {/* Claim line */}
                 <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ duration: 1, delay: 0.6 }}
-                    className="text-[11px] font-black tracking-[0.4em] uppercase text-white/40 mb-8"
+                    transition={{ duration: 1.2, delay: 0.8 }}
+                    className="text-[12px] font-black tracking-[0.5em] uppercase text-white/50 mb-12 flex items-center gap-4 justify-center"
                 >
-                    Calzado Brasilero Premium — Autenticado y Listo para Vender
+                    <span className="w-8 h-px bg-white/20" />
+                    Archive of Premium Brazilian Footwear
+                    <span className="w-8 h-px bg-white/20" />
                 </motion.p>
 
-                {/* Description */}
-                <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.9, delay: 0.7, ease: [0.19, 1, 0.22, 1] }}
-                    className="text-gray-400 text-base md:text-xl max-w-2xl mb-12 font-light leading-relaxed"
-                >
-                    La ingeniería de precisión se encuentra con la{' '}
-                    <span className="text-white font-medium">estética del diseño premium</span>.{' '}
-                    Vendé calzado brasilero con logística total incluida.
-                </motion.p>
-
-                {/* CTAs */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.9, delay: 0.9 }}
-                    className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 w-full"
+                    transition={{ duration: 1, delay: 1 }}
+                    className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20 w-full"
                 >
-                    <Link href="/catalog" className="w-full sm:w-auto">
+                    <Link href="/catalog" className="w-full sm:w-auto overflow-hidden group relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#00E5FF] to-[#8B5CF6] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         <button
-                            data-cursor="cta"
-                            className="bg-[#00E5FF] text-black font-black uppercase tracking-widest shadow-[0_0_20px_rgba(0,229,255,0.4)] hover:shadow-[0_0_40px_rgba(0,229,255,0.8)] hover:-translate-y-1 transition-all w-full sm:w-auto h-16 px-10 text-sm"
+                            className="bg-[#00E5FF] group-hover:bg-transparent text-black group-hover:text-white font-black uppercase tracking-[0.2em] shadow-[0_0_40px_rgba(0,229,255,0.3)] hover:shadow-[0_0_60px_rgba(0,229,255,0.6)] transition-all w-full sm:w-auto h-20 px-14 text-sm relative z-10"
                         >
-                            Ver el Catálogo 2026
+                            Ver el Catálogo
                         </button>
                     </Link>
+                    
                     <Link href="/register" className="w-full sm:w-auto">
                         <Button
                             variant="outline"
-                            className="w-full sm:w-auto h-16 px-10 bg-white/[0.04] hover:bg-white/10 text-white border-white/10 font-black tracking-[0.2em] uppercase text-sm rounded-none"
+                            className="w-full sm:w-auto h-20 px-14 bg-white/[0.02] hover:bg-white/5 text-white border-white/10 font-black tracking-[0.2em] uppercase text-sm rounded-none backdrop-blur-xl group"
                         >
                             Unirme como Revendedor
+                            <ArrowRight size={16} className="ml-3 group-hover:translate-x-2 transition-transform" />
                         </Button>
                     </Link>
                 </motion.div>
 
-                {/* Mini stats row */}
+                {/* Performance Stats Overlay */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ duration: 1, delay: 1.1 }}
-                    className="flex items-center gap-8 text-center"
+                    transition={{ duration: 1.5, delay: 1.2 }}
+                    className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-16 border-t border-white/5 pt-12 text-left"
                 >
                     {[
-                        { value: '+500', label: 'Revendedores' },
-                        { value: '100%', label: 'Autenticado' },
-                        { value: '30-50%', label: 'Margen' },
+                        { label: 'Stock Total', value: '4.7k+', detail: 'Unidades listas' },
+                        { label: 'Revendedores', value: '500+', detail: 'En todo el país' },
+                        { label: 'Tasa Entrega', value: '99.8%', detail: 'Logística Real' },
+                        { label: 'Margen Promedio', value: '45%', detail: 'Rentabilidad' },
                     ].map((s, i) => (
-                        <React.Fragment key={s.label}>
-                            <div>
-                                <div className="text-xl font-black text-white">{s.value}</div>
-                                <div className="text-[10px] text-gray-600 uppercase tracking-widest">{s.label}</div>
-                            </div>
-                            {i < 2 && <div className="w-px h-8 bg-white/10" />}
-                        </React.Fragment>
+                        <div key={s.label} className="group cursor-default">
+                            <div className="text-[9px] font-black text-[#00E5FF] uppercase tracking-[0.3em] mb-1 group-hover:translate-x-1 transition-transform">{s.label}</div>
+                            <div className="text-3xl font-black text-white whitespace-nowrap">{s.value}</div>
+                            <div className="text-[10px] text-white/30 uppercase tracking-widest mt-1">{s.detail}</div>
+                        </div>
                     ))}
                 </motion.div>
             </div>
 
-            {/* Section indicator */}
+            {/* Scroll Indicator */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.5 }}
-                className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
+                transition={{ delay: 2 }}
+                className="absolute bottom-12 flex flex-col items-center"
             >
-                <div className="flex items-center gap-4 text-[9px] font-black tracking-[0.5em] uppercase text-gray-600">
-                    <span>01</span>
-                    <div className="w-16 h-px bg-white/10" />
-                    <span className="text-[#00E5FF]">07</span>
+                <div className="w-px h-24 bg-gradient-to-b from-white/20 via-[#00E5FF]/60 to-transparent relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1/2 bg-white animate-scroll-down" />
                 </div>
-                <div className="w-px h-16 bg-gradient-to-b from-[#00E5FF]/60 to-transparent animate-pulse" />
             </motion.div>
         </section>
     );
@@ -318,111 +299,142 @@ const ProductShowcase = ({ products, loading }: { products: Product[]; loading: 
 
             <div className="max-w-[1440px] mx-auto px-6 lg:px-12 mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <motion.div
-                    initial={{ opacity: 0, x: -30 }}
+                    initial={{ opacity: 0, x: -50 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8 }}
-                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    className="relative z-10 block"
                 >
-                    <span className="text-[#00E5FF] tracking-[0.5em] uppercase text-[10px] font-black mb-4 block">
-                        Selección 2026
-                    </span>
-                    <h2 className="text-5xl md:text-6xl font-black tracking-tighter text-white uppercase leading-none">
-                        The Addictive<br />Flow.
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        viewport={{ once: true }}
+                        className="inline-flex items-center gap-2 px-3 py-1 bg-[#00E5FF]/[0.05] border border-[#00E5FF]/20 rounded-full mb-6"
+                    >
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
+                        <span className="text-[#00E5FF] tracking-[0.3em] uppercase text-[9px] font-black">
+                            TENDENCIAS 2026
+                        </span>
+                    </motion.div>
+                    
+                    <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-white uppercase leading-[0.85] mb-2 selection:bg-[#00E5FF] selection:text-black hover:drop-shadow-[0_0_30px_rgba(0,229,255,0.2)] transition-all">
+                        LO MÁS <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500">EXCLUSIVO.</span>
                     </h2>
-                    <p className="text-gray-600 text-xs mt-3 tracking-widest uppercase">
-                        Mostrando {showcaseProducts.length} de 47 modelos disponibles
+                    <p className="text-gray-400 text-xs mt-5 tracking-[0.2em] uppercase font-semibold border-l-2 border-[#00E5FF]/50 pl-3">
+                        Mostrando {showcaseProducts.length} de 47 modelos en stock
                     </p>
                 </motion.div>
 
-                <Link
-                    href="/catalog"
-                    className="group h-14 px-10 bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#00E5FF] hover:text-black hover:border-[#00E5FF] transition-all duration-500 text-[10px] font-black uppercase tracking-[0.3em] text-white gap-3"
+                <motion.div 
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                    viewport={{ once: true }}
                 >
-                    Ver Colección Completa
-                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
+                    <Link
+                        href="/catalog"
+                        className="group h-14 px-10 bg-white/[0.03] border border-[#00E5FF]/20 flex items-center justify-center hover:bg-[#00E5FF] hover:text-black shadow-[0_0_20px_rgba(0,229,255,0.05)] hover:shadow-[0_0_30px_rgba(0,229,255,0.4)] transition-all duration-500 text-[10px] font-black uppercase tracking-[0.3em] text-white gap-3 rounded-sm backdrop-blur-md"
+                    >
+                        Ver Colección Completa
+                        <ArrowRight size={14} className="group-hover:translate-x-2 group-hover:scale-110 transition-all duration-300" />
+                    </Link>
+                </motion.div>
             </div>
 
             {/* Horizontal scroll cards */}
-            <div className="flex gap-6 overflow-x-auto no-scrollbar px-6 lg:px-12 pb-8 snap-x snap-mandatory">
+            <div className="flex gap-6 overflow-x-auto hide-scrollbar px-6 lg:px-12 pb-16 snap-x snap-mandatory w-full scroll-smooth">
                 {showcaseProducts.map((product, idx) => (
                     <motion.div
                         key={product.id}
-                        initial={{ opacity: 0, y: 50 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: idx * 0.08 }}
-                        viewport={{ once: true }}
-                        className="min-w-[300px] md:min-w-[380px] snap-start group flex-shrink-0"
+                        initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: 0.7, delay: idx * 0.1, type: "spring", bounce: 0.3 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        className="min-w-[320px] md:min-w-[420px] snap-center md:snap-start group flex-shrink-0"
+                        whileHover={{ y: -8 }}
                     >
-                        <Link href="/catalog">
-                            {/* Image */}
-                            <div
-                                data-cursor="view"
-                                data-cursor-label="VER"
-                                className="relative aspect-[4/5] bg-[#0A0A0A] overflow-hidden mb-5 border border-white/[0.05] group-hover:border-[#00E5FF]/40 transition-all duration-700"
-                            >
-                                <Image
-                                    src={product.images?.[0] || 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?q=80'}
-                                    alt={product.name}
-                                    fill
-                                    sizes="(max-width: 768px) 100vw, 40vw"
-                                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-[1.04]"
-                                />
-                                {/* Hover overlay with CTA */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="absolute bottom-6 left-6 right-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                                    <button className="w-full py-3.5 bg-white text-black text-[9px] font-black uppercase tracking-widest hover:bg-[#00E5FF] transition-colors">
-                                        ASEGURAR ESTE PAR
-                                    </button>
-                                </div>
+                        <Link href={`/catalog/${product.id}`} className="block relative h-full">
+                            {/* Card Background Gradient Glow on Hover */}
+                            <div className="absolute -inset-1 bg-gradient-to-br from-[#00E5FF]/0 via-[#8B5CF6]/0 to-[#00E5FF]/0 group-hover:from-[#00E5FF]/40 group-hover:via-[#8B5CF6]/20 group-hover:to-[#00E5FF]/40 blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700 rounded-3xl" />
+                            
+                            <div className="relative h-full bg-[#050505] border border-white/[0.05] group-hover:border-white/[0.15] p-3 rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                                {/* Image Container */}
+                                <div
+                                    data-cursor="view"
+                                    data-cursor-label="VER"
+                                    className="relative aspect-[4/5] bg-black/50 overflow-hidden rounded-xl"
+                                >
+                                    <Image
+                                        src={product.images?.[0] || 'https://images.unsplash.com/photo-1620806821213-92fbb9ebaaeb?q=80'}
+                                        alt={product.name}
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 40vw"
+                                        className="object-cover transition-all duration-1000 group-hover:scale-110 filter mix-blend-screen group-hover:mix-blend-normal"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#020202] via-transparent to-[#020202]/30 opacity-80 group-hover:opacity-40 transition-opacity duration-700" />
+                                    
+                                    {/* Hover overlay with CTA */}
+                                    <div className="absolute bottom-5 left-5 right-5 translate-y-8 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out z-20">
+                                        <button className="w-full py-4 bg-[#00E5FF] text-black text-[10px] font-black uppercase tracking-[0.2em] rounded-lg shadow-[0_0_20px_rgba(0,229,255,0.4)] hover:bg-white transition-colors">
+                                            Asegurar este Par
+                                        </button>
+                                    </div>
 
-                                {/* Category pill */}
-                                <div className="absolute top-5 right-5">
-                                    <span className="bg-[#00E5FF] px-3 py-1 text-black text-[9px] font-black uppercase tracking-tight">
-                                        {product.category}
-                                    </span>
-                                </div>
-
-                                {/* ÉTER Certified badge */}
-                                <div className="absolute top-5 left-5">
-                                    <div className="flex items-center gap-1.5 bg-black/80 backdrop-blur-sm border border-[#00E5FF]/40 px-2.5 py-1.5">
-                                        <ShieldCheck size={9} className="text-[#00E5FF]" />
-                                        <span className="text-[8px] font-black text-[#00E5FF] uppercase tracking-wider">
-                                            CERTIFIED
+                                    {/* Category pill */}
+                                    <div className="absolute top-4 right-4 z-20">
+                                        <span className="bg-white/10 backdrop-blur-md border border-white/20 px-3.5 py-1.5 rounded-full text-white text-[9px] font-bold uppercase tracking-widest shadow-xl">
+                                            {product.category}
                                         </span>
                                     </div>
-                                </div>
 
-                                {/* Low stock */}
-                                {product.totalStock < 10 && (
-                                    <div className="absolute bottom-[60px] left-5 right-5 group-hover:hidden">
-                                        <span className="text-red-400 text-[9px] font-black uppercase tracking-widest">
-                                            ⚡ Solo {product.totalStock} pares disponibles
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Info */}
-                            <div className="flex justify-between items-end">
-                                <div>
-                                    <h3 className="text-lg font-black tracking-tighter text-white uppercase group-hover:text-[#00E5FF] transition-colors">
-                                        {product.name}
-                                    </h3>
-                                    <div className="flex items-center gap-2 mt-1.5">
-                                        <div className="flex gap-0.5">
-                                            {[...Array(5)].map((_, i) => (
-                                                <Star key={i} size={8} className="fill-[#00E5FF] text-[#00E5FF]" />
-                                            ))}
+                                    {/* ÉTER Certified badge */}
+                                    <div className="absolute top-4 left-4 z-20">
+                                        <div className="flex items-center gap-1.5 bg-[#00E5FF]/10 backdrop-blur-md border border-[#00E5FF]/30 px-3 py-1.5 rounded-full">
+                                            <ShieldCheck size={10} className="text-[#00E5FF]" />
+                                            <span className="text-[8px] font-black text-[#00E5FF] uppercase tracking-[0.2em]">
+                                                Certified
+                                            </span>
                                         </div>
-                                        <span className="text-[9px] text-gray-600 uppercase tracking-wider">
-                                            Último precio
+                                    </div>
+
+                                    {/* Low stock Indicator */}
+                                    {product.totalStock < 10 && (
+                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover:opacity-0 transition-opacity duration-500 pointer-events-none z-10 w-full text-center">
+                                            <span className="bg-red-500/20 backdrop-blur-sm border border-red-500/30 text-red-400 text-[10px] font-black uppercase tracking-[0.3em] px-4 py-2 rounded-full shadow-lg">
+                                                🚨 Últimos {product.totalStock} 
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Info */}
+                                <div className="mt-5 px-2 pb-2 flex flex-col justify-between">
+                                    <div className="mb-4 flex items-start justify-between gap-4">
+                                        <h3 className="text-xl font-black tracking-tighter text-white/90 group-hover:text-white uppercase leading-tight line-clamp-2 transition-colors">
+                                            {product.name}
+                                        </h3>
+                                        <span className="text-xl font-black text-[#00E5FF] shrink-0">
+                                            ${product.basePrice.toLocaleString('es-AR')}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between border-t border-white/[0.05] pt-4">
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex gap-[2px]">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <Star key={i} size={10} className="fill-[#00E5FF] text-[#00E5FF]" />
+                                                ))}
+                                            </div>
+                                            <span className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">
+                                                Premium
+                                            </span>
+                                        </div>
+                                        <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] group-hover:text-[#00E5FF]/80 transition-colors">
+                                            Descubrir <ArrowRight size={10} className="inline ml-1 mb-0.5" />
                                         </span>
                                     </div>
                                 </div>
-                                <span className="text-lg font-black text-white">
-                                    ${product.basePrice.toLocaleString('es-AR')}
-                                </span>
                             </div>
                         </Link>
                     </motion.div>

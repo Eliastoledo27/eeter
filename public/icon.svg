@@ -1,18 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2B1004"/>
-      <stop offset="1" stop-color="#C88A04"/>
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="14" fill="url(#g)"/>
-  <text
-    x="50%"
-    y="55%"
-    text-anchor="middle"
-    dominant-baseline="middle"
-    font-family="system-ui, -apple-system, sans-serif"
-    font-weight="900"
-    font-size="34"
-    fill="#000000">É</text>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="120" fill="#000000" />
+  <text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="280" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">
+    É<tspan fill="#00E5FF">.</tspan>
+  </text>
 </svg>

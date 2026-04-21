@@ -33,7 +33,8 @@ export async function POST(req: Request) {
     const genAI = new GoogleGenerativeAI(apiKey);
     console.log(`Usando API Key (termina en): ${apiKey.slice(-4)}`);
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({
+        model: 'gemini-2.5-flash', });
 
     // Process products SEQUENTIALLY with delay to avoid rate limits (free tier: 5 req/min)
     const optimizedProducts = [];
