@@ -17,11 +17,11 @@ const NAV_LINKS = [
 
 export function CatalogNavbar() {
     const { profile, loading: isLoading } = useAuth();
-    const { totals, setIsOpen: setIsCartOpen } = useCartStore();
+    const { items, setIsOpen: setIsCartOpen } = useCartStore();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    const cartCount = totals()?.itemCount || 0;
+    const cartCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -65,7 +65,7 @@ export function CatalogNavbar() {
                                         'text-[11px] font-black tracking-widest uppercase transition-colors relative group',
                                         link.isHighlight
                                             ? 'text-[#00E5FF] hover:text-white'
-                                            : 'text-gray-400 hover:text-white'
+                                            : 'text-[#B8B8B8] hover:text-white'
                                     )}
                                 >
                                     {link.label}
@@ -77,23 +77,23 @@ export function CatalogNavbar() {
                         {/* Desktop Actions */}
                         <div className="hidden md:flex items-center gap-2">
                             {/* Search */}
-                            <button className="p-2.5 rounded-xl text-gray-400 hover:text-[#00E5FF] hover:bg-white/5 transition-all">
+                            <button className="p-2.5 rounded-xl text-[#B8B8B8] hover:text-[#00E5FF] hover:bg-white/5 transition-all">
                                 <Search size={18} />
                             </button>
 
                             {/* Favorites */}
-                            <button className="p-2.5 rounded-xl text-gray-400 hover:text-[#00E5FF] hover:bg-white/5 transition-all">
+                            <button className="p-2.5 rounded-xl text-[#B8B8B8] hover:text-[#00E5FF] hover:bg-white/5 transition-all">
                                 <Heart size={18} />
                             </button>
 
                             {/* Cart */}
                             <button
                                 onClick={() => setIsCartOpen(true)}
-                                className="relative p-2.5 rounded-xl text-gray-400 hover:text-[#00E5FF] hover:bg-white/5 transition-all"
+                                className="relative p-2.5 rounded-xl text-[#B8B8B8] hover:text-[#00E5FF] hover:bg-white/5 transition-all"
                             >
                                 <ShoppingBag size={18} />
                                 {cartCount > 0 && (
-                                    <span className="absolute top-1.5 right-1.5 bg-[#00E5FF] text-black text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full shadow-[0_0_10px_rgba(0,229,255,0.4)]">
+                                    <span className="absolute top-1.5 right-1.5 bg-[#00E5FF] text-black text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full shadow-[0_0_10px_rgba(198,255,0,0.4)]">
                                         {cartCount}
                                     </span>
                                 )}
@@ -110,7 +110,7 @@ export function CatalogNavbar() {
                                 </Link>
                             ) : (
                                 <Link href="/login">
-                                    <button className="ml-2 p-2.5 rounded-xl text-gray-400 hover:text-[#00E5FF] hover:bg-white/5 transition-all">
+                                    <button className="ml-2 p-2.5 rounded-xl text-[#B8B8B8] hover:text-[#00E5FF] hover:bg-white/5 transition-all">
                                         <User size={18} />
                                     </button>
                                 </Link>
@@ -174,19 +174,19 @@ export function CatalogNavbar() {
                             <div className="mt-auto pb-12 flex flex-col gap-4">
                                 {profile ? (
                                     <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                                        <button className="w-full bg-[#00E5FF] text-black py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-[#00E5FF]/20">
+                                        <button className="w-full bg-[#00E5FF] text-black py-5 rounded-md font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-[#00E5FF]/20">
                                             Ir al Dashboard
                                         </button>
                                     </Link>
                                 ) : (
                                     <>
                                         <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                                            <button className="w-full bg-white text-black py-5 rounded-2xl font-black uppercase tracking-widest text-[10px]">
+                                            <button className="w-full bg-white text-black py-5 rounded-md font-black uppercase tracking-widest text-[10px]">
                                                 Ingresar
                                             </button>
                                         </Link>
                                         <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                                            <button className="w-full bg-white/5 border border-white/10 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[10px]">
+                                            <button className="w-full bg-white/5 border border-[#252525] text-white py-5 rounded-md font-black uppercase tracking-widest text-[10px]">
                                                 Empieza Ahora
                                             </button>
                                         </Link>

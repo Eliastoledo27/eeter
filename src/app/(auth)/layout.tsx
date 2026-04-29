@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -12,7 +13,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="min-h-screen flex bg-[#0A0A0A] relative overflow-hidden">
             {/* ─── Left Side: Brand Panel (desktop only) ─── */}
             <div className="hidden lg:flex lg:w-[45%] xl:w-[50%] relative items-center justify-center p-12">
-                {/* Animated gradient orbs */}
+                {/* ... (animations) */}
                 <div className="absolute inset-0 overflow-hidden">
                     <motion.div
                         className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-amber-900/30 via-yellow-800/20 to-transparent blur-[120px]"
@@ -53,12 +54,22 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                     transition={{ duration: 0.8, delay: 0.2 }}
                 >
                     {/* Logo */}
-                    <Link href="/" className="inline-flex items-center gap-3 mb-12 group">
-                        <div className="w-14 h-14 bg-transparent border-2 border-[#00B8D9] flex items-center justify-center rounded-xl relative shadow-[0_0_25px_rgba(200,138,4,0.2)] group-hover:shadow-[0_0_35px_rgba(200,138,4,0.35)] transition-shadow duration-500">
-                            <span className="text-4xl font-bold text-[#00B8D9]">É</span>
-                            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#00B8D9] rounded-full animate-pulse" />
+                    <Link href="/" className="inline-flex items-center gap-4 mb-12 group">
+                        <Image 
+                            src="/logo.png" 
+                            alt="ÉTER Logo" 
+                            width={56} 
+                            height={56} 
+                            className="rounded-xl border-2 border-[#00B8D9] shadow-[0_0_25px_rgba(0,184,217,0.2)] group-hover:shadow-[0_0_35px_rgba(0,184,217,0.35)] transition-all duration-500"
+                        />
+                        <div className="relative w-[140px] h-[34px]">
+                            <Image 
+                                src="/texto.png" 
+                                alt="ÉTER" 
+                                fill 
+                                className="object-contain object-left" 
+                            />
                         </div>
-                        <span className="text-2xl font-bold text-white tracking-tight">ÉTER STORE</span>
                     </Link>
 
                     {/* Heading */}
@@ -130,11 +141,22 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 >
                     {/* Mobile logo */}
                     <div className="lg:hidden text-center mb-8">
-                        <Link href="/" className="inline-flex items-center gap-2">
-                            <div className="w-10 h-10 bg-transparent border border-[#00B8D9] flex items-center justify-center rounded-lg">
-                                <span className="text-2xl font-bold text-[#00B8D9]">É</span>
+                        <Link href="/" className="inline-flex items-center gap-3">
+                            <Image 
+                                src="/logo.png" 
+                                alt="ÉTER Logo" 
+                                width={40} 
+                                height={40} 
+                                className="rounded-lg border border-[#00B8D9] shadow-[0_0_15px_rgba(0,184,217,0.15)]"
+                            />
+                            <div className="relative w-[110px] h-[28px]">
+                                <Image 
+                                    src="/texto.png" 
+                                    alt="ÉTER" 
+                                    fill 
+                                    className="object-contain object-left" 
+                                />
                             </div>
-                            <span className="text-lg font-bold text-white">ÉTER STORE</span>
                         </Link>
                     </div>
 

@@ -26,6 +26,7 @@ export const ProductForm = ({ product, onSuccess, onClose }: ProductFormProps) =
     const [name, setName] = useState(product?.name || '');
     const [description, setDescription] = useState(product?.description || '');
     const [category, setCategory] = useState(product?.category || 'Sneakers');
+    const [isActive, setIsActive] = useState<boolean>(product?.is_active ?? true);
     const [price, setPrice] = useState(product?.base_price?.toString() || '');
     const [imageUrl, setImageUrl] = useState(product?.images?.[0] || '');
     const [file, setFile] = useState<File | null>(null);
@@ -150,6 +151,7 @@ export const ProductForm = ({ product, onSuccess, onClose }: ProductFormProps) =
             formData.append('base_price', price);
             formData.append('stock_by_size', JSON.stringify(stock));
             formData.append('image_url', imageUrl);
+            formData.append('is_active', isActive.toString());
             if (file) formData.append('image_file', file);
 
             let result;
@@ -268,6 +270,31 @@ export const ProductForm = ({ product, onSuccess, onClose }: ProductFormProps) =
                                                 placeholder="0.00"
                                             />
                                         </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4 bg-white/[0.02] border border-white/5 rounded-[2rem] p-6">
+                                    <div className="flex items-center justify-between">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 flex items-center gap-2">
+                                                <Zap size={12} className={isActive ? "text-[#00E5FF]" : "text-white/20"} /> ESTADO_PUBLIK
+                                            </label>
+                                            <p className="text-[9px] text-white/20 font-medium uppercase tracking-widest">
+                                                {isActive ? "PRODUCTO VISIBLE EN EL CATÁLOGO PÚBLICO" : "PRODUCTO OCULTO (MODO OFFLINE)"}
+                                            </p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsActive(!isActive)}
+                                            className={`relative w-14 h-7 rounded-full transition-all duration-500 p-1 ${isActive ? "bg-[#00E5FF]/20 border-[#00E5FF]/40 shadow-[0_0_15px_rgba(0,229,255,0.1)]" : "bg-white/5 border-white/10"
+                                                } border`}
+                                        >
+                                            <motion.div
+                                                animate={{ x: isActive ? 28 : 0 }}
+                                                className={`w-5 h-5 rounded-full transition-colors duration-500 ${isActive ? "bg-[#00E5FF] shadow-[0_0_10px_#00E5FF]" : "bg-white/20"
+                                                    }`}
+                                            />
+                                        </button>
                                     </div>
                                 </div>
 

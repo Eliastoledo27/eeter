@@ -1,6 +1,7 @@
 'use client'
 
 import { Navbar } from '@/components/layout/Navbar'
+import { Footer } from '@/components/layout/Footer'
 import { ArrowRight, Star, ShieldCheck, Package, DollarSign, CheckCircle2, ShoppingBag, Globe, Infinity, Clock, Award, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -344,47 +345,8 @@ export default function RevolutionaryLandingPage() {
                 </div>
             </section>
 
-            {/* FOOTER */}
-            <footer className="bg-white text-black py-16 px-6">
-                <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-                        <div>
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-orange-500 rounded-2xl flex items-center justify-center text-white font-black text-3xl">
-                                    É
-                                </div>
-                                <span className="font-black text-2xl">ÉTER STORE</span>
-                            </div>
-                            <p className="text-gray-600 text-sm">
-                                Plataforma líder de dropshipping B2B en Argentina.
-                            </p>
-                        </div>
-
-                        {[
-                            { title: "PLATAFORMA", links: [{ name: "Catálogo", href: "/catalog" }, { name: "Registro", href: "/register" }, { name: "Ingresar", href: "/login" }] },
-                            { title: "COMUNIDAD", links: [{ name: "Instagram", href: "#" }, { name: "Discord", href: "#" }] },
-                            { title: "LEGALES", links: [{ name: "Términos", href: "#" }, { name: "Privacidad", href: "#" }] }
-                        ].map((col, idx) => (
-                            <div key={idx}>
-                                <h4 className="font-black mb-4">{col.title}</h4>
-                                <ul className="space-y-2 text-sm text-gray-600">
-                                    {col.links.map((link, i) => (
-                                        <li key={i}>
-                                            <Link href={link.href} className="hover:text-cyan-600 transition-colors">
-                                                {link.name}
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="border-t border-gray-200 pt-8 text-center text-sm text-gray-500">
-                        © 2026 Éter Store Inc. Designed in Buenos Aires.
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     )
 }
+

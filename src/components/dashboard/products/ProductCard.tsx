@@ -40,7 +40,7 @@ export const ProductCard = ({ product, onDelete, onEdit, isSelected, onToggleSel
         : 0;
 
     return (
-        <div className={`group relative bg-[#050505] border rounded-[2.5rem] overflow-hidden hover:shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_80px_-20px_rgba(0,229,255,0.15)] transition-all duration-700 ease-[0.16,1,0.3,1] ${isSelected ? 'border-[#00E5FF] ring-8 ring-[#00E5FF]/5' : 'border-white/5 hover:border-[#00E5FF]/30'} ${product.is_active ? '' : 'opacity-40 grayscale'}`}>
+        <div className={`group relative bg-[#050505] border rounded-[2.5rem] overflow-hidden hover:shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_80px_-20px_rgba(0,229,255,0.15)] transition-all duration-700 ease-out ${isSelected ? 'border-[#00E5FF] ring-8 ring-[#00E5FF]/5' : 'border-white/5 hover:border-[#00E5FF]/30'} ${product.is_active ? '' : 'opacity-40 grayscale'}`}>
 
             {/* Selection Checkbox */}
             {onToggleSelect && (
@@ -68,7 +68,7 @@ export const ProductCard = ({ product, onDelete, onEdit, isSelected, onToggleSel
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         loading="lazy"
-                        className="object-contain p-8 transition-all duration-1000 ease-[0.16,1,0.3,1] group-hover:scale-110 group-hover:-rotate-2 drop-shadow-[0_25px_40px_rgba(0,0,0,0.8)]"
+                        className="object-contain p-8 transition-all duration-1000 ease-out group-hover:scale-110 group-hover:-rotate-2 drop-shadow-[0_25px_40px_rgba(0,0,0,0.8)]"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-white/5">
@@ -82,6 +82,12 @@ export const ProductCard = ({ product, onDelete, onEdit, isSelected, onToggleSel
                         <ScanText size={12} className="text-[#00E5FF]" />
                         {product.category || 'MÓDULO_GEN'}
                     </span>
+                    {product.liquidation_active && (
+                        <span className="px-4 py-2 rounded-xl bg-[#00E5FF] text-[9px] font-black tracking-[0.3em] text-black uppercase shadow-[0_0_30px_#00E5FF] flex items-center gap-2">
+                            <Tag size={12} fill="currentColor" />
+                            LIQUIDACIÓN -{product.liquidation_discount_percent}%
+                        </span>
+                    )}
                     {!product.is_active && (
                         <span className="px-4 py-2 rounded-xl bg-rose-600 text-[9px] font-black tracking-[0.3em] text-white uppercase shadow-2xl animate-pulse">
                             SINCRONIZACIÓN_OFF
@@ -90,7 +96,7 @@ export const ProductCard = ({ product, onDelete, onEdit, isSelected, onToggleSel
                 </div>
 
                 {/* Actions (Overlay) */}
-                <div className="absolute inset-x-6 bottom-6 translate-y-[150%] group-hover:translate-y-0 transition-all duration-700 ease-[0.16,1,0.3,1] flex gap-3 z-20">
+                <div className="absolute inset-x-6 bottom-6 translate-y-[150%] group-hover:translate-y-0 transition-all duration-700 ease-out flex gap-3 z-20">
                     {onEdit && (
                         <button
                             onClick={onEdit}
@@ -129,9 +135,16 @@ export const ProductCard = ({ product, onDelete, onEdit, isSelected, onToggleSel
                 <div className="flex items-center justify-between border-t border-white/5 pt-6 mt-auto">
                     <div className="flex flex-col gap-1">
                         <span className="text-[9px] font-black text-white/10 uppercase tracking-[0.4em]">Invasión_Base</span>
-                        <span className="text-2xl font-black text-white tabular-nums flex items-center">
-                            <span className="text-sm text-[#00E5FF] mr-1.5 opacity-40">$</span>
-                            {product.base_price.toLocaleString()}
+                        <span className="text-2xl font-black text-white tabular-nums flex items-center gap-2">
+                            <div className="flex flex-col">
+                                {product.liquidation_active && (
+                                    <span className="text-[10px] text-white/20 line-through decoration-[#00E5FF]/40 mb-[-4px]">$ {product.base_price.toLocaleString()}</span>
+                                )}
+                                <div className="flex items-center">
+                                    <span className="text-sm text-[#00E5FF] mr-1.5 opacity-40">$</span>
+                                    {(product.liquidation_active && product.liquidation_price ? product.liquidation_price : product.base_price).toLocaleString()}
+                                </div>
+                            </div>
                         </span>
                     </div>
                     <div className="flex flex-col items-end gap-1">

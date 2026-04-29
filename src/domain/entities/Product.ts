@@ -5,10 +5,16 @@ export interface Product {
   category: string;
   basePrice: number;
   images: string[];
+  brand: string;
   stockBySize: Record<string, number>;
   totalStock: number;
   status: 'active' | 'inactive' | 'draft';
+  colorDescription?: string;
+  estimatedProfit?: number;
   margin?: number;
+  liquidationActive?: boolean;
+  liquidationPrice?: number;
+  liquidationDiscountPercent?: number;
   createdAt: Date;
   updatedAt?: Date;
 }

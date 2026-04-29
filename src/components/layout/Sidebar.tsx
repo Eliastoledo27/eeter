@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import Image from 'next/image'
 import { LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/useAuth'
@@ -49,14 +50,16 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
       <div className="p-4 flex justify-center border-b border-white/5 h-16 items-center">
         <Link href="/dashboard">
           <div className={cn(
-            "bg-transparent border border-primary flex items-center justify-center relative shadow-[0_0_15px_rgba(200,138,4,0.15)] rounded-lg group cursor-pointer hover:bg-primary/10 transition-all duration-300",
+            "bg-transparent flex items-center justify-center relative rounded-lg group cursor-pointer hover:bg-white/5 transition-all duration-300",
             isCollapsed ? "w-10 h-10" : "w-12 h-12"
           )}>
-            <span className={cn(
-              "font-bold text-primary group-hover:text-shadow transition-all font-heading",
-              isCollapsed ? "text-2xl" : "text-3xl"
-            )}>É</span>
-            {!isCollapsed && <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse"></div>}
+            <Image 
+                src="/logo.png" 
+                alt="ÉTER Logo" 
+                width={isCollapsed ? 32 : 40} 
+                height={isCollapsed ? 32 : 40} 
+                className="rounded-lg border border-primary/30 shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)]"
+            />
           </div>
         </Link>
       </div>

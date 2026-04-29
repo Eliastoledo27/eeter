@@ -45,7 +45,7 @@ interface CartStore {
   lastOrder: {
     orderId: string;
     referenceCode: string;
-    items: Array<{ name: string; selectedSize: string; quantity: number; basePrice: number; images: string[] }>;
+    items: Array<{ productId?: string; name: string; selectedSize: string; quantity: number; basePrice: number; images: string[] }>;
     total: number;
     customerName: string;
     customerPhone: string;

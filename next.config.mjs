@@ -5,6 +5,8 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 31536000,
     remotePatterns: [
       {
         protocol: 'https',
@@ -45,6 +47,12 @@ const nextConfig = {
   },
   output: 'standalone',
   poweredByHeader: false,
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['localhost:3000', 'localhost:3001', 'localhost:3002']
+    },
+    optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts']
+  },
   async rewrites() {
     return [
       { source: '/catalog.json', destination: '/api/catalog' },

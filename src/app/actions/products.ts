@@ -16,6 +16,11 @@ export interface ProductType {
     stock_by_size: Record<string, number>;
     is_active: boolean;
     created_at?: string;
+    auraScore?: number;
+    liquidation_active?: boolean;
+    liquidation_discount_percent?: number;
+    liquidation_price?: number;
+    liquidation_at?: string;
 }
 
 interface SupabaseProduct {
@@ -28,6 +33,10 @@ interface SupabaseProduct {
     stock_by_size: Record<string, number>;
     status: string;
     created_at: string;
+    liquidation_active?: boolean;
+    liquidation_discount_percent?: number;
+    liquidation_price?: number;
+    liquidation_at?: string;
 }
 
 const bulkProductSchema = z.object({
@@ -107,48 +116,107 @@ export async function bulkImportProducts(products: Record<string, unknown>[]) {
 }
 
 export async function bulkUpdateProducts(updates: { id: string, data: Partial<ProductType> }[]) {
-    const { user, isAdmin, isStaff } = await checkUserPermissions();
+    try {
+        let permResult = await checkUserPermissions();
+        
+        // Retry once if occasionally failing due to network glitch
+        if (!permResult.user) {
+            await new Promise(res => setTimeout(res, 500));
+            permResult = await checkUserPermissions();
+        }
 
-    if (!user || (!isAdmin && !isStaff)) {
-        return { error: 'Unauthorized' };
+        const { user, isAdmin, isStaff, error: permError } = permResult;
+
+        if (!user || (!isAdmin && !isStaff)) {
+            return { 
+                success: false, 
+                error: `Autorización denegada: ${permError || 'Permisos insuficientes'}` 
+            };
+        }
+
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+        const supabase = createSupabaseAdmin(
+            supabaseUrl!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnon!,
+            { auth: { autoRefreshToken: false, persistSession: false } }
+        );
+        
+        console.log(`[bulkUpdateProducts] Processing ${updates.length} updates...`);
+        let successCount = 0;
+        const errors: { id?: string; error: string }[] = [];
+
+        // Sequential processing for reliability with improved data sanitization
+        for (const update of updates) {
+            const { id, data } = update;
+            if (!id) continue;
+
+            const dbUpdate: Record<string, unknown> = {};
+            
+            if (data.name) dbUpdate.name = data.name.trim();
+            if (data.category) dbUpdate.category = data.category.trim();
+            if (data.description !== undefined) dbUpdate.description = data.description;
+            if (data.base_price !== undefined) dbUpdate.price = Number(data.base_price);
+            
+            if (data.stock_by_size) {
+                const cleanStock = typeof data.stock_by_size === 'object' ? data.stock_by_size : {};
+                dbUpdate.stock_by_size = cleanStock;
+                
+                // Precise stock total calculation
+                dbUpdate.stock = Object.values(cleanStock).reduce((acc: number, val: unknown) => {
+                    const n = Number(val);
+                    return acc + (isNaN(n) ? 0 : n);
+                }, 0);
+            }
+            
+            if (data.is_active !== undefined) {
+                dbUpdate.status = data.is_active ? 'activo' : 'inactivo';
+            }
+
+            if (Object.keys(dbUpdate).length === 0) {
+                successCount++;
+                continue;
+            }
+
+            console.log(`[bulkUpdateProducts] Updating product ${id}:`, dbUpdate);
+
+            const { error } = await supabase
+                .from('productos')
+                .update(dbUpdate)
+                .eq('id', id);
+
+            if (error) {
+                errors.push({ id, error: error.message });
+            } else {
+                successCount++;
+            }
+        }
+
+        // Parallel revalidation
+        console.log(`[bulkUpdateProducts] Update complete. Success: ${successCount}, Errors: ${errors.length}`);
+        const paths = ['/', '/dashboard/products', '/c/catalogorev', '/catalog', '/catalog/best'];
+        paths.forEach(path => {
+            try {
+                revalidatePath(path);
+            } catch (e) {
+                console.error(`Error revalidating path ${path}:`, e);
+            }
+        });
+
+        return { 
+            success: errors.length === 0, 
+            successCount, 
+            errors,
+            message: errors.length > 0 ? `Error en ${errors.length} ítems.` : 'Sincronización completa.'
+        };
+    } catch (error: any) {
+        console.error('CRITICAL ERROR in bulkUpdateProducts:', error);
+        return { 
+            success: false, 
+            error: error?.message || 'Error de conexión',
+            details: 'No se pudo completar la sincronización con la base de datos.'
+        };
     }
-
-    const supabase = createClient();
-
-    let successCount = 0;
-    const errors = [];
-
-    for (const update of updates) {
-        const { id, data } = update;
-
-        const dbUpdate: Record<string, unknown> = {};
-        if (data.name) dbUpdate.name = data.name;
-        if (data.base_price !== undefined) dbUpdate.price = data.base_price;
-        if (data.stock_by_size) {
-            dbUpdate.stock_by_size = data.stock_by_size;
-            dbUpdate.stock = Object.values(data.stock_by_size).reduce((a: number, b: unknown) => Number(a) + Number(b), 0);
-        }
-        if (data.description) dbUpdate.description = data.description;
-        if (data.is_active !== undefined) {
-            dbUpdate.status = data.is_active ? 'activo' : 'inactivo';
-        }
-
-        const { error } = await supabase
-            .from('productos')
-            .update(dbUpdate)
-            .eq('id', id);
-
-        if (error) {
-            errors.push({ id, error: error.message });
-        } else {
-            successCount++;
-        }
-    }
-
-    revalidatePath('/');
-    revalidatePath('/dashboard/products');
-
-    return { success: true, successCount, errors };
 }
 
 export async function bulkDeleteProducts(ids: string[]) {
@@ -178,73 +246,58 @@ export async function bulkDeleteProducts(ids: string[]) {
 export async function getProducts(
     query?: string,
     category?: string,
-    status: 'active' | 'inactive' | 'all' = 'active'
+    status: 'active' | 'inactive' | 'all' = 'active',
+    options?: { limit?: number }
 ) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     if (!supabaseUrl || !supabaseAnon) {
+        console.error('Environment variables for Supabase are missing');
         return [];
     }
 
-    let supabase = createClient();
-
-    if (process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL) {
-        supabase = createSupabaseAdmin(
-            process.env.NEXT_PUBLIC_SUPABASE_URL,
-            process.env.SUPABASE_SERVICE_ROLE_KEY,
-            {
-                auth: {
-                    autoRefreshToken: false,
-                    persistSession: false,
-                },
-            }
-        );
-    }
+    const supabase = createSupabaseAdmin(
+        supabaseUrl,
+        process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnon,
+        {
+            auth: { autoRefreshToken: false, persistSession: false }
+        }
+    );
 
     try {
         let dbQuery = supabase
             .from('productos')
-            .select('id, name, description, category, price, images, stock_by_size, status, created_at')
+            .select('id,name,description,category,price,images,stock_by_size,status,created_at,liquidation_active,liquidation_discount_percent,liquidation_price,liquidation_at')
             .order('created_at', { ascending: false });
 
-        if (status === 'active') {
-            dbQuery = dbQuery.eq('status', 'activo');
-        }
-
-        if (status === 'inactive') {
-            dbQuery = dbQuery.eq('status', 'inactivo');
-        }
-
-        if (query) {
-            dbQuery = dbQuery.ilike('name', `%${query}%`);
-        }
-
-        if (category && category !== 'Todos') {
-            dbQuery = dbQuery.eq('category', category);
-        }
+        if (status === 'active') dbQuery = dbQuery.eq('status', 'activo');
+        if (status === 'inactive') dbQuery = dbQuery.eq('status', 'inactivo');
+        if (query) dbQuery = dbQuery.ilike('name', `%${query.trim()}%`);
+        if (category && category !== 'Todos') dbQuery = dbQuery.eq('category', category);
+        if (options?.limit && options.limit > 0) dbQuery = dbQuery.limit(options.limit);
 
         const { data, error } = await dbQuery;
 
-        if (error) {
-            console.error('Fetch products error:', error);
-            return [];
-        }
+        if (error) throw error;
+        if (!data) return [];
 
-        const mappedData = data.map((p: SupabaseProduct) => ({
+        return data.map((p: any) => ({
             id: p.id,
-            name: p.name,
-            description: p.description,
-            category: p.category,
-            base_price: p.price,
-            images: p.images || [],
+            name: p.name || 'Producto sin nombre',
+            description: p.description || '',
+            category: p.category || 'General',
+            base_price: Number(p.price || 0),
+            images: Array.isArray(p.images) ? p.images : [],
             stock_by_size: p.stock_by_size || {},
             is_active: p.status === 'activo',
-            created_at: p.created_at
-        }));
-
-        return mappedData as ProductType[];
+            created_at: p.created_at,
+            liquidation_active: !!p.liquidation_active,
+            liquidation_discount_percent: Number(p.liquidation_discount_percent || 0),
+            liquidation_price: Number(p.liquidation_price || 0),
+            liquidation_at: p.liquidation_at
+        })) as ProductType[];
     } catch (e) {
-        console.error('Unexpected products fetch error:', e);
+        console.error('Error fetching products:', e);
         return [];
     }
 }
@@ -264,6 +317,7 @@ export async function createProduct(formData: FormData) {
     const base_price = parseFloat(formData.get('base_price') as string);
     const stockStr = formData.get('stock_by_size') as string;
     const stock_by_size = stockStr ? JSON.parse(stockStr) : {};
+    const isActive = formData.get('is_active') === 'true';
 
     const imageFile = formData.get('image_file') as File;
     let imageUrl = formData.get('image_url') as string;
@@ -293,7 +347,7 @@ export async function createProduct(formData: FormData) {
         images: [imageUrl],
         stock_by_size,
         stock: Object.values(stock_by_size).reduce((a: number, b: unknown) => Number(a) + Number(b), 0),
-        status: 'activo'
+        status: isActive ? 'activo' : 'inactivo'
     };
 
     const { data, error } = await supabase
@@ -340,6 +394,7 @@ export async function updateProduct(id: string, formData: FormData) {
     const base_price = parseFloat(formData.get('base_price') as string);
     const stockStr = formData.get('stock_by_size') as string;
     const stock_by_size = stockStr ? JSON.parse(stockStr) : {};
+    const isActive = formData.get('is_active') === 'true';
     let imageUrl = formData.get('image_url') as string;
     const imageFile = formData.get('image_file') as File;
 
@@ -363,7 +418,8 @@ export async function updateProduct(id: string, formData: FormData) {
         price: base_price,
         stock_by_size,
         stock: Object.values(stock_by_size).reduce((a: number, b: unknown) => Number(a) + Number(b), 0),
-        images: [imageUrl]
+        images: [imageUrl],
+        status: isActive ? 'activo' : 'inactivo'
     };
 
     const { error } = await supabase
@@ -424,7 +480,17 @@ export async function deleteProduct(id: string) {
 }
 
 export async function getCategories() {
-    const supabase = createClient();
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseAnon) return [];
+
+    const supabase = createSupabaseAdmin(
+        supabaseUrl,
+        process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnon,
+        {
+            auth: { autoRefreshToken: false, persistSession: false }
+        }
+    );
     const { data, error } = await supabase
         .from('productos')
         .select('category')

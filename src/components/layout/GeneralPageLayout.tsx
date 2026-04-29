@@ -25,7 +25,7 @@ const ScrollProgress = () => {
 
     return (
         <motion.div
-            className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#00E5FF] to-[#00D1E6] origin-left z-[100]"
+            className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#00E5FF] to-[#AEE600] origin-left z-[100]"
             style={{ scaleX }}
         />
     );
@@ -33,47 +33,58 @@ const ScrollProgress = () => {
 
 export function GeneralPageLayout({ children, title, subtitle, description, breadcrumb }: GeneralPageLayoutProps) {
     return (
-        <main className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#00E5FF] selection:text-black overflow-x-hidden pt-32">
+        <main className="relative min-h-screen overflow-x-hidden bg-[#050505] pt-32 text-white selection:bg-[#00E5FF] selection:text-black">
             <ScrollProgress />
             <Navbar />
+            <div className="grunge-overlay fixed" />
+            <motion.div
+                animate={{ x: [0, 10, 0], rotate: [0, 4, 0] }}
+                transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut' }}
+                className="paint-splatter -left-16 top-36 hidden md:block"
+            />
+            <motion.div
+                animate={{ y: [0, -12, 0], rotate: [0, -5, 0] }}
+                transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut' }}
+                className="paint-splatter -right-20 top-[38rem] hidden opacity-20 md:block"
+            />
 
-            <div className="container mx-auto px-6 relative z-10">
+            <div className="container relative z-10 mx-auto px-6">
                 {/* Back Button / Breadcrumb */}
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     className="mb-12"
                 >
-                    <Link href="/" className="inline-flex items-center gap-2 text-[#00E5FF] hover:text-white transition-colors text-sm font-mono uppercase tracking-widest group">
+                    <Link href="/" className="group inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.16em] text-[#00E5FF] transition-colors hover:text-white">
                         <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                         VOLVER AL INICIO {breadcrumb && ` / ${breadcrumb}`}
                     </Link>
                 </motion.div>
 
                 {/* Header Section */}
-                <div className="mb-24 relative">
+                <div className="relative mb-20 overflow-hidden rounded-lg border border-[#252525] bg-[#0B0B0B] p-7 md:p-10">
+                    <span className="brush-green -left-6 top-10 hidden opacity-50 md:block" />
+                    <span className="brush-purple right-10 bottom-8 hidden opacity-35 md:block" />
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
                     >
                         {subtitle && (
-                            <span className="text-[#00E5FF] font-mono text-sm tracking-[0.4em] uppercase mb-4 block">
+                            <span className="mb-4 block text-sm font-black uppercase tracking-[0.24em] text-[#00E5FF]">
                                 {subtitle}
                             </span>
                         )}
-                        <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/20 uppercase">
+                        <h1 className="mb-8 max-w-5xl text-5xl font-black uppercase leading-[0.88] tracking-[-0.06em] text-white md:text-8xl">
                             {title}
                         </h1>
                         {description && (
-                            <p className="max-w-2xl text-gray-400 text-lg md:text-xl font-light leading-relaxed">
+                            <p className="max-w-2xl text-lg font-medium leading-relaxed text-[#B8B8B8] md:text-xl">
                                 {description}
                             </p>
                         )}
                     </motion.div>
 
-                    {/* Aesthetic Background Element */}
-                    <div className="absolute -top-20 -left-20 w-64 h-64 bg-[#00E5FF]/10 blur-[100px] rounded-full -z-10" />
                 </div>
 
                 {/* Main Content */}
@@ -81,14 +92,11 @@ export function GeneralPageLayout({ children, title, subtitle, description, brea
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2, duration: 0.8 }}
-                    className="pb-32"
+                    className="pb-32 [&_.bg-white\\/5]:border-[#252525] [&_.bg-white\\/5]:bg-[#111111] [&_.border-white\\/10]:border-[#252525] [&_h2]:tracking-[-0.03em]"
                 >
                     {children}
                 </motion.div>
             </div>
-
-            {/* Decorative Grid */}
-            <div className="fixed inset-0 bg-[linear-gradient(rgba(200,138,4,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(200,138,4,0.02)_1px,transparent_1px)] bg-[size:100px_100px] pointer-events-none -z-10" />
 
             <Footer />
         </main>

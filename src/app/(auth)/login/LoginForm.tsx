@@ -21,8 +21,8 @@ function getPasswordStrength(pw: string): { label: string; score: number; color:
     if (pw.length >= 12) score++
 
     if (score <= 1) return { label: 'Débil', score, color: 'bg-red-500' }
-    if (score <= 2) return { label: 'Regular', score, color: 'bg-orange-500' }
-    if (score <= 3) return { label: 'Buena', score, color: 'bg-cyan-500' }
+    if (score <= 2) return { label: 'Regular', score, color: 'bg-[#00B8D9]' }
+    if (score <= 3) return { label: 'Buena', score, color: 'bg-[#00E5FF]' }
     return { label: 'Fuerte', score, color: 'bg-emerald-500' }
 }
 
@@ -127,12 +127,12 @@ export default function LoginForm() {
     return (
         <div className="w-full">
             {/* Glass card */}
-            <div className="backdrop-blur-2xl bg-white/[0.03] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl">
+            <div className="backdrop-blur-2xl bg-[#111111] border border-[#252525] rounded-md p-6 sm:p-8 shadow-2xl">
                 {/* Header */}
                 <div className="mb-8">
                     <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">
                         Bienvenido de{' '}
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-cyan-400 to-cyan-500">
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-[#00E5FF] to-[#00E5FF]">
                             vuelta
                         </span>
                     </h2>
@@ -176,7 +176,7 @@ export default function LoginForm() {
                                 aria-describedby={errors.email ? 'login-email-error' : undefined}
                                 className={`w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/[0.04] border text-white text-sm placeholder:text-gray-600 
                   focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 transition-all duration-200
-                  ${errors.email ? 'border-red-500/50' : 'border-white/10 hover:border-white/20'}`}
+                  ${errors.email ? 'border-red-500/50' : 'border-[#252525] hover:border-white/20'}`}
                             />
                             {touched.email && email && !errors.email && (
                                 <CheckCircle2 className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
@@ -206,7 +206,7 @@ export default function LoginForm() {
                                 aria-describedby={errors.password ? 'login-password-error' : undefined}
                                 className={`w-full pl-11 pr-12 py-3.5 rounded-xl bg-white/[0.04] border text-white text-sm placeholder:text-gray-600
                   focus:outline-none focus:ring-2 focus:ring-[#00B8D9]/40 focus:border-[#00B8D9]/60 transition-all duration-200
-                  ${errors.password ? 'border-red-500/50' : 'border-white/10 hover:border-white/20'}`}
+                  ${errors.password ? 'border-red-500/50' : 'border-[#252525] hover:border-white/20'}`}
                             />
                             <button
                                 type="button"
@@ -244,7 +244,7 @@ export default function LoginForm() {
                         <label className="flex items-center gap-2 cursor-pointer text-gray-400 hover:text-gray-300 transition-colors group">
                             <input
                                 type="checkbox"
-                                className="w-4 h-4 rounded border-white/20 bg-white/5 text-[#00B8D9] focus:ring-[#00B8D9]/40 focus:ring-offset-0 cursor-pointer"
+                                className="w-4 h-4 rounded border-white/20 bg-[#111111] text-[#00B8D9] focus:ring-[#00B8D9]/40 focus:ring-offset-0 cursor-pointer"
                             />
                             <span className="text-xs">Recordarme</span>
                         </label>
@@ -257,8 +257,8 @@ export default function LoginForm() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full py-3.5 rounded-xl font-bold text-sm text-black bg-gradient-to-r from-cyan-500 via-[#00B8D9] to-cyan-600
-              hover:from-cyan-400 hover:via-cyan-500 hover:to-cyan-500 transition-all duration-300
+                        className="w-full py-3.5 rounded-xl font-bold text-sm text-black bg-gradient-to-r from-[#00E5FF] via-[#00B8D9] to-cyan-600
+              hover:from-[#00E5FF] hover:via-[#00E5FF] hover:to-[#00E5FF] transition-all duration-300
               shadow-[0_0_30px_rgba(200,138,4,0.2)] hover:shadow-[0_0_40px_rgba(200,138,4,0.35)]
               disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none
               flex items-center justify-center gap-2"
@@ -276,7 +276,7 @@ export default function LoginForm() {
                 {/* Social login divider */}
                 <div className="relative my-7">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-white/10" />
+                        <div className="w-full border-t border-[#252525]" />
                     </div>
                     <div className="relative flex justify-center text-xs">
                         <span className="px-3 bg-[#0A0A0A] text-gray-500 uppercase tracking-wider font-mono">
@@ -290,7 +290,7 @@ export default function LoginForm() {
                     <button
                         type="button"
                         onClick={handleGoogleLogin}
-                        className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.04] border border-white/10 
+                        className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.04] border border-[#252525] 
               hover:bg-white/[0.08] hover:border-white/20 transition-all duration-200 text-sm text-gray-300 font-medium group"
                     >
                         <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -305,7 +305,7 @@ export default function LoginForm() {
                     <button
                         type="button"
                         onClick={handleFacebookLogin}
-                        className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.04] border border-white/10 
+                        className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.04] border border-[#252525] 
               hover:bg-white/[0.08] hover:border-white/20 transition-all duration-200 text-sm text-gray-300 font-medium group"
                     >
                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#1877F2">

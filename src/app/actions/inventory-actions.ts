@@ -191,3 +191,36 @@ export async function updateProductNames(updates: { id: string; name: string }[]
     return { success: true }
 }
 
+export async function updateProductStockBySize(productId: string, stockBySize: Record<string, number>) {
+    const { user, isAdmin, isStaff } = await checkUserPermissions()
+    if (!user || (!isAdmin && !isStaff)) {
+        return { success: false, error: 'Unauthorized: insufficient permissions' }
+    }
+
+    const supabase = createClient()
+
+    const normalized: Record<string, number> = {}
+    Object.entries(stockBySize || {}).forEach(([size, qty]) => {
+        const n = Number(qty)
+        if (!Number.isNaN(n) && n > 0) {
+            normalized[size] = Math.trunc(n)
+        }
+    })
+
+    const totalStock = Object.values(normalized).reduce((sum, qty) => sum + qty, 0)
+
+    const { error } = await supabase
+        .from('productos')
+        .update({
+            stock_by_size: normalized,
+            stock: totalStock,
+        })
+        .eq('id', productId)
+
+    if (error) {
+        return { success: false, error: error.message }
+    }
+
+    return { success: true, stock_by_size: normalized, stock: totalStock }
+}
+

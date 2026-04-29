@@ -23,21 +23,21 @@ export default function CartPage() {
     const isEmpty = items.length === 0
 
     return (
-        <div className="min-h-screen bg-black text-white pt-20">
+        <div className="eter-page-surface relative min-h-screen overflow-hidden bg-[#050505] text-white pt-20">
             {/* Header */}
-            <section className="border-b border-white/10 py-8 px-6">
+            <section className="border-b border-[#252525] py-8 px-6">
                 <div className="container mx-auto max-w-7xl">
                     <div className="flex items-center justify-between flex-wrap gap-4">
                         <div className="flex items-center gap-4">
                             <Link
                                 href="/catalog"
-                                className="p-3 hover:bg-cyan-500/10 rounded-xl transition-colors group"
+                                className="p-3 hover:bg-[#00E5FF]/10 rounded-xl transition-colors group"
                             >
-                                <ArrowLeft className="text-gray-400 group-hover:text-cyan-500 transition-colors" size={24} />
+                                <ArrowLeft className="text-gray-400 group-hover:text-[#00E5FF] transition-colors" size={24} />
                             </Link>
                             <div>
                                 <h1 className="text-5xl md:text-6xl font-black tracking-tight">
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-orange-500">CARRITO</span>
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00E5FF] to-[#00B8D9]">CARRITO</span>
                                 </h1>
                                 <p className="text-gray-400 mt-2">
                                     {items.length === 0 ? 'Tu carrito está vacío' : `${itemCount} ${itemCount === 1 ? 'producto' : 'productos'} en tu carrito`}
@@ -61,7 +61,7 @@ export default function CartPage() {
                 {isEmpty ? (
                     // Empty State
                     <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <div className="p-12 bg-gradient-to-br from-white/5 to-white/0 rounded-[3rem] mb-8 border-4 border-white/10">
+                        <div className="p-12 bg-gradient-to-br from-white/5 to-white/0 rounded-lg mb-8 border-4 border-[#252525]">
                             <ShoppingBag className="text-gray-600 mx-auto" size={120} />
                         </div>
                         <h2 className="text-4xl md:text-5xl font-black mb-4">
@@ -72,7 +72,7 @@ export default function CartPage() {
                         </p>
                         <Link
                             href="/catalog"
-                            className="px-10 py-5 bg-gradient-to-r from-cyan-500 to-orange-500 text-black font-black text-lg rounded-2xl hover:scale-105 transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.3)] flex items-center gap-3"
+                            className="px-10 py-5 bg-gradient-to-r from-[#00E5FF] to-[#00B8D9] text-black font-black text-lg rounded-md hover:scale-105 transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.3)] flex items-center gap-3"
                         >
                             <Package size={24} />
                             EXPLORAR CATÁLOGO
@@ -85,8 +85,8 @@ export default function CartPage() {
                                 { label: 'Envío Gratis', value: 'En 24/48hs' },
                                 { label: '0% Inversión', value: 'Sin riesgos' }
                             ].map((stat, idx) => (
-                                <div key={idx} className="backdrop-blur-xl bg-white/5 rounded-2xl p-6 border-2 border-white/10">
-                                    <div className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-orange-500">
+                                <div key={idx} className="backdrop-blur-xl bg-[#111111] rounded-md p-6 border-2 border-[#252525]">
+                                    <div className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00E5FF] to-[#00B8D9]">
                                         {stat.label}
                                     </div>
                                     <div className="text-sm text-gray-400 mt-2">{stat.value}</div>
@@ -108,11 +108,11 @@ export default function CartPage() {
                                 {items.map((item) => (
                                     <div
                                         key={`${item.id}-${item.selectedSize}`}
-                                        className="backdrop-blur-2xl bg-white/5 rounded-3xl p-6 border-2 border-white/10 hover:border-white/20 transition-all duration-300"
+                                        className="backdrop-blur-2xl bg-[#111111] rounded-lg p-6 border-2 border-[#252525] hover:border-white/20 transition-all duration-300"
                                     >
                                         <div className="flex gap-6">
                                             {/* Image */}
-                                            <div className="relative w-32 h-32 flex-shrink-0 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
+                                            <div className="relative w-32 h-32 flex-shrink-0 rounded-md overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
                                                 {item.images && item.images[0] && (
                                                     <Image
                                                         src={item.images[0]}
@@ -147,24 +147,24 @@ export default function CartPage() {
 
                                                 {/* Price & Quantity */}
                                                 <div className="flex items-center justify-between mt-4">
-                                                    <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-orange-500">
+                                                    <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00E5FF] to-[#00B8D9]">
                                                         ${item.basePrice.toLocaleString()}
                                                     </p>
 
                                                     {/* Quantity Controls */}
                                                     <div className="flex items-center gap-4">
                                                         <span className="text-sm text-gray-400">Cantidad:</span>
-                                                        <div className="flex items-center gap-3 backdrop-blur-xl bg-white/5 rounded-xl p-2 border-2 border-white/10">
+                                                        <div className="flex items-center gap-3 backdrop-blur-xl bg-[#111111] rounded-xl p-2 border-2 border-[#252525]">
                                                             <button
                                                                 onClick={() => updateQuantity(item.id, item.selectedSize, item.quantity - 1)}
-                                                                className="w-10 h-10 hover:bg-cyan-500 hover:text-black rounded-lg transition-all duration-300 flex items-center justify-center font-bold"
+                                                                className="w-10 h-10 hover:bg-[#00E5FF] hover:text-black rounded-lg transition-all duration-300 flex items-center justify-center font-bold"
                                                             >
                                                                 <Minus size={18} />
                                                             </button>
                                                             <span className="w-12 text-center font-black text-xl">{item.quantity}</span>
                                                             <button
                                                                 onClick={() => updateQuantity(item.id, item.selectedSize, item.quantity + 1)}
-                                                                className="w-10 h-10 hover:bg-cyan-500 hover:text-black rounded-lg transition-all duration-300 flex items-center justify-center font-bold"
+                                                                className="w-10 h-10 hover:bg-[#00E5FF] hover:text-black rounded-lg transition-all duration-300 flex items-center justify-center font-bold"
                                                             >
                                                                 <Plus size={18} />
                                                             </button>
@@ -180,7 +180,7 @@ export default function CartPage() {
                             {/* Continue Shopping */}
                             <Link
                                 href="/catalog"
-                                className="flex items-center justify-center gap-3 py-5 backdrop-blur-xl bg-white/5 hover:bg-white/10 border-2 border-white/10 hover:border-cyan-500/50 rounded-2xl font-bold transition-all duration-300 text-lg group"
+                                className="flex items-center justify-center gap-3 py-5 backdrop-blur-xl bg-[#111111] hover:bg-white/10 border-2 border-[#252525] hover:border-[#00E5FF]/50 rounded-md font-bold transition-all duration-300 text-lg group"
                             >
                                 <ArrowLeft className="group-hover:-translate-x-1 transition-transform" size={20} />
                                 Seguir Comprando
@@ -191,11 +191,11 @@ export default function CartPage() {
                         <div className="lg:col-span-1">
                             <div className="sticky top-24 space-y-6">
                                 {/* Summary Card */}
-                                <div className="backdrop-blur-2xl bg-gradient-to-br from-white/10 to-white/5 rounded-[3rem] p-8 border-4 border-white/10 space-y-6">
+                                <div className="backdrop-blur-2xl bg-gradient-to-br from-white/10 to-white/5 rounded-lg p-8 border-4 border-[#252525] space-y-6">
                                     <h2 className="text-2xl font-black">Resumen del Pedido</h2>
 
                                     {/* Promo Code */}
-                                    <div className="backdrop-blur-xl bg-white/5 rounded-2xl p-4 border-2 border-white/10">
+                                    <div className="backdrop-blur-xl bg-[#111111] rounded-md p-4 border-2 border-[#252525]">
                                         <label className="text-sm font-bold text-gray-400 mb-2 block flex items-center gap-2">
                                             <Tag size={16} />
                                             Código de descuento
@@ -206,12 +206,12 @@ export default function CartPage() {
                                                 value={promoCode}
                                                 onChange={(e) => setPromoCode(e.target.value)}
                                                 placeholder="ETER10"
-                                                className="flex-1 px-4 py-3 bg-white/5 border-2 border-white/10 focus:border-cyan-500 rounded-xl outline-none text-white placeholder-gray-500 transition-colors"
+                                                className="flex-1 px-4 py-3 bg-[#111111] border-2 border-[#252525] focus:border-[#00E5FF] rounded-xl outline-none text-white placeholder-gray-500 transition-colors"
                                             />
                                             <button
                                                 onClick={handleApplyPromo}
                                                 disabled={promoApplied}
-                                                className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-orange-500 text-black font-black rounded-xl hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+                                                className="px-6 py-3 bg-gradient-to-r from-[#00E5FF] to-[#00B8D9] text-black font-black rounded-xl hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 {promoApplied ? '✓' : 'APLICAR'}
                                             </button>
@@ -245,25 +245,25 @@ export default function CartPage() {
                                             <span className="font-bold">GRATIS</span>
                                         </div>
 
-                                        <div className="h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+                                        <div className="h-px bg-gradient-to-r from-transparent via-[#00E5FF]/50 to-transparent" />
 
                                         <div className="flex justify-between items-baseline">
                                             <span className="text-2xl font-bold">Total</span>
-                                            <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-orange-500">
+                                            <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00E5FF] to-[#00B8D9]">
                                                 ${(promoApplied ? total * 0.9 : total).toLocaleString()}
                                             </span>
                                         </div>
                                     </div>
 
                                     {/* Trust Badges */}
-                                    <div className="grid grid-cols-3 gap-3 py-4 border-y border-white/10">
+                                    <div className="grid grid-cols-3 gap-3 py-4 border-y border-[#252525]">
                                         {[
                                             { icon: Shield, label: 'Pago seguro' },
                                             { icon: Lock, label: 'Encriptado' },
                                             { icon: Truck, label: '24/48hs' }
                                         ].map((badge, idx) => (
                                             <div key={idx} className="text-center space-y-2">
-                                                <badge.icon className="mx-auto text-cyan-500" size={24} />
+                                                <badge.icon className="mx-auto text-[#00E5FF]" size={24} />
                                                 <p className="text-xs text-gray-400">{badge.label}</p>
                                             </div>
                                         ))}
@@ -275,19 +275,19 @@ export default function CartPage() {
                                             useCartStore.getState().setIsOpen(true);
                                             useCartStore.getState().setCartStep('checkout');
                                         }}
-                                        className="w-full py-6 bg-gradient-to-r from-cyan-500 to-orange-500 text-black font-black text-lg rounded-2xl hover:scale-105 transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.3)] flex items-center justify-center gap-3"
+                                        className="w-full py-6 bg-gradient-to-r from-[#00E5FF] to-[#00B8D9] text-black font-black text-lg rounded-md hover:scale-105 transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.3)] flex items-center justify-center gap-3"
                                     >
                                         <CreditCard size={24} />
                                         FINALIZAR COMPRA
                                     </button>
 
                                     <p className="text-center text-xs text-gray-400">
-                                        Al continuar, aceptás nuestros <Link href="/terms" className="text-cyan-500 hover:underline">Términos y Condiciones</Link>
+                                        Al continuar, aceptás nuestros <Link href="/terms" className="text-[#00E5FF] hover:underline">Términos y Condiciones</Link>
                                     </p>
                                 </div>
 
                                 {/* Benefits */}
-                                <div className="backdrop-blur-xl bg-white/5 rounded-2xl p-6 border-2 border-white/10 space-y-4">
+                                <div className="backdrop-blur-xl bg-[#111111] rounded-md p-6 border-2 border-[#252525] space-y-4">
                                     <h3 className="font-black text-lg mb-4">Beneficios de tu compra</h3>
                                     {[
                                         { icon: Package, text: 'Envío express en 24/48hs' },
@@ -296,8 +296,8 @@ export default function CartPage() {
                                         { icon: Truck, text: 'Seguimiento en tiempo real' }
                                     ].map((benefit, idx) => (
                                         <div key={idx} className="flex items-center gap-3 text-sm text-gray-300">
-                                            <div className="p-2 bg-cyan-500/10 rounded-lg">
-                                                <benefit.icon className="text-cyan-500" size={18} />
+                                            <div className="p-2 bg-[#00E5FF]/10 rounded-lg">
+                                                <benefit.icon className="text-[#00E5FF]" size={18} />
                                             </div>
                                             {benefit.text}
                                         </div>
@@ -311,7 +311,7 @@ export default function CartPage() {
 
             {/* Bottom Trust Bar */}
             {!isEmpty && (
-                <section className="py-12 px-6 bg-black border-t border-cyan-500/20 mt-20">
+                <section className="py-12 px-6 bg-black border-t border-[#00E5FF]/20 mt-20">
                     <div className="container mx-auto max-w-7xl">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                             {[
@@ -320,10 +320,10 @@ export default function CartPage() {
                                 { icon: CreditCard, label: 'PAGO SEGURO', value: 'Todas las tarjetas' }
                             ].map((item, idx) => (
                                 <div key={idx} className="group">
-                                    <div className="inline-block p-4 bg-cyan-500/10 rounded-2xl mb-3 group-hover:bg-cyan-500/20 transition-colors">
-                                        <item.icon className="text-cyan-500" size={32} />
+                                    <div className="inline-block p-4 bg-[#00E5FF]/10 rounded-md mb-3 group-hover:bg-[#00E5FF]/20 transition-colors">
+                                        <item.icon className="text-[#00E5FF]" size={32} />
                                     </div>
-                                    <div className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-orange-500">
+                                    <div className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00E5FF] to-[#00B8D9]">
                                         {item.label}
                                     </div>
                                     <div className="text-sm text-gray-400 mt-1">{item.value}</div>

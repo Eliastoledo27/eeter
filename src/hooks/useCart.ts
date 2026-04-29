@@ -30,6 +30,7 @@ export function useCart() {
             name: legacyItem.name,
             description: '', // Fallback
             category: legacyItem.brand || 'General',
+            brand: legacyItem.brand || 'ÉTER Original',
             basePrice: legacyItem.price,
             images: [legacyItem.image],
             stockBySize: {}, // Not needed for adding to cart

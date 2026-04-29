@@ -1,96 +1,67 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { Instagram, Twitter, MessageCircle, MapPin, ShieldCheck, Zap, Truck } from 'lucide-react'
+import Link from 'next/link';
+import Image from 'next/image';
+import { Instagram, Send, Mail, CheckCircle2 } from 'lucide-react';
 
 interface ResellerFooterProps {
-    resellerSlug: string
-    resellerName: string
+  resellerSlug?: string;
+  resellerName?: string;
 }
 
 export function ResellerFooter({ resellerSlug, resellerName }: ResellerFooterProps) {
-    const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
 
-    return (
-        <footer className="bg-[#020202] text-white pt-20 pb-10 border-t border-white/5 relative overflow-hidden">
-            {/* Background Gradient */}
-            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#00E5FF]/50 to-transparent" />
+  return (
+    <footer className="relative z-10 border-t border-white/5 bg-[#050505] py-10">
+      <div className="mx-auto max-w-[1440px] px-5 md:px-10">
+        <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-4">
+            <Link href="/" className="inline-block">
+              <div className="relative h-8 w-24">
+                <Image
+                  src="/texto.png"
+                  alt="ÉTER"
+                  fill
+                  className="object-contain object-left"
+                />
+              </div>
+            </Link>
+            <p className="max-w-xs text-xs leading-relaxed text-white/40">
+              Transformando el negocio de reventa en Argentina.
+              Parte del ecosistema oficial de ÉTER Store.
+            </p>
+          </div>
 
-            {/* Decorative background text */}
-            <div className="absolute bottom-0 right-0 text-[15vw] font-black text-white/[0.02] pointer-events-none select-none translate-y-1/4 leading-none uppercase">
-                {resellerName || 'ÉTER'}
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-4">
+              <Link href="#" className="text-white/45 transition-colors hover:text-[#00E5FF]">
+                <Instagram size={18} aria-label="Instagram" />
+              </Link>
+              <Link href="#" className="text-white/45 transition-colors hover:text-[#00E5FF]">
+                <Send size={18} aria-label="Telegram" />
+              </Link>
+              <Link href="mailto:ventas@eter.com.ar" className="text-white/45 transition-colors hover:text-[#00E5FF]">
+                <Mail size={18} aria-label="Email" />
+              </Link>
             </div>
-
-            <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-16">
-                    {/* Reseller Info */}
-                    <div className="lg:col-span-4 space-y-8">
-                        <div className="flex items-center gap-4 group">
-                            <div className="w-12 h-12 bg-white text-black rounded-2xl flex items-center justify-center font-black text-2xl group-hover:bg-[#00E5FF] transition-all duration-500">
-                                É
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-2xl font-black text-white tracking-tighter uppercase leading-none">ÉTER</span>
-                                <span className="text-[10px] font-black text-[#00E5FF] tracking-[0.3em] uppercase">{resellerName || 'PARTNER OFICIAL'}</span>
-                            </div>
-                        </div>
-
-                        <p className="text-gray-500 text-sm leading-relaxed max-w-xs italic uppercase font-mono">
-                            Distrubuidor autorizado de calzado premium brasilero. Exclusivdad y calidad garantizada por la red ÉTER.
-                        </p>
-
-                        <div className="flex gap-4">
-                            <div className="flex items-center gap-2">
-                                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-[#00E5FF]">
-                                    <ShieldCheck size={20} />
-                                </div>
-                                <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-tight">ORIGINAL<br/>CERTIFICADO</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-[#00E5FF]">
-                                    <Truck size={20} />
-                                </div>
-                                <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-tight">LOGÍSTICA<br/>ÉTER</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Contact Info */}
-                    <div className="lg:col-span-4 lg:col-start-6 space-y-8">
-                        <h3 className="text-[10px] font-black text-[#00E5FF] tracking-widest uppercase">Atención Directa</h3>
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-4 group">
-                                <MapPin size={18} className="text-gray-600 group-hover:text-[#00E5FF]" />
-                                <span className="text-sm text-gray-400 group-hover:text-white transition-colors">Argentina, Logística Federal</span>
-                            </div>
-                            <div className="flex items-center gap-4 group">
-                                <MessageCircle size={18} className="text-gray-600 group-hover:text-[#00E5FF]" />
-                                <span className="text-sm text-gray-400 group-hover:text-white transition-colors">Whatsapp Support 24/7</span>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-3">
-                            <Link href="#" className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-[#00E5FF] hover:text-black transition-all border border-white/5">
-                                <Instagram size={18} />
-                            </Link>
-                            <Link href="#" className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-[#00E5FF] hover:text-black transition-all border border-white/5">
-                                <Twitter size={18} />
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Bottom Bar */}
-                <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] font-black uppercase tracking-[0.2em] text-gray-700">
-                    <p>© {currentYear} ÉTER STORE x {resellerName}.</p>
-                    <div className="flex gap-8">
-                        <Link href="/privacy" className="hover:text-white transition-colors">Privacidad</Link>
-                        <Link href="/support" className="hover:text-white transition-colors">Soporte</Link>
-                        <span className="cursor-default">Partner Certificado</span>
-                        <span className="cursor-default">Logística Internacional</span>
-                    </div>
-                </div>
+            
+            <div className="flex items-center gap-2 rounded-full border border-[#C6FF00]/20 bg-[#C6FF00]/5 px-3 py-1.5">
+              <CheckCircle2 size={12} className="text-[#C6FF00]" />
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-[#C6FF00]">Tienda Verificada ÉTER</span>
             </div>
-        </footer>
-    )
+          </div>
+        </div>
+
+        <div className="mt-10 border-t border-white/5 pt-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between text-[10px] font-medium uppercase tracking-[0.1em] text-white/30">
+          <p>© {currentYear} ÉTER Core. Todos los derechos reservados.</p>
+          <div className="flex items-center gap-6">
+            <Link href="/terms" className="hover:text-white transition-colors">Términos</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacidad</Link>
+            <Link href="/support" className="hover:text-white transition-colors">Ayuda</Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
 }

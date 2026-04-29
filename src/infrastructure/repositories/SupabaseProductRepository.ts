@@ -14,6 +14,11 @@ interface SupabaseProductRow {
   stock: number;
   status: string;
   margin?: number;
+  brand: string | null;
+  estimated_profit: number;
+  liquidation_active: boolean;
+  liquidation_price: number | null;
+  liquidation_discount_percent: number | null;
   created_at: string;
   updated_at?: string | null;
 }
@@ -25,6 +30,7 @@ export class SupabaseProductRepository implements ProductRepository {
     let query = this.supabase
       .from('productos')
       .select('*')
+      .eq('status', 'activo')
       .order('created_at', { ascending: false });
 
     if (filter?.category && filter.category !== 'Todos') {
@@ -81,7 +87,9 @@ export class SupabaseProductRepository implements ProductRepository {
         image: product.images[0] || null, // Legacy support
         stock_by_size: product.stockBySize,
         stock: product.totalStock,
-        status: product.status === 'active' ? 'activo' : 'inactivo' // Mapping enum
+        status: product.status === 'active' ? 'activo' : 'inactivo', // Mapping enum
+        brand: product.brand,
+        estimated_profit: product.estimatedProfit
       })
       .select()
       .single();
@@ -106,6 +114,8 @@ export class SupabaseProductRepository implements ProductRepository {
       updates.stock = Object.values(product.stockBySize).reduce((a, b) => a + b, 0);
     }
     if (product.status) updates.status = product.status === 'active' ? 'activo' : 'inactivo';
+    if (product.brand) updates.brand = product.brand;
+    if (product.estimatedProfit !== undefined) updates.estimated_profit = product.estimatedProfit;
 
     updates.updated_at = new Date().toISOString();
 
@@ -142,6 +152,11 @@ export class SupabaseProductRepository implements ProductRepository {
       totalStock: row.stock || 0,
       status: row.status === 'activo' ? 'active' : 'inactive',
       margin: Number(row.margin) || 0,
+      brand: row.brand || '',
+      estimatedProfit: Number(row.estimated_profit) || 0,
+      liquidationActive: row.liquidation_active || false,
+      liquidationPrice: row.liquidation_price ? Number(row.liquidation_price) : undefined,
+      liquidationDiscountPercent: row.liquidation_discount_percent ? Number(row.liquidation_discount_percent) : undefined,
       createdAt: new Date(row.created_at),
       updatedAt: row.updated_at ? new Date(row.updated_at) : undefined,
     };

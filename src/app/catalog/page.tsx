@@ -2,13 +2,14 @@ import { SupabaseProductRepository } from '@/infrastructure/repositories/Supabas
 import { headers } from 'next/headers';
 import CatalogClient from './CatalogClient';
 import { Metadata } from 'next';
+import { getProducts } from '@/app/actions/products';
 
 export const metadata: Metadata = {
     title: 'Catálogo Oficial Éter Store | Zapatillas Importadas y Stock Inmediato',
     description: 'Comprá las mejores zapatillas premium de Brasil en Mar del Plata. Modelos exclusivos, calidad G5/Espejo y envíos express a toda Argentina. ¡Entrá y llevate las tuyas!',
 };
 
-export const revalidate = 0; // Fresh stock for bots
+export const revalidate = 300; // Fresh stock every 5 minutes
 
 export default async function CatalogPage({
     searchParams
@@ -21,14 +22,13 @@ export default async function CatalogPage({
     // Detect typical bot agents or explicit text request
     const isBot = /Chatfuel|ManyChat|curl|bot|googlebot|crawler/i.test(userAgent) || searchParams.format === 'text';
 
-    if (isBot) {
-        const repository = new SupabaseProductRepository();
-        const products = await repository.findAll();
-        const activeProducts = products.filter(p => p.status === 'active');
+    // Fetch products for both bots and normal users (for SSR/Hydration)
+    const products = await getProducts(undefined, undefined, 'active');
 
-        const catalogData = activeProducts.map((product) => {
-            const sizesStr = Object.keys(product.stockBySize).length > 0
-                ? Object.entries(product.stockBySize)
+    if (isBot) {
+        const catalogData = products.map((product) => {
+            const sizesStr = Object.keys(product.stock_by_size || {}).length > 0
+                ? Object.entries(product.stock_by_size)
                     .map(([size, quantity]) => `Talle ${size} (${quantity} disponibles)`)
                     .join(', ')
                 : 'Stock único';
@@ -36,8 +36,8 @@ export default async function CatalogPage({
             return `### ${product.name}
 - **ID**: ${product.id}
 - **Categoría**: ${product.category}
-- **Precio**: $${product.basePrice}
-- **Stock Total**: ${product.totalStock}
+- **Precio**: $${product.base_price}
+- **Stock Total**: ${Object.values(product.stock_by_size || {}).reduce((a, b) => a + (Number(b) || 0), 0)}
 - **Talles**: ${sizesStr}
 - **Link**: https://eter.store/catalog/${product.id}
 - **Imagen**: ${product.images?.[0] || ''}`;
@@ -77,7 +77,7 @@ export default async function CatalogPage({
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            <CatalogClient />
+            <CatalogClient initialProducts={products} />
         </>
     );
 }

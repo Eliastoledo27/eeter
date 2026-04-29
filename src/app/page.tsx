@@ -1,5 +1,8 @@
 import { Metadata } from 'next';
 import { HomeDecision } from '@/components/home/HomeDecision';
+import { getProducts } from '@/app/actions/products';
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
     title: 'Éter Store | Calzado Premium Brasilero y Oportunidad de Negocio',
@@ -28,7 +31,9 @@ export const metadata: Metadata = {
     },
 };
 
-export default function Page() {
+export default async function Page() {
+    const initialProducts = await getProducts();
+
     return (
         <main className="min-h-screen bg-[#050505]">
             <h1 className="sr-only">Zapatillas importadas Brasil Mar del Plata - Calzado deportivo premium - Éter Store Oficial</h1>
@@ -54,7 +59,7 @@ export default function Page() {
                 }}
             />
 
-            <HomeDecision />
+            <HomeDecision initialProducts={initialProducts} />
         </main>
     );
 }

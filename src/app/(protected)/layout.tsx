@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
 import { useAuthStore } from '@/store/auth-store'
@@ -38,9 +39,16 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   if (!isInitialized || (isLoading && !isAuthenticated)) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 bg-transparent border border-[#00E5FF] flex items-center justify-center rounded-lg">
-            <span className="text-3xl font-bold text-[#00E5FF] animate-pulse">É</span>
+        <div className="flex flex-col items-center gap-6">
+          <div className="relative">
+            <Image 
+                src="/logo.png" 
+                alt="ÉTER Logo" 
+                width={80} 
+                height={80} 
+                className="animate-pulse"
+            />
+            <div className="absolute -inset-4 bg-[#00E5FF]/10 blur-2xl rounded-full -z-10 animate-pulse" />
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-[#00E5FF] rounded-full animate-bounce [animation-delay:0ms]" />

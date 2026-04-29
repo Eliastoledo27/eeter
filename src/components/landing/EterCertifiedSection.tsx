@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ShieldCheck, Factory, QrCode } from 'lucide-react';
 
 const STEPS = [
@@ -46,21 +47,21 @@ export function EterCertifiedSection() {
                 >
                     {/* Outer ring */}
                     <div className="relative mb-10">
-                        <div className="w-36 h-36 rounded-full border-2 border-[#00E5FF]/60 flex items-center justify-center">
-                            <div className="w-28 h-28 rounded-full border border-[#00E5FF]/30 flex items-center justify-center bg-[#00E5FF]/5 backdrop-blur-sm">
-                                <div className="text-center">
-                                    <ShieldCheck className="w-8 h-8 text-[#00E5FF] mx-auto mb-1" />
-                                    <span className="text-[7px] font-black tracking-[0.3em] text-[#00E5FF] uppercase block">
-                                        ÉTER
-                                    </span>
-                                </div>
+                        <div className="w-36 h-36 rounded-2xl border-2 border-[#00E5FF]/40 flex items-center justify-center bg-gradient-to-br from-[#00E5FF]/10 to-transparent backdrop-blur-xl group">
+                            <div className="w-24 h-24 relative">
+                                <Image 
+                                    src="/logo.png" 
+                                    alt="ÉTER Certified" 
+                                    fill 
+                                    className="object-contain"
+                                />
                             </div>
                         </div>
                         {/* Rotating ring */}
                         <motion.div
                             animate={{ rotate: 360 }}
-                            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                            className="absolute inset-0 rounded-full border border-dashed border-[#00E5FF]/20"
+                            transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+                            className="absolute -inset-4 rounded-full border border-dashed border-[#00E5FF]/10"
                         />
                     </div>
 

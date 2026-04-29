@@ -5,314 +5,474 @@ import { Footer } from '@/components/layout/Footer';
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { CatalogHero } from '@/components/catalog/CatalogHero';
 import { PulseTicker } from '@/components/pulse/PulseTicker';
-import { Filter, Search, Loader2, X, ShoppingCart, SlidersHorizontal, ChevronDown, LayoutGrid, List } from 'lucide-react';
+import {
+    Search,
+    ChevronDown,
+    LayoutGrid,
+    List,
+    RotateCcw,
+    LayoutTemplate,
+    ArrowUpRight,
+    CircleDot,
+    TrendingUp,
+    Sparkles,
+} from 'lucide-react';
 import { useCatalog } from '@/hooks/useCatalog';
-import { useState, useMemo, useDeferredValue } from 'react';
+import { useState, useMemo, useDeferredValue, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FilterSidebar } from '@/components/catalog/FilterSidebar';
 import { CatalogSkeleton } from '@/components/catalog/ProductSkeleton';
-import { useCartStore } from '@/store/cart-store';
+import { useAuraStore } from '@/hooks/useAuraStore';
+import { AuraQuiz } from '@/components/catalog/AuraQuiz';
+import { LiquidationCarousel } from '@/components/catalog/LiquidationCarousel';
+import { LiquidationCardsSection } from '@/components/catalog/LiquidationCardsSection';
+import { SidebarLiquidation } from '@/components/catalog/SidebarLiquidation';
+import { SidebarFeaturedSale } from '@/components/catalog/SidebarFeaturedSale';
+import { SidebarPremiumOffers } from '@/components/catalog/SidebarPremiumOffers';
+import { rankCatalogProducts } from '@/lib/recommendation-engine';
+import {
+    getRecoExperimentMetrics,
+    getRecoVariant,
+    getSegmentPopularity,
+    getRecoVisitorId,
+    trackRecoClick,
+    trackRecoImpression,
+    RecoVariant,
+} from '@/lib/recommendation-analytics';
+import { mapProductTypeToProduct } from '@/lib/product-mapping';
+import { ProductType } from '@/app/actions/products';
+import { Product } from '@/types';
 
-export default function CatalogPage() {
-    const { loading, categories, products } = useCatalog();
-    const { items, setIsOpen: setIsCartOpen } = useCartStore();
-    const cartCount = items.reduce((acc, item) => acc + item.quantity, 0);
+const easeOut = [0.16, 1, 0.3, 1] as const;
+
+interface CatalogClientProps {
+    initialProducts?: ProductType[];
+}
+
+export default function CatalogPage({ initialProducts }: CatalogClientProps) {
+    const { loading: catalogLoading, categories: dbCategories, products: dbProducts } = useCatalog();
+    const viewedIds = useAuraStore((s) => s.viewedIds);
+    const purchasedIds = useAuraStore((s) => s.purchasedIds);
+    const sessionServedIds = useAuraStore((s) => s.sessionServedIds);
+    const exposureByProduct = useAuraStore((s) => s.exposureByProduct);
+    const hasCompletedQuiz = useAuraStore((s) => s.hasCompletedQuiz);
+    const profile = useAuraStore((s) => s.profile);
+    const markServed = useAuraStore((s) => s.markServed);
+    const addExposure = useAuraStore((s) => s.addExposure);
+    const openQuiz = useAuraStore((s) => s.openQuiz);
+
     const [activeCategory, setActiveCategory] = useState('Todos');
-    const [activeOccasion, setActiveOccasion] = useState('Todos');
+    const [activeBrand, setActiveBrand] = useState('Todas');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [searchQuery, setSearchQuery] = useState('');
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-    const [sortBy, setSortBy] = useState('newest');
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [sortBy, setSortBy] = useState('popular');
+    const [visibleCount, setVisibleCount] = useState(12);
+
+    // Hydration management
+    const mappedInitial = useMemo(() => initialProducts?.map(mapProductTypeToProduct) || [], [initialProducts]);
+    const products = useMemo(() => 
+        dbProducts?.length ? dbProducts : mappedInitial, 
+    [dbProducts, mappedInitial]);
+
+    const categories = useMemo(() => 
+        dbCategories?.length > 1 ? dbCategories : (products.length ? ['Todos', ...Array.from(new Set(products.map(p => p.category)))] : ['Todos']),
+    [dbCategories, products]);
+
+    const loading = catalogLoading && products.length === 0;
+    
+    // Client-only state initialized after mount to prevent hydration mismatch
+    const [mounted, setMounted] = useState(false);
+    const [recoVariant, setRecoVariant] = useState<RecoVariant | null>(null);
+    const [visitorSeed, setVisitorSeed] = useState<string | null>(null);
+    const [experimentMetrics, setExperimentMetrics] = useState<ReturnType<typeof getRecoExperimentMetrics> | null>(null);
+
     const deferredSearchQuery = useDeferredValue(searchQuery);
+    const segmentKey = [profile?.occasion, profile?.style, profile?.budget, profile?.ageRange].filter(Boolean).join('|') || 'anonymous';
 
-    const occasions = ['Streetwear', 'Gym', 'Performance', 'Gala'];
+    useEffect(() => {
+        setMounted(true);
+        // Initialize client-side specific values after mount
+        setRecoVariant(getRecoVariant());
+        setVisitorSeed(getRecoVisitorId());
+        setExperimentMetrics(getRecoExperimentMetrics());
+        
+        if (hasCompletedQuiz) {
+            setSortBy('aura');
+        }
+    }, [hasCompletedQuiz]);
 
-    const filteredProducts = useMemo(() => {
-        if (!products) return [];
-        let result = [...products];
-
-        if (deferredSearchQuery) {
-            const q = deferredSearchQuery.toLowerCase();
-            result = result.filter(p =>
-                p.name.toLowerCase().includes(q) ||
-                (p.category && p.category.toLowerCase().includes(q))
-            );
-        }
-        if (activeCategory !== 'Todos') {
-            result = result.filter(p => p.category === activeCategory);
-        }
-        if (activeOccasion !== 'Todos') {
-            // Simulating occasion filtering based on description or category mapping
-            result = result.filter(p => {
-                const searchStr = `${p.name} ${p.category} ${p.description || ''}`.toLowerCase();
-                return searchStr.includes(activeOccasion.toLowerCase());
-            });
-        }
-        if (priceRange[0] > 0 || priceRange[1] < 1000000) {
-            result = result.filter(p => p.basePrice >= priceRange[0] && p.basePrice <= priceRange[1]);
-        }
-        if (selectedSizes.length > 0) {
-            result = result.filter(p => {
-                if (!p.stockBySize) return false;
-                const avail = Object.entries(p.stockBySize)
-                    .filter(([, qty]) => Number(qty) > 0)
-                    .map(([size]) => size);
-                return selectedSizes.some(s => avail.includes(s));
-            });
-        }
-        if (sortBy === 'price-asc') result.sort((a, b) => a.basePrice - b.basePrice);
-        else if (sortBy === 'price-desc') result.sort((a, b) => b.basePrice - a.basePrice);
-        else result.sort((a, b) => {
-            const dA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-            const dB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-            return dB - dA;
-        });
-
-        return result;
-    }, [products, deferredSearchQuery, activeCategory, activeOccasion, priceRange, selectedSizes, sortBy]);
-
-    const resetFilters = () => {
+    const resetFilters = useCallback(() => {
         setActiveCategory('Todos');
-        setActiveOccasion('Todos');
+        setActiveBrand('Todas');
         setSearchQuery('');
         setPriceRange([0, 1000000]);
         setSelectedSizes([]);
-        setSortBy('newest');
+        setSortBy(hasCompletedQuiz ? 'aura' : 'popular');
+    }, [hasCompletedQuiz]);
+
+    const filteredAndSortedProducts = useMemo(() => {
+        const result = products.filter((product) => {
+            const matchesCategory = activeCategory === 'Todos' || product.category === activeCategory;
+            const matchesBrand = activeBrand === 'Todas' || product.brand === activeBrand;
+            const matchesSearch = product.name.toLowerCase().includes(deferredSearchQuery.toLowerCase());
+            const matchesPrice = product.basePrice >= priceRange[0] && product.basePrice <= priceRange[1];
+            const matchesSize = selectedSizes.length === 0 || selectedSizes.some((size) => product.stockBySize?.[size] > 0);
+            return matchesCategory && matchesBrand && matchesSearch && matchesPrice && matchesSize && product.status === 'active';
+        });
+
+        if (!mounted || !recoVariant || !visitorSeed) return result;
+
+        switch (sortBy) {
+            case 'aura':
+                return rankCatalogProducts(result, {
+                    viewedIds,
+                    purchasedIds,
+                    sessionServedIds,
+                    exposureByProduct,
+                    profile,
+                    seed: `${visitorSeed}:${activeCategory}:${activeBrand}:${deferredSearchQuery}`,
+                    variant: recoVariant || 'control',
+                    segmentPopularity: getSegmentPopularity(segmentKey),
+                });
+            case 'popular': {
+                const popularity = getSegmentPopularity(segmentKey);
+                result.sort((a, b) => {
+                    const brandA = (a.brand || '').toLowerCase();
+                    const brandB = (b.brand || '').toLowerCase();
+                    const categoryA = (a.category || '').toLowerCase();
+                    const categoryB = (b.category || '').toLowerCase();
+                    const scoreA =
+                        (popularity.byProductId[a.id] || 0) * 3 +
+                        (popularity.byBrand[brandA] || 0) * 2 +
+                        (popularity.byCategory[categoryA] || 0);
+                    const scoreB =
+                        (popularity.byProductId[b.id] || 0) * 3 +
+                        (popularity.byBrand[brandB] || 0) * 2 +
+                        (popularity.byCategory[categoryB] || 0);
+                    return scoreB - scoreA;
+                });
+                break;
+            }
+            case 'price_asc':
+                result.sort((a, b) => a.basePrice - b.basePrice);
+                break;
+            case 'price_desc':
+                result.sort((a, b) => b.basePrice - a.basePrice);
+                break;
+            case 'news':
+                result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                break;
+            default:
+                break;
+        }
+
+        return result;
+    }, [
+        products,
+        activeCategory,
+        activeBrand,
+        deferredSearchQuery,
+        priceRange,
+        selectedSizes,
+        sortBy,
+        viewedIds,
+        purchasedIds,
+        profile,
+        visitorSeed,
+        recoVariant,
+        segmentKey,
+        mounted
+    ]);
+
+    const displayProducts = useMemo(() => 
+        filteredAndSortedProducts.slice(0, visibleCount),
+    [filteredAndSortedProducts, visibleCount]);
+    const hasMore = visibleCount < filteredAndSortedProducts.length;
+
+    const lastServedIdsRef = useRef<string>('');
+
+    useEffect(() => {
+        if (displayProducts.length === 0 || !recoVariant) return;
+        const productIds = displayProducts.map((product) => product.id);
+        const currentIdsHash = productIds.join(',');
+
+        // Prevent update loop if products haven't actually changed
+        if (lastServedIdsRef.current === currentIdsHash) return;
+        lastServedIdsRef.current = currentIdsHash;
+
+        markServed(productIds);
+        addExposure(productIds);
+        trackRecoImpression({
+            variant: recoVariant,
+            productIds,
+            viewedIds,
+            segment: segmentKey,
+            productsMeta: displayProducts.map((product) => ({
+                id: product.id,
+                category: product.category,
+                brand: product.brand,
+            })),
+            catalogSize: filteredAndSortedProducts.length,
+        });
+        setExperimentMetrics(getRecoExperimentMetrics());
+    }, [
+        addExposure,
+        displayProducts,
+        filteredAndSortedProducts.length,
+        markServed,
+        recoVariant || 'control',
+        segmentKey,
+        viewedIds,
+    ]);
+
+    const handleProductClick = useCallback(
+        (product: (typeof displayProducts)[number]) => {
+            if (!recoVariant) return;
+            trackRecoClick({
+                variant: recoVariant,
+                productId: product.id,
+                viewedIds,
+                segment: segmentKey,
+                category: product.category,
+                brand: product.brand,
+            });
+            setExperimentMetrics(getRecoExperimentMetrics());
+        },
+        [recoVariant, segmentKey, viewedIds]
+    );
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        e.currentTarget.style.setProperty('--mouse-x', `${x}%`);
+        e.currentTarget.style.setProperty('--mouse-y', `${y}%`);
     };
 
-    const hasActiveFilters = activeCategory !== 'Todos' || activeOccasion !== 'Todos' || selectedSizes.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000000;
-
     return (
-        <div className="min-h-screen bg-[#050505] text-white selection:bg-[#00E5FF] selection:text-black overflow-x-hidden font-sans">
+        <main
+            onMouseMove={handleMouseMove}
+            className="flex flex-col min-h-screen overflow-x-hidden font-sans text-white selection:bg-[#00E5FF]/30 selection:text-white"
+        >
             <Navbar />
-            <CatalogHero />
-            <PulseTicker />
 
-            <div className="container mx-auto px-4 md:px-6 pb-24 relative z-10">
-                {/* ── High Impact Floating Toolbar ────────────────── */}
-                <div className="sticky top-[70px] md:top-[90px] z-40 -mx-2 px-2 pt-2 pb-4 pointer-events-none">
-                    <div className="bg-[#0A0A0A]/80 backdrop-blur-3xl border border-white/10 rounded-2xl md:rounded-3xl p-3 md:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto">
-                        <div className="flex flex-col gap-4">
-                            <div className="flex items-center gap-3">
-                                {/* Enhanced Search */}
-                                <div className="flex-1 relative group">
-                                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-[#00E5FF] transition-colors" />
-                                    <input
-                                        type="text"
-                                        placeholder="Buscar por marca o modelo..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full h-12 bg-white/[0.03] border border-white/[0.06] rounded-xl md:rounded-2xl pl-12 pr-10 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00E5FF]/30 transition-all font-medium"
-                                    />
-                                    {searchQuery && (
-                                        <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-xl hover:bg-white/10 transition-colors">
-                                            <X size={16} className="text-white/40" />
-                                        </button>
-                                    )}
-                                </div>
+            {/* Eliminated global fixed backdrop to match clean Index aesthetic */}
 
-                                {/* Desktop View Switcher */}
-                                <div className="hidden md:flex bg-white/[0.03] border border-white/[0.06] rounded-2xl p-1 gap-1">
-                                    <button
-                                        onClick={() => setViewMode('grid')}
-                                        className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all ${
-                                            viewMode === 'grid' 
-                                                ? 'bg-[#00E5FF] text-black shadow-[0_0_20px_rgba(0,229,255,0.2)]' 
-                                                : 'text-white/20 hover:text-white/40'
-                                        }`}
-                                    >
-                                        <LayoutGrid size={18} />
-                                    </button>
-                                    <button
-                                        onClick={() => setViewMode('list')}
-                                        className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all ${
-                                            viewMode === 'list' 
-                                                ? 'bg-[#00E5FF] text-black shadow-[0_0_20px_rgba(0,229,255,0.2)]' 
-                                                : 'text-white/20 hover:text-white/40'
-                                        }`}
-                                    >
-                                        <List size={18} />
-                                    </button>
-                                </div>
+            <div className="relative z-[2] flex-1">
+                <CatalogHero />
+                <LiquidationCarousel products={products} />
 
-                                {/* Filter Toggle */}
-                                <button
-                                    onClick={() => setIsSidebarOpen(true)}
-                                    className="relative h-12 px-4 md:px-6 flex items-center justify-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-xl md:rounded-2xl hover:border-[#00E5FF]/30 transition-all group"
+                <section className="relative z-0 border-t border-white/10 bg-[#050505] px-4 py-8 lg:px-6">
+                    <div className="paint-splatter splat-green -left-14 top-10 hidden md:block" />
+                    <div className="paint-splatter splat-purple -right-10 bottom-20 hidden opacity-40 md:block" />
+                    <div className="mx-auto max-w-[1600px] relative z-10">
+                        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_340px]">
+                            <div className="min-w-0 order-2 lg:order-1">
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.6, ease: easeOut }}
+                                    className="eter-card mb-8 p-6 md:p-8"
                                 >
-                                    <SlidersHorizontal size={16} className="text-white/40 group-hover:text-[#00E5FF] transition-colors" />
-                                    <span className="hidden md:block text-[11px] font-black uppercase tracking-[0.2em] text-white/50 group-hover:text-white transition-colors">Filtros Avanzados</span>
-                                    {hasActiveFilters && (
-                                        <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#00E5FF] shadow-[0_0_10px_#00E5FF] border-2 border-[#0A0A0A]" />
+                                    <div className="mb-5 flex flex-col justify-between gap-5 md:flex-row md:items-center">
+                                        <div>
+                                            <nav className="mb-2 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.22em] text-white/40">
+                                                <span>ETER</span>
+                                                <span className="text-white/20">/</span>
+                                                <span>CATALOGO</span>
+                                                <span className="text-white/20">/</span>
+                                                <span className="text-[#00E5FF]">LIQUIDACION</span>
+                                            </nav>
+                                            <h1 className="text-4xl font-black uppercase tracking-tight text-white md:text-5xl">
+                                                Catalogo <span className="text-tri-gradient">Liquidacion</span>
+                                            </h1>
+                                        </div>
+
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            <div className="group relative">
+                                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 transition-colors group-focus-within:text-[#00E5FF]" size={18} />
+                                                <input
+                                                    type="text"
+                                                    placeholder="BUSCAR PRODUCTO..."
+                                                    value={searchQuery}
+                                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                                    className="h-12 w-[280px] rounded-full border border-white/15 bg-black/40 pl-11 pr-4 text-xs font-bold tracking-[0.14em] text-white placeholder:text-white/30 focus:border-[#00E5FF]/50 focus:outline-none"
+                                                />
+                                            </div>
+                                            <div className="flex items-center rounded-full border border-white/15 bg-black/50 p-1">
+                                                <button
+                                                    onClick={() => setViewMode('grid')}
+                                                    className={`rounded-full p-2.5 transition-all ${viewMode === 'grid' ? 'bg-[#00E5FF] text-black' : 'text-white/40 hover:text-white'}`}
+                                                >
+                                                    <LayoutGrid size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => setViewMode('list')}
+                                                    className={`rounded-full p-2.5 transition-all ${viewMode === 'list' ? 'bg-[#00E5FF] text-black' : 'text-white/40 hover:text-white'}`}
+                                                >
+                                                    <List size={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-wrap items-center gap-5">
+                                        <div className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-white/70">
+                                            <span className="h-2 w-2 animate-pulse rounded-full bg-[#00E5FF]" />
+                                            <span>{filteredAndSortedProducts.length} modelos activos</span>
+                                        </div>
+                                        <div className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-white/70">
+                                            <CircleDot size={14} className="text-[#C6FF00]" />
+                                            <span>Categoria: {activeCategory}</span>
+                                        </div>
+                                        {activeBrand !== 'Todas' && (
+                                            <div className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-white/70">
+                                                <TrendingUp size={14} className="text-[#7A00FF]" />
+                                                <span>Marca: {activeBrand}</span>
+                                            </div>
+                                        )}
+                                        <div className="ml-auto flex items-center gap-4">
+                                            <button
+                                                onClick={openQuiz}
+                                                className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#00E5FF] transition-all hover:brightness-125"
+                                            >
+                                                <Sparkles size={13} />
+                                                Re-calibrar Aura
+                                            </button>
+                                            <button
+                                                onClick={resetFilters}
+                                                className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-white/40 transition-colors hover:text-white"
+                                            >
+                                                <RotateCcw size={13} />
+                                                Limpiar filtros
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {mounted && recoVariant && experimentMetrics && (
+                                        <>
+                                            <div className="mt-5 grid gap-3 rounded-2xl border border-white/10 bg-black/35 p-4 md:grid-cols-2 xl:grid-cols-4">
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-[0.16em] text-white/40">Variante activa</p>
+                                                    <p className="mt-1 text-xs font-black uppercase tracking-[0.14em] text-[#00E5FF]">
+                                                        {recoVariant === 'personalized_diverse' ? 'Personalized Diverse' : 'Control'}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-[0.16em] text-white/40">Cobertura catalogo</p>
+                                                    <p className="mt-1 text-sm font-black text-white">
+                                                        {((experimentMetrics.metricsByVariant.find((m) => m.variant === recoVariant)?.coverage || 0) * 100).toFixed(1)}%
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-[0.16em] text-white/40">Descubrimiento</p>
+                                                    <p className="mt-1 text-sm font-black text-white">
+                                                        {((experimentMetrics.metricsByVariant.find((m) => m.variant === recoVariant)?.discoveryRate || 0) * 100).toFixed(1)}%
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-[0.16em] text-white/40">Lift CTR / RPV</p>
+                                                    <p className="mt-1 text-sm font-black text-white">
+                                                        {(experimentMetrics.delta.ctrLift * 100).toFixed(1)}% / {(experimentMetrics.delta.revenuePerVisitorLift * 100).toFixed(1)}%
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="mt-3 flex flex-wrap items-center gap-4 text-[10px] font-black uppercase tracking-[0.14em]">
+                                                <span className={`${experimentMetrics.significance.ctr.significant ? 'text-[#C6FF00]' : 'text-white/45'}`}>
+                                                    CTR p={experimentMetrics.significance.ctr.pValue.toFixed(4)}
+                                                </span>
+                                                <span className={`${experimentMetrics.significance.revenuePerVisitor.significant ? 'text-[#C6FF00]' : 'text-white/45'}`}>
+                                                    RPV p={experimentMetrics.significance.revenuePerVisitor.pValue.toFixed(4)}
+                                                </span>
+                                            </div>
+                                        </>
                                     )}
-                                </button>
-                            </div>
+                                </motion.div>
+                                <LiquidationCardsSection products={products} title="Productos en Liquidación" />
 
-                            {/* Horizontal Category Scroll */}
-                            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
-                                {['Todos', ...categories.filter(c => c !== 'Todos')].map(cat => (
-                                    <button
-                                        key={cat}
-                                        onClick={() => setActiveCategory(cat)}
-                                        className={`whitespace-nowrap px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 shrink-0 border ${
-                                            activeCategory === cat
-                                                ? 'bg-[#00E5FF]/10 border-[#00E5FF]/40 text-[#00E5FF] shadow-[0_0_20px_rgba(0,229,255,0.1)]'
-                                                : 'bg-white/[0.02] border-white/[0.05] text-white/30 hover:text-white/60 hover:border-white/10'
-                                        }`}
-                                    >
-                                        {cat}
-                                    </button>
-                                ))}
-                                {hasActiveFilters && (
-                                    <button
-                                        onClick={resetFilters}
-                                        className="whitespace-nowrap px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-rose-500/80 hover:bg-rose-500/10 transition-all shrink-0 border border-transparent"
-                                    >
-                                        Limpiar
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* ── Main Content ────────────────── */}
-                <div className="flex gap-8 mt-8">
-                    {/* Desktop Sidebar */}
-                    <aside className="hidden lg:block w-64 shrink-0">
-                        <div className="sticky top-[190px] max-h-[calc(100vh-220px)] overflow-y-auto no-scrollbar rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6">
-                            <FilterSidebar
-                                categories={categories.filter(cat => cat !== 'Todos')}
-                                activeCategory={activeCategory}
-                                onCategoryChange={setActiveCategory}
-                                occasions={occasions}
-                                activeOccasion={activeOccasion}
-                                onOccasionChange={setActiveOccasion}
-                                priceRange={priceRange}
-                                onPriceChange={setPriceRange}
-                                selectedSizes={selectedSizes}
-                                onSizesChange={setSelectedSizes}
-                                sortBy={sortBy}
-                                onSortChange={setSortBy}
-                                onReset={resetFilters}
-                            />
-                        </div>
-                    </aside>
-
-                    {/* Product Grid */}
-                    <div className="flex-1 min-w-0">
-                        {/* Results count bar */}
-                        <div className="flex items-center justify-between mb-6">
-                            <p className="text-xs text-white/30 font-medium">
-                                {loading ? 'Cargando...' : (
-                                    <><span className="text-white/60 font-bold">{filteredProducts.length}</span> productos encontrados</>
-                                )}
-                            </p>
-                            {/* Mobile sort */}
-                            <div className="relative sm:hidden">
-                                <select
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value)}
-                                    className="h-9 appearance-none bg-white/[0.04] border border-white/[0.08] rounded-lg pl-3 pr-7 text-[11px] font-semibold text-white/50 uppercase tracking-wider cursor-pointer focus:outline-none"
-                                >
-                                    <option value="newest" className="bg-[#111]">Recientes</option>
-                                    <option value="price-asc" className="bg-[#111]">$ Menor</option>
-                                    <option value="price-desc" className="bg-[#111]">$ Mayor</option>
-                                </select>
-                                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" />
-                            </div>
-                        </div>
-
-                        {loading ? (
-                            <CatalogSkeleton />
-                        ) : filteredProducts.length > 0 ? (
-                            <motion.div
-                                layout
-                                className={
-                                    viewMode === 'grid' 
-                                        ? "grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6"
-                                        : "flex flex-col gap-4"
-                                }
-                            >
-                                <AnimatePresence mode="popLayout">
-                                    {filteredProducts.map((product) => (
-                                        <motion.div
-                                            key={product.id}
-                                            layout
-                                            initial={{ opacity: 0, y: 15 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 0.95 }}
-                                            transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
-                                        >
-                                            <ProductCard product={product} viewMode={viewMode} />
-                                        </motion.div>
-                                    ))}
+                                <AnimatePresence mode="wait">
+                                     {loading ? (
+                                         <motion.div key="skeleton" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                             <CatalogSkeleton />
+                                         </motion.div>
+                                     ) : displayProducts.length > 0 ? (
+                                         <motion.div
+                                             key="grid"
+                                             initial={{ opacity: 0, y: 24 }}
+                                             animate={{ opacity: 1, y: 0 }}
+                                             exit={{ opacity: 0, y: 24 }}
+                                             transition={{ duration: 0.55, ease: easeOut }}
+                                             className={`grid gap-6 ${
+                                                 viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4' : 'grid-cols-1'
+                                             }`}
+                                         >
+                                             {displayProducts.map((product, idx) => (
+                                                 <motion.div
+                                                     key={product.id}
+                                                     initial={{ opacity: 0, y: 26, scale: 0.98 }}
+                                                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                                                     viewport={{ once: true, margin: '-40px' }}
+                                                     transition={{ duration: 0.55, ease: easeOut, delay: (idx % 12) * 0.04 }}
+                                                 >
+                                                     <ProductCard
+                                                         product={product}
+                                                         viewMode={viewMode}
+                                                         index={idx}
+                                                         onProductClick={handleProductClick}
+                                                     />
+                                                 </motion.div>
+                                             ))}
+                                         </motion.div>
+                                     ) : (
+                                         <motion.div
+                                             key="empty"
+                                             initial={{ opacity: 0 }}
+                                             animate={{ opacity: 1 }}
+                                             className="flex flex-col items-center justify-center border border-dashed border-white/15 bg-black/35 px-6 py-24 text-center"
+                                         >
+                                             <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-white/20 bg-white/5">
+                                                  <LayoutTemplate size={34} className="text-white/30" />
+                                             </div>
+                                             <h3 className="mb-2 text-2xl font-black uppercase tracking-tight text-white">No hay resultados</h3>
+                                             <p className="mb-7 text-sm font-bold uppercase tracking-[0.12em] text-white/45">Proba ajustando filtros para ver mas pares</p>
+                                             <button
+                                                 onClick={resetFilters}
+                                                 className="rounded-full bg-[#00E5FF] px-8 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-black transition-all hover:scale-105 hover:bg-white"
+                                             >
+                                                 Resetear busqueda
+                                             </button>
+                                         </motion.div>
+                                     )}
                                 </AnimatePresence>
-                            </motion.div>
-                        ) : (
-                            /* Empty state */
-                            <div className="flex flex-col items-center justify-center py-24 text-center">
-                                <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center mb-6">
-                                    <Search className="text-white/15" size={24} />
-                                </div>
-                                <h3 className="text-xl font-bold text-white/80 mb-2">Sin resultados</h3>
-                                <p className="text-sm text-white/30 max-w-xs mb-6">
-                                    Probá ajustar los filtros o el término de búsqueda.
-                                </p>
-                                <button
-                                    onClick={resetFilters}
-                                    className="px-6 py-3 bg-[#00E5FF] text-black rounded-xl text-xs font-bold uppercase tracking-wider hover:shadow-[0_0_25px_rgba(0,229,255,0.3)] transition-all active:scale-95"
-                                >
-                                    Limpiar filtros
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
 
-            {/* ── Mobile Filter Drawer ────────────────── */}
-            <AnimatePresence>
-                {isSidebarOpen && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[150] lg:hidden"
-                        onClick={() => setIsSidebarOpen(false)}
-                    >
-                        <motion.div
-                            initial={{ y: '100%' }}
-                            animate={{ y: 0 }}
-                            exit={{ y: '100%' }}
-                            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-                            className="absolute inset-x-0 bottom-0 max-h-[88vh] bg-[#0A0A0A] rounded-t-3xl border-t border-white/10 flex flex-col overflow-hidden"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            {/* Drawer handle */}
-                            <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06] shrink-0">
-                                <div>
-                                    <h2 className="text-lg font-bold">Filtros</h2>
-                                    <p className="text-[11px] text-white/30 mt-0.5">{filteredProducts.length} productos</p>
-                                </div>
-                                <button
-                                    onClick={() => setIsSidebarOpen(false)}
-                                    className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
-                                >
-                                    <X size={16} />
-                                </button>
+                                {hasMore && !loading && (
+                                    <div className="mt-12 flex justify-center">
+                                        <button
+                                            onClick={() => setVisibleCount((prev) => prev + 12)}
+                                            className="group relative overflow-hidden rounded-full px-10 py-4"
+                                        >
+                                            <div className="absolute inset-0 bg-[#00E5FF] transition-transform duration-500 group-hover:scale-110" />
+                                            <div className="relative inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] text-black">
+                                                Cargar mas modelos
+                                                <ChevronDown size={16} className="transition-transform group-hover:translate-y-1" />
+                                            </div>
+                                        </button>
+                                    </div>
+                                )}
                             </div>
 
-                            <div className="flex-1 overflow-y-auto px-6 py-4 no-scrollbar">
+                            <aside className="order-2 lg:order-2 lg:pl-10 lg:border-l lg:border-white/5 relative h-full space-y-12">
+                                <div className="absolute -left-[1px] top-0 bottom-0 w-[1px] bg-gradient-to-b from-[#00E5FF]/20 via-[#00E5FF]/5 to-transparent hidden lg:block" />
+                                
                                 <FilterSidebar
-                                    categories={categories.filter(cat => cat !== 'Todos')}
+                                    categories={categories}
                                     activeCategory={activeCategory}
                                     onCategoryChange={setActiveCategory}
-                                    occasions={occasions}
-                                    activeOccasion={activeOccasion}
-                                    onOccasionChange={setActiveOccasion}
+                                    occasions={['Casual', 'Deporte', 'Streetwear']}
+                                    activeOccasion="Todos"
+                                    onOccasionChange={() => {}}
                                     priceRange={priceRange}
                                     onPriceChange={setPriceRange}
                                     selectedSizes={selectedSizes}
@@ -320,38 +480,45 @@ export default function CatalogPage() {
                                     sortBy={sortBy}
                                     onSortChange={setSortBy}
                                     onReset={resetFilters}
+                                    brands={['Nike', 'Jordan', 'Adidas', 'Yeezy', 'New Balance']}
+                                    activeBrand={activeBrand}
+                                    onBrandChange={setActiveBrand}
                                 />
-                            </div>
+                                 <SidebarLiquidation products={products} />
+                            </aside>
+                        </div>
+                    </div>
+                </section>
 
-                            <div className="px-6 py-4 border-t border-white/[0.06] shrink-0">
-                                <button
-                                    onClick={() => setIsSidebarOpen(false)}
-                                    className="w-full h-12 bg-[#00E5FF] text-black rounded-xl font-bold text-sm uppercase tracking-wider shadow-[0_8px_30px_rgba(0,229,255,0.25)] active:scale-[0.98] transition-all"
-                                >
-                                    Ver {filteredProducts.length} resultados
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                <section className="relative overflow-hidden border-t border-white/10 py-20">
+                    <div className="paint-splatter splat-cyan -right-24 top-0 hidden opacity-20 lg:block" />
+                    <div className="brush-stroke brush-tricolor left-[10%] top-16 hidden opacity-40 lg:block" />
+                    <div className="mx-auto max-w-6xl px-6 text-center">
+                        <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#00E5FF]/35 bg-[#00E5FF]/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#00E5FF]">
+                            Oferta activa
+                        </span>
+                        <h2 className="mb-5 text-5xl font-black uppercase leading-none tracking-tight text-white md:text-7xl">
+                            Listo para vender <br /> <span className="text-tri-gradient">en automatico</span>
+                        </h2>
+                        <p className="mx-auto mb-9 max-w-2xl text-base text-white/60">
+                            Sumate al canal mayorista, publica hoy y aprovecha los tramos de liquidacion para aumentar conversion.
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-4">
+                            <button className="inline-flex items-center gap-3 rounded-full bg-[#00E5FF] px-9 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-black transition-all hover:scale-105 hover:bg-white">
+                                Registrarme ahora
+                                <ArrowUpRight size={16} />
+                            </button>
+                            <button className="rounded-full border border-white/20 bg-white/[0.03] px-9 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-white transition-all hover:border-[#C6FF00]/50 hover:text-[#C6FF00]">
+                                Hablar con asesor
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
 
+            <AuraQuiz />
+            <PulseTicker />
             <Footer />
-
-            {/* Floating Cart Button */}
-            {cartCount > 0 && (
-                <motion.button
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    onClick={() => setIsCartOpen(true)}
-                    className="fixed bottom-24 right-7 z-[150] h-14 w-14 rounded-2xl bg-white text-black flex items-center justify-center shadow-[0_15px_35px_rgba(0,0,0,0.5)] hover:bg-[#00E5FF] transition-all active:scale-90"
-                >
-                    <ShoppingCart size={22} strokeWidth={2.5} />
-                    <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[#00E5FF] text-black flex items-center justify-center text-[11px] font-black shadow-[0_0_15px_rgba(0,229,255,0.6)] border-2 border-[#050505]">
-                        {cartCount}
-                    </span>
-                </motion.button>
-            )}
-        </div>
+        </main>
     );
 }

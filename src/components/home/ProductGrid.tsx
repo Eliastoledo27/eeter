@@ -2,15 +2,16 @@
 
 import { useMemo, useState, useCallback, type MouseEvent } from 'react';
 import Image from 'next/image';
-import { Heart, ShoppingBag, ShoppingCart, ArrowUpRight } from 'lucide-react';
-import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
+import { Heart, ShoppingBag, ShoppingCart, ArrowUpRight, Zap, Sparkles } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 import type { ProductType } from '@/app/actions/products';
 import type { Product } from '@/types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface ProductGridProps {
   products: ProductType[];
@@ -39,6 +40,7 @@ const mapToCartProduct = (product: ProductType): Product => ({
   name: product.name,
   description: product.description || '',
   category: product.category || 'General',
+  brand: 'ÉTER Original',
   basePrice: product.base_price,
   images: product.images || [],
   stockBySize: product.stock_by_size || {},
@@ -105,6 +107,7 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
   const { toggle, has } = useFavoritesStore();
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
   const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedSizesByProduct, setSelectedSizesByProduct] = useState<Record<string, string>>({});
 
   const openQuickView = useCallback((product: ProductType) => {
     setSelectedProduct(product);
@@ -138,6 +141,18 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
     },
     [toggle]
   );
+
+  const getSelectedCardSize = useCallback(
+    (product: ProductType) =>
+      selectedSizesByProduct[product.id] || getDefaultSize(product.stock_by_size || {}),
+    [selectedSizesByProduct]
+  );
+
+  const handleSelectCardSize = useCallback((productId: string, size: string, event?: MouseEvent) => {
+    event?.preventDefault();
+    event?.stopPropagation();
+    setSelectedSizesByProduct((prev) => ({ ...prev, [productId]: size }));
+  }, []);
 
   const sizeOptions = useMemo(() => {
     if (!selectedProduct) return [];
@@ -177,8 +192,13 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
                   : { duration: 0.35, delay: Math.min(index * 0.03, 0.3) }
               }
               onClick={() => openQuickView(product)}
-              className="outline-none group cursor-pointer flex flex-col h-full overflow-hidden rounded-[2rem] border border-white/[0.06] bg-[#050505]/40 backdrop-blur-md transition-all duration-500 hover:border-[#00E5FF]/30 active:scale-[0.98]"
+              className="outline-none group cursor-pointer flex flex-col h-full overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[#050505]/55 backdrop-blur-md transition-all duration-500 hover:-translate-y-1 hover:border-[#00E5FF]/35 hover:shadow-[0_16px_40px_rgba(0,0,0,0.35)] active:scale-[0.98] relative focus-within:ring-2 focus-within:ring-[#00E5FF]/60"
             >
+                {/* Aura Match Flare */}
+                {product.auraScore && product.auraScore > 40 && (
+                    <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-[#00E5FF]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                )}
+
                 {/* Image Section */}
                 <div className="relative aspect-[4/5] overflow-hidden bg-white/[0.02]">
                   {product.images && product.images[0] ? (
@@ -200,6 +220,13 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
                     <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border backdrop-blur-md ${badge.classes}`}>
                       {badge.label}
                     </span>
+                    
+                    {product.auraScore && product.auraScore > 50 && (
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest bg-black/60 text-[#00E5FF] border border-[#00E5FF]/30 backdrop-blur-xl animate-pulse">
+                            <Zap size={8} className="fill-[#00E5FF]" />
+                            <span>{Math.round(Math.min(product.auraScore, 99))}% Match</span>
+                        </div>
+                    )}
                   </div>
 
                   {/* Favorite button */}
@@ -224,24 +251,71 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
                 </div>
 
                 {/* Info Section */}
-                <div className="p-6 flex flex-col flex-1">
-                  <span className="text-[9px] font-black text-[#00E5FF] uppercase tracking-[0.3em] mb-2">
-                    {product.category || 'ÉTER COLLECTION'}
-                  </span>
+                <div className="p-4 sm:p-5 lg:p-6 flex flex-col flex-1 gap-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[9px] font-black text-[#00E5FF] uppercase tracking-[0.24em]">
+                        {product.category || 'ÉTER COLLECTION'}
+                    </span>
+                    {product.auraScore && product.auraScore > 75 && (
+                        <Sparkles size={10} className="text-[#00E5FF]" />
+                    )}
+                  </div>
 
-                  <h3 className="text-lg font-black text-white uppercase tracking-tighter line-clamp-2 mb-4 group-hover:text-[#00E5FF] transition-colors">
+                  <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight line-clamp-2 group-hover:text-[#00E5FF] transition-colors">
                     {product.name}
                   </h3>
 
-                  <div className="mt-auto flex items-end justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-white/65">Talles</span>
+                      <span className="text-[10px] font-semibold text-white/45">
+                        {sizesAvailable.length > 0 ? `${sizesAvailable.length} disponibles` : 'Sin stock'}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5" role="group" aria-label={`Talles de ${product.name}`}>
+                      {sizesAvailable.length > 0 ? (
+                        sizesAvailable.slice(0, 8).map(([size, qty]) => {
+                          const isSelected = getSelectedCardSize(product) === size;
+                          const isLow = Number(qty) <= 2;
+                          return (
+                            <button
+                              key={size}
+                              type="button"
+                              onClick={(e) => handleSelectCardSize(product.id, size, e)}
+                              className={cn(
+                                'min-w-8 rounded-md border px-2 py-1 text-[11px] font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]/70',
+                                isSelected
+                                  ? 'border-[#00E5FF] bg-[#00E5FF]/20 text-[#b9f8ff] shadow-[0_0_12px_rgba(0,229,255,0.25)]'
+                                  : 'border-white/15 bg-white/[0.02] text-white/75 hover:border-[#00E5FF]/50 hover:text-white',
+                                isLow && 'border-cyan-400/45'
+                              )}
+                              aria-pressed={isSelected}
+                              aria-label={`Talle ${size}, stock ${qty}`}
+                              title={`Talle ${size} - ${qty} en stock`}
+                            >
+                              {size}
+                            </button>
+                          );
+                        })
+                      ) : (
+                        <span className="text-[11px] text-red-300/80">No hay talles disponibles</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-auto pt-1 flex items-end justify-between border-t border-white/10">
                     <div className="flex flex-col">
                         <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Inversión</span>
-                        <span className="text-xl font-black text-white font-mono">
-                            <span className="text-xs text-[#00E5FF] mr-1">$</span>
-                            {Number(product.base_price).toLocaleString('es-AR')}
-                        </span>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-xs text-[#00E5FF] font-black">$</span>
+                            <span className="text-xl font-black text-white font-mono tracking-tighter">
+                                {Number(product.base_price).toLocaleString('es-AR')}
+                            </span>
+                        </div>
                     </div>
-                    <ArrowUpRight size={18} className="text-white/20 group-hover:text-[#00E5FF] group-hover:rotate-45 transition-all" />
+                    <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover:bg-[#00E5FF]/10 group-hover:border-[#00E5FF]/30 transition-all">
+                        <ArrowUpRight size={18} className="text-white/20 group-hover:text-[#00E5FF] group-hover:rotate-45 transition-all" />
+                    </div>
                   </div>
                 </div>
             </motion.div>
@@ -318,7 +392,9 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
                     onClick={() => handleAddToCart(selectedProduct, selectedSize)}
                     disabled={!modalAvailability.canAdd}
                   >
-                    {modalAvailability.canAdd ? 'AGREGAR AL ECOSISTEMA' : 'AGOTADO'}
+                    {modalAvailability.canAdd
+                      ? `AGREGAR TALLE ${selectedSize || getDefaultSize(selectedProduct.stock_by_size || {})}`
+                      : 'AGOTADO'}
                   </Button>
                 </div>
               </div>

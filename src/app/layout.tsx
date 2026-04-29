@@ -61,10 +61,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/icon.svg?v=2', type: 'image/svg+xml' },
+      { url: '/logo.png', type: 'image/png' },
     ],
     apple: [
-      { url: '/icon.svg?v=2', type: 'image/svg+xml' },
+      { url: '/logo.png', type: 'image/png' },
     ],
   },
   verification: {
@@ -82,7 +82,7 @@ const jsonLd = {
   "@type": "Organization",
   "name": "ÉTER Store",
   "url": "https://www.eter.store",
-  "logo": "https://www.eter.store/icon.svg",
+  "logo": "https://www.eter.store/logo.png",
   "description": "Distribuidora líder de calzado premium brasilero y plataforma para revendedores.",
   "sameAs": [
     "https://facebook.com/eterstore",
@@ -108,7 +108,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} className="dark">
       <body
-        className={`${manrope.variable} font-sans antialiased bg-[#0A0A0A] text-white overflow-x-hidden`}
+        className={`${manrope.variable} font-sans antialiased bg-[#050505] text-white overflow-x-hidden texture-grain`}
       >
         <script
           type="application/ld+json"

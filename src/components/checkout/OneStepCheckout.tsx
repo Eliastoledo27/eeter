@@ -180,7 +180,7 @@ export function OneStepCheckout() {
                                                 {...register('email')}
                                                 type="email"
                                                 placeholder="tu@email.com"
-                                                className="w-full bg-black border border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
+                                                className="w-full bg-black border border-[#252525] rounded-xl py-4 pl-12 pr-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
                                             />
                                         </div>
                                         {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
@@ -194,7 +194,7 @@ export function OneStepCheckout() {
                                                 {...register('firstName')}
                                                 type="text"
                                                 placeholder="Juan"
-                                                className="w-full bg-black border border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
+                                                className="w-full bg-black border border-[#252525] rounded-xl py-4 pl-12 pr-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
                                             />
                                         </div>
                                         {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>}
@@ -206,7 +206,7 @@ export function OneStepCheckout() {
                                             {...register('lastName')}
                                             type="text"
                                             placeholder="Pérez"
-                                            className="w-full bg-black border border-white/10 rounded-xl py-4 px-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
+                                            className="w-full bg-black border border-[#252525] rounded-xl py-4 px-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
                                         />
                                         {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>}
                                     </div>
@@ -219,7 +219,7 @@ export function OneStepCheckout() {
                                                 {...register('phone')}
                                                 type="tel"
                                                 placeholder="+54 9 223 500 0000"
-                                                className="w-full bg-black border border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
+                                                className="w-full bg-black border border-[#252525] rounded-xl py-4 pl-12 pr-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
                                             />
                                         </div>
                                         {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
@@ -243,7 +243,7 @@ export function OneStepCheckout() {
                                                 {...register('address')}
                                                 type="text"
                                                 placeholder="Calle y Número"
-                                                className="w-full bg-black border border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
+                                                className="w-full bg-black border border-[#252525] rounded-xl py-4 pl-12 pr-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
                                             />
                                         </div>
                                         {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>}
@@ -255,7 +255,7 @@ export function OneStepCheckout() {
                                             {...register('city')}
                                             type="text"
                                             placeholder="Mar del Plata"
-                                            className="w-full bg-black border border-white/10 rounded-xl py-4 px-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
+                                            className="w-full bg-black border border-[#252525] rounded-xl py-4 px-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
                                         />
                                         {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city.message}</p>}
                                     </div>
@@ -266,7 +266,7 @@ export function OneStepCheckout() {
                                             {...register('postalCode')}
                                             type="text"
                                             placeholder="7600"
-                                            className="w-full bg-black border border-white/10 rounded-xl py-4 px-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
+                                            className="w-full bg-black border border-[#252525] rounded-xl py-4 px-4 text-sm focus:border-[#00E5FF] transition-colors outline-none"
                                         />
                                         {errors.postalCode && <p className="text-red-500 text-xs mt-1">{errors.postalCode.message}</p>}
                                     </div>
@@ -275,7 +275,7 @@ export function OneStepCheckout() {
                                         <label className="text-[10px] uppercase font-black tracking-widest text-gray-400">Provincia</label>
                                         <select
                                             {...register('province')}
-                                            className="w-full bg-black border border-white/10 rounded-xl py-4 px-4 text-sm focus:border-[#00E5FF] transition-colors outline-none appearance-none text-white"
+                                            className="w-full bg-black border border-[#252525] rounded-xl py-4 px-4 text-sm focus:border-[#00E5FF] transition-colors outline-none appearance-none text-white"
                                         >
                                             <option value="">Selecciona tu provincia</option>
                                             <option value="BA">Buenos Aires</option>
@@ -299,7 +299,7 @@ export function OneStepCheckout() {
                                     <button
                                         type="button"
                                         onClick={() => setValue('paymentMethod', 'stripe')}
-                                        className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all ${paymentMethod === 'stripe' ? 'border-[#00E5FF] bg-[#00E5FF]/10 text-[#00E5FF]' : 'border-white/10 text-gray-400 hover:border-white/20'}`}
+                                        className={`p-6 rounded-md border-2 flex flex-col items-center gap-3 transition-all ${paymentMethod === 'stripe' ? 'border-[#00E5FF] bg-[#00E5FF]/10 text-[#00E5FF]' : 'border-[#252525] text-gray-400 hover:border-white/20'}`}
                                     >
                                         <Wallet size={32} />
                                         <span className="text-xs font-black uppercase tracking-widest text-center">Tarjeta de Crédito / Débito (Stripe)</span>
@@ -307,7 +307,7 @@ export function OneStepCheckout() {
                                     <button
                                         type="button"
                                         onClick={() => setValue('paymentMethod', 'mercadopago')}
-                                        className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all ${paymentMethod === 'mercadopago' ? 'border-[#009EE3] bg-[#009EE3]/10 text-[#009EE3]' : 'border-white/10 text-gray-400 hover:border-white/20'}`}
+                                        className={`p-6 rounded-md border-2 flex flex-col items-center gap-3 transition-all ${paymentMethod === 'mercadopago' ? 'border-[#009EE3] bg-[#009EE3]/10 text-[#009EE3]' : 'border-[#252525] text-gray-400 hover:border-white/20'}`}
                                     >
                                         <Wallet size={32} />
                                         <span className="text-xs font-black uppercase tracking-widest text-center">Mercado Pago (Tarjetas, Dinero en cuenta)</span>
@@ -321,7 +321,7 @@ export function OneStepCheckout() {
                                             initial={{ opacity: 0, height: 0 }}
                                             animate={{ opacity: 1, height: 'auto' }}
                                             exit={{ opacity: 0, height: 0 }}
-                                            className="bg-[#00E5FF]/10 border border-[#00E5FF]/20 p-6 rounded-2xl text-[#00E5FF]"
+                                            className="bg-[#00E5FF]/10 border border-[#00E5FF]/20 p-6 rounded-md text-[#00E5FF]"
                                         >
                                             <h4 className="font-black uppercase tracking-tight mb-2 italic">Pago Seguro con Stripe</h4>
                                             <p className="text-sm text-gray-300">Serás redirigido a la plataforma segura de Stripe para completar tu compra. Aceptamos todas las tarjetas.</p>
@@ -333,7 +333,7 @@ export function OneStepCheckout() {
                                             initial={{ opacity: 0, height: 0 }}
                                             animate={{ opacity: 1, height: 'auto' }}
                                             exit={{ opacity: 0, height: 0 }}
-                                            className="bg-[#009EE3]/10 border border-[#009EE3]/20 p-6 rounded-2xl text-[#009EE3]"
+                                            className="bg-[#009EE3]/10 border border-[#009EE3]/20 p-6 rounded-md text-[#009EE3]"
                                         >
                                             <h4 className="font-black uppercase tracking-tight mb-2 italic">Pago Seguro con Mercado Pago</h4>
                                             <p className="text-sm text-gray-300">Serás redirigido a la pasarela segura de Mercado Pago. Podés pagar con tarjetas de débito, crédito, o dinero en cuenta (no hace falta tener cuenta).</p>
@@ -348,7 +348,7 @@ export function OneStepCheckout() {
                                 <button
                                     type="submit"
                                     disabled={isProcessing}
-                                    className="w-full bg-gradient-to-r from-[#00E5FF] to-[#00B3FF] text-black font-black uppercase tracking-widest h-16 rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] transition-transform disabled:opacity-50"
+                                    className="w-full bg-gradient-to-r from-[#00E5FF] to-[#00B3FF] text-black font-black uppercase tracking-widest h-16 rounded-md flex items-center justify-center gap-3 hover:scale-[1.02] transition-transform disabled:opacity-50"
                                 >
                                     {isProcessing ? 'Procesando Pago Segurizado...' : 'Finalizar Pedido'}
                                     {!isProcessing && <ArrowRight size={20} />}
@@ -370,7 +370,7 @@ export function OneStepCheckout() {
                                 <div className="space-y-4 max-h-[30vh] overflow-y-auto no-scrollbar pr-2">
                                     {items.map(item => (
                                         <div key={`${item.id}-${item.selectedSize}`} className="flex gap-4">
-                                            <div className="w-16 h-16 bg-white/5 rounded-xl border border-white/10 relative overflow-hidden shrink-0">
+                                            <div className="w-16 h-16 bg-[#111111] rounded-xl border border-[#252525] relative overflow-hidden shrink-0">
                                                 {item.images?.[0] && (
                                                     <Image src={item.images[0]} fill alt={item.name} className="object-cover" />
                                                 )}
@@ -401,7 +401,7 @@ export function OneStepCheckout() {
                                     </div>
                                 </div>
 
-                                <div className="pt-4 border-t border-white/10">
+                                <div className="pt-4 border-t border-[#252525]">
                                     <div className="flex justify-between items-center">
                                         <span className="font-black uppercase tracking-widest">Total a Pagar</span>
                                         <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00E5FF] to-[#00B3FF]">
@@ -414,7 +414,7 @@ export function OneStepCheckout() {
                                     type="submit"
                                     form="checkout-form"
                                     disabled={isProcessing}
-                                    className="hidden lg:flex w-full bg-gradient-to-r from-[#00E5FF] to-[#00B3FF] text-black font-black uppercase tracking-widest h-16 rounded-2xl items-center justify-center gap-3 hover:scale-[1.02] transition-transform disabled:opacity-50 mt-8 shadow-[0_0_40px_rgba(0,229,255,0.2)]"
+                                    className="hidden lg:flex w-full bg-gradient-to-r from-[#00E5FF] to-[#00B3FF] text-black font-black uppercase tracking-widest h-16 rounded-md items-center justify-center gap-3 hover:scale-[1.02] transition-transform disabled:opacity-50 mt-8 shadow-[0_0_40px_rgba(198,255,0,0.2)]"
                                 >
                                     {isProcessing ? 'Procesando Pago Seguro...' : 'Confirmar Pedido'}
                                     {!isProcessing && <ArrowRight size={20} />}

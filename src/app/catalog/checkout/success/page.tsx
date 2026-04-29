@@ -1,6 +1,8 @@
 'use client';
 
 import { useCartStore } from '@/store/cart-store';
+import { useAuraStore } from '@/hooks/useAuraStore';
+import { getRecoVariant, trackRecoPurchase } from '@/lib/recommendation-analytics';
 import { motion } from 'framer-motion';
 import { CheckCircle2, MessageCircle, ArrowLeft, Clock, Package, Sparkles } from 'lucide-react';
 import Link from 'next/link';
@@ -13,9 +15,10 @@ function SuccessContent() {
   const searchParams = useSearchParams();
   const status = searchParams.get('status') || 'approved';
   const paymentId = searchParams.get('payment_id');
-  const externalRef = searchParams.get('external_reference');
 
   const { lastOrder, clearLastOrder } = useCartStore();
+  const markPurchased = useAuraStore((state) => state.markPurchased);
+  const profile = useAuraStore((state) => state.profile);
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
@@ -23,6 +26,20 @@ function SuccessContent() {
     const timer = setTimeout(() => setShowConfetti(false), 4000);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!lastOrder || isPending) return;
+    const purchasedIds = lastOrder.items.map((item) => item.productId).filter(Boolean) as string[];
+    if (purchasedIds.length > 0) {
+      markPurchased(purchasedIds);
+      trackRecoPurchase({
+        variant: getRecoVariant(),
+        productIds: purchasedIds,
+        revenue: lastOrder.total,
+        segment: [profile?.occasion, profile?.style, profile?.budget].filter(Boolean).join('|') || 'anonymous',
+      });
+    }
+  }, [isPending, lastOrder, markPurchased, profile?.budget, profile?.occasion, profile?.style]);
 
   const isPending = status === 'pending';
 

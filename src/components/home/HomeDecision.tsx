@@ -3,8 +3,13 @@
 import { useEffect, useState } from 'react';
 import { SplashScreen } from '@/components/home/SplashScreen';
 import LandingPage from '@/components/landing/LandingPage';
+import { ProductType } from '@/app/actions/products';
 
-export function HomeDecision() {
+interface HomeDecisionProps {
+    initialProducts?: ProductType[];
+}
+
+export function HomeDecision({ initialProducts }: HomeDecisionProps) {
     const [showSplash, setShowSplash] = useState<boolean | null>(null);
 
     useEffect(() => {
@@ -38,5 +43,5 @@ export function HomeDecision() {
     }
 
     // Si ya vio el splash hoy o regresó usando navegación/botones, mostramos la verdadera Landing Page
-    return <LandingPage />;
+    return <LandingPage initialProducts={initialProducts} />;
 }

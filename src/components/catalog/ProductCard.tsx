@@ -1,285 +1,317 @@
 'use client';
 
-import { Product } from '@/types';
-import { ShoppingCart, ArrowUpRight, X, Info } from 'lucide-react';
+import Image from 'next/image';
+import { Product } from '@/domain/entities/Product';
+import Link from 'next/link';
+import { ArrowRight, ShoppingCart, Zap, CheckCircle2, Maximize2, ShieldCheck, Box } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
-import Image from 'next/image';
-import { useState, useMemo, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 interface ProductCardProps {
-  product: Product;
-  href?: string;
-  viewMode?: 'grid' | 'list';
+    product: Product;
+    viewMode?: 'grid' | 'list';
+    href?: string;
+    index?: number;
+    onProductClick?: (product: Product) => void;
 }
 
-export function ProductCard({ product, href, viewMode = 'grid' }: ProductCardProps) {
-  const router = useRouter();
-  const { addItem, setIsOpen: setIsCartOpen } = useCartStore();
-  const [showSizeSelector, setShowSizeSelector] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+/**
+ * ProductCard - Premium High-End Dark Mode Component
+ * Optimized for ÉTER Brand Identity (2026)
+ */
+export function ProductCard({ product, href, index = 0, onProductClick }: ProductCardProps) {
+    const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    const [isHovered, setIsHovered] = useState(false);
+    const [isAdding, setIsAdding] = useState(false);
+    
+    const addItem = useCartStore((state) => state.addItem);
+    const toggleCart = useCartStore((state) => state.toggleCart);
 
-  const availableSizes = useMemo(() => {
-    if (!product.stockBySize) return [];
-    return Object.entries(product.stockBySize)
-      .filter(([, qty]) => Number(qty) > 0)
-      .map(([size]) => size)
-      .sort((a, b) => Number(a) - Number(b));
-  }, [product.stockBySize]);
+    // Dynamic Badges based on product metadata or index
+    const isNew = index % 8 === 0;
+    const isLimited = index % 12 === 3;
 
-  const handleAddToCart = (e: React.MouseEvent, size?: string) => {
-    e.preventDefault();
-    e.stopPropagation();
+    // Memoized size processing for performance
+    const availableSizes = useMemo(() => {
+        return Object.entries(product.stockBySize || {})
+            .sort(([a], [b]) => {
+                const numA = parseInt(a);
+                const numB = parseInt(b);
+                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                return a.localeCompare(b);
+            });
+    }, [product.stockBySize]);
 
-    if (!size && availableSizes.length > 0) {
-      if (availableSizes.length === 1) {
-        processAddToCart(availableSizes[0]);
-      } else {
-        setShowSizeSelector(true);
-      }
-      return;
-    }
-    processAddToCart(size || 'Unique');
-  };
+    const getStockStatus = (size: string) => {
+        const stock = product.stockBySize?.[size] || 0;
+        if (stock === 0) return 'out';
+        if (stock <= 3) return 'critical';
+        if (stock <= 8) return 'low';
+        return 'available';
+    };
 
-  const processAddToCart = (size: string) => {
-    addItem(product, size);
-    setShowSizeSelector(false);
-    setIsCartOpen(true);
-    toast.success(`${product.name} añadido`, {
-      description: `Talle ${size}`,
-      style: {
-        background: '#111',
-        color: '#fff',
-        border: '1px solid rgba(0,229,255,0.15)',
-      }
-    });
-  };
+    const handleAddToCart = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!selectedSize) {
+            toast.error('SELECCIÓN REQUERIDA', {
+                description: 'Por favor, inyecta un talle para continuar.',
+                style: { background: '#0A0A0A', border: '1px solid rgba(255, 0, 0, 0.2)', color: '#fff' }
+            });
+            return;
+        }
 
-  if (viewMode === 'list') {
+        setIsAdding(true);
+        
+        // Artificial delay for premium feedback feel
+        setTimeout(() => {
+            addItem(product, selectedSize, 1);
+            setIsAdding(false);
+            
+            toast.success('PROTOCOLO COMPLETADO', {
+                description: `${product.name} (Talle ${selectedSize}) añadido al clúster.`,
+                icon: <CheckCircle2 className="text-[#00E5FF]" size={16} />,
+                action: {
+                    label: 'VER CARRITO',
+                    onClick: () => toggleCart()
+                },
+                style: { 
+                    background: '#050505', 
+                    color: '#fff',
+                    border: '1px solid rgba(0, 229, 255, 0.2)',
+                    borderRadius: '1.25rem'
+                }
+            });
+        }, 800);
+    };
+
     return (
-      <motion.div
-        layout
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        onClick={() => router.push(href || `/catalog/${product.id}`)}
-        className="group relative bg-white/[0.02] border border-white/[0.06] hover:border-[#00E5FF]/30 p-4 flex items-center gap-6 cursor-pointer transition-all duration-300"
-      >
-        <div className="w-20 h-20 relative bg-white/[0.03] rounded-xl overflow-hidden shrink-0">
-          <Image
-            src={product.images[0] || '/placeholder-shoe.png'}
-            alt={product.name}
-            fill
-            className="object-cover transition-transform group-hover:scale-110"
-          />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-black text-[#00E5FF] uppercase tracking-widest">{product.category}</span>
-            <span className="w-1 h-1 rounded-full bg-white/10" />
-            <span className="text-[10px] text-white/40 uppercase tracking-widest">In Stock</span>
-          </div>
-          <h3 className="text-sm md:text-base font-bold text-white truncate group-hover:text-[#00E5FF] transition-colors">
-            {product.name}
-          </h3>
-          <div className="flex flex-wrap gap-1 mt-2">
-            {availableSizes.slice(0, 5).map(s => (
-              <span key={s} className="text-[9px] font-bold px-2 py-0.5 bg-white/5 border border-white/5 text-white/40 rounded">
-                {s}
-              </span>
-            ))}
-            {availableSizes.length > 5 && <span className="text-[9px] text-white/20">+{availableSizes.length - 5}</span>}
-          </div>
-        </div>
-        <div className="text-right flex flex-col items-end gap-2">
-          <span className="text-lg font-black text-white">
-            ${product.basePrice.toLocaleString('es-AR')}
-          </span>
-          <button 
-            onClick={handleAddToCart}
-            className="h-10 px-4 bg-[#00E5FF] text-black text-[10px] font-black uppercase tracking-wider hover:shadow-[0_0_15px_rgba(0,229,255,0.4)] active:scale-95 transition-all"
-          >
-            AÑADIR
-          </button>
-        </div>
-      </motion.div>
+        <motion.div
+            layout
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: index * 0.05, ease: [0.23, 1, 0.32, 1] }}
+            style={{ willChange: 'transform' }}
+            className="group relative flex flex-col h-full overflow-hidden rounded-[2.5rem] border border-white/5 bg-[#050505] p-3 transition-all duration-700 hover:border-[#00E5FF]/30"
+        >
+            {/* Glassmorphism Background Effects */}
+            <div className="absolute inset-0 z-0 bg-gradient-to-b from-white/[0.03] to-transparent opacity-50 pointer-events-none" />
+            <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#00E5FF]/5 blur-[90px] transition-all duration-1000 group-hover:bg-[#00E5FF]/10 group-hover:scale-125" />
+            <div className="texture-grain absolute inset-0 opacity-10 pointer-events-none" />
+            
+            {/* Media Content Wrapper */}
+            <div className="relative z-10 w-full mb-6 aspect-[4/5] overflow-hidden rounded-[2rem] bg-[#0A0A0A] border border-white/[0.03]">
+                {/* Tactical Status Badges */}
+                <div className="absolute left-4 top-4 z-30 flex flex-col gap-2">
+                    <AnimatePresence>
+                        {isNew && (
+                            <motion.div
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className="flex items-center gap-2 rounded-full border border-[#00E5FF]/30 bg-black/80 px-3 py-1.5 backdrop-blur-xl"
+                            >
+                                <div className="h-1 w-1 rounded-full bg-[#00E5FF] animate-pulse" />
+                                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-[#00E5FF]">New Deployment</span>
+                            </motion.div>
+                        )}
+                        {index % 12 === 3 && (
+                            <motion.div
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className="flex items-center gap-2 rounded-full border border-amber-500/30 bg-black/80 px-3 py-1.5 backdrop-blur-xl"
+                            >
+                                <Zap size={10} className="text-amber-500" fill="currentColor" />
+                                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-amber-500">Limited Edition</span>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* Actions Overlay Controls */}
+                <div className="absolute right-4 top-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col gap-2">
+                    <button 
+                        className="h-10 w-10 flex items-center justify-center rounded-full bg-black/60 border border-white/10 text-white/60 hover:text-[#00E5FF] hover:border-[#00E5FF]/40 backdrop-blur-md transition-all"
+                        aria-label="Vista rápida"
+                    >
+                        <Maximize2 size={16} />
+                    </button>
+                </div>
+
+                <Link 
+                    href={href || `/catalog/${product.id}`}
+                    onClick={() => onProductClick?.(product)}
+                    className="block w-full h-full cursor-pointer relative"
+                >
+                    <Image
+                        src={product.images?.[0] || 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=700&h=700&fit=crop'}
+                        alt={product.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
+                        priority={index < 6}
+                    />
+                    
+                    {/* View Details Immersive Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-end p-6">
+                        <span className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-white">
+                            Explorar <ArrowRight size={14} className="text-[#00E5FF]" />
+                        </span>
+                    </div>
+                </Link>
+            </div>
+
+            {/* Product Structural Data */}
+            <div className="relative z-10 flex flex-col flex-1 px-3 pb-2">
+                <div className="mb-6">
+                    <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                            <Box size={10} className="text-white/20" />
+                            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
+                                {product.brand || 'ÉTER ORIGINAL'}
+                            </p>
+                        </div>
+                        <div className="h-1.5 w-1.5 rounded-full bg-white/10" />
+                    </div>
+                    <h3 className="text-xl font-black uppercase tracking-tight text-white italic group-hover:text-[#00E5FF] transition-colors duration-500 leading-tight">
+                        {product.name}
+                    </h3>
+                </div>
+
+                {/* Tactical Size Selection Matrix */}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between mb-4 px-1">
+                        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/30">
+                            Matriz de Talles
+                        </span>
+                        <AnimatePresence mode="wait">
+                            {selectedSize && (
+                                <motion.span 
+                                    initial={{ opacity: 0, x: 5 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -5 }}
+                                    className={cn(
+                                        "text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md",
+                                        getStockStatus(selectedSize) === 'critical' ? 'bg-red-500/10 text-red-500' : 'bg-[#00E5FF]/10 text-[#00E5FF]'
+                                    )}
+                                >
+                                    {getStockStatus(selectedSize) === 'critical' ? '¡ÚLTIMA!' : 'EN STOCK'}
+                                </motion.span>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                    
+                    <div className="grid grid-cols-5 gap-2">
+                        {availableSizes.map(([size, stock]) => {
+                            const status = getStockStatus(size);
+                            const isSelected = selectedSize === size;
+                            
+                            return (
+                                <button
+                                    key={size}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        if (status !== 'out') setSelectedSize(isSelected ? null : size);
+                                    }}
+                                    disabled={status === 'out'}
+                                    className={cn(
+                                        "relative aspect-square flex items-center justify-center rounded-xl border text-[10px] font-black transition-all duration-300",
+                                        status === 'out'
+                                            ? 'opacity-10 cursor-not-allowed border-white/5 grayscale'
+                                            : isSelected
+                                            ? 'bg-white text-black border-white shadow-[0_0_25px_rgba(255,255,255,0.3)] scale-110 z-20'
+                                            : 'bg-white/[0.02] border-white/5 text-white/40 hover:border-[#00E5FF]/40 hover:text-[#00E5FF] group/size'
+                                    )}
+                                >
+                                    {size}
+                                    {status === 'critical' && !isSelected && (
+                                        <div className="absolute top-1 right-1 h-1 w-1 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)]" />
+                                    )}
+                                    {isSelected && (
+                                        <motion.div 
+                                            layoutId={`active-size-${product.id}`}
+                                            className="absolute inset-0 bg-[#00E5FF]/10 mix-blend-overlay pointer-events-none rounded-xl"
+                                        />
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+                
+                {/* Pricing & Deployment Hub */}
+                <div className="mt-auto pt-6 flex items-center justify-between border-t border-white/5">
+                    <div className="flex flex-col">
+                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 mb-1">
+                            Valuación
+                        </span>
+                        <div className="flex items-baseline gap-1.5">
+                            <span className="text-sm font-black text-[#00E5FF]">$</span>
+                            <span className="text-2xl font-black tracking-tighter text-white italic">
+                                {product.basePrice.toLocaleString('es-AR')}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <motion.button 
+                        whileHover={selectedSize ? { scale: 1.05 } : {}}
+                        whileTap={selectedSize ? { scale: 0.95 } : {}}
+                        onClick={handleAddToCart}
+                        disabled={!selectedSize || isAdding}
+                        className={cn(
+                            "relative flex h-14 w-14 items-center justify-center rounded-[1.25rem] transition-all duration-500 overflow-hidden",
+                            selectedSize 
+                                ? "bg-[#00E5FF] text-black shadow-[0_0_40px_rgba(0,229,255,0.25)]" 
+                                : "bg-white/[0.03] text-white/10 border border-white/5 grayscale"
+                        )}
+                        aria-label="Añadir al carrito"
+                    >
+                        <AnimatePresence mode="wait">
+                            {isAdding ? (
+                                <motion.div
+                                    key="adding"
+                                    initial={{ opacity: 0, rotate: -180 }}
+                                    animate={{ opacity: 1, rotate: 0 }}
+                                    exit={{ opacity: 0, rotate: 180 }}
+                                    className="h-5 w-5 border-2 border-black/30 border-t-black rounded-full animate-spin"
+                                />
+                            ) : (
+                                <motion.div
+                                    key="cart"
+                                    initial={{ opacity: 0, scale: 0.5 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="flex items-center justify-center"
+                                >
+                                    <ShoppingCart size={22} strokeWidth={2.5} />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                        
+                        {/* Glow Animation on Clickable */}
+                        {selectedSize && !isAdding && (
+                            <motion.div 
+                                animate={{ opacity: [0.3, 0.6, 0.3] }}
+                                transition={{ repeat: Infinity, duration: 2 }}
+                                className="absolute inset-0 bg-white/20 blur-xl pointer-events-none"
+                            />
+                        )}
+                    </motion.button>
+                </div>
+            </div>
+            
+            {/* Glossy Interactive Filter */}
+            <div className="absolute inset-0 z-0 bg-gradient-to-tr from-transparent via-white/[0.01] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+            
+            {/* Visual Continuity Label */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-700 translate-y-4 group-hover:translate-y-0">
+                <ShieldCheck size={10} className="text-[#00E5FF]/40" />
+                <span className="text-[7px] font-black uppercase tracking-[0.4em] text-white/20 whitespace-nowrap">Authentic Archive Series</span>
+            </div>
+        </motion.div>
     );
-  }
-
-  return (
-    <motion.div
-      layout
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
-      onClick={() => router.push(href || `/catalog/${product.id}`)}
-      className="group relative bg-[#0A0A0A] rounded-2xl md:rounded-3xl overflow-hidden border border-white/[0.06] hover:border-[#00E5FF]/25 transition-all duration-500 cursor-pointer h-full flex flex-col"
-    >
-      {/* Hover glow */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#00E5FF]/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-      {/* Image / Video Container */}
-      <div className="aspect-[4/5] relative overflow-hidden bg-gradient-to-b from-white/[0.02] to-transparent">
-        <AnimatePresence mode="wait">
-          {isHovered && product.id.length % 2 === 0 ? ( // Simulating video availability for demonstration
-            <motion.div
-              key="video"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 z-10"
-            >
-              <video
-                ref={videoRef}
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-full object-cover"
-                src="https://tolzrvsykzmvndvomllt.supabase.co/storage/v1/object/public/products/videos/loop-360-preview.mp4"
-                poster={product.images[0]}
-              />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="image"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0"
-            >
-              <Image
-                src={product.images[0] || '/placeholder-shoe.png'}
-                alt={product.name}
-                fill
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                className="object-contain p-4 md:p-6 transition-transform duration-700 group-hover:scale-105"
-                priority={false}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Size Selector Overlay */}
-        <AnimatePresence>
-          {showSizeSelector && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 z-40 bg-black/85 backdrop-blur-xl flex flex-col justify-center items-center p-4"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            >
-              <button
-                onClick={(e) => { e.stopPropagation(); setShowSizeSelector(false); }}
-                className="absolute top-3 right-3 text-white/40 hover:text-white p-1.5 transition-colors"
-              >
-                <X size={18} />
-              </button>
-
-              <p className="text-[10px] font-bold text-[#00E5FF] uppercase tracking-[0.2em] mb-4">Elegí tu talle</p>
-
-              <div className="grid grid-cols-3 gap-2 w-full max-w-[200px]">
-                {availableSizes.map(size => (
-                  <button
-                    key={size}
-                    onClick={(e) => handleAddToCart(e, size)}
-                    className="h-10 border border-white/10 bg-white/5 text-white rounded-lg text-xs font-bold hover:bg-[#00E5FF] hover:border-[#00E5FF] hover:text-black transition-all active:scale-90"
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Badges */}
-        <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-20">
-          {availableSizes.length > 0 && availableSizes.length < 3 && (
-            <span className="bg-rose-500/20 text-rose-400 px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider border border-rose-500/20 backdrop-blur-sm">
-              Últimos
-            </span>
-          )}
-          {product.category === 'Running' && (
-            <span className="bg-[#00E5FF]/20 text-[#00E5FF] px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border border-[#00E5FF]/20 backdrop-blur-sm">
-              Performance
-            </span>
-          )}
-        </div>
-
-        {/* Fit Tip (Tooltip Style) */}
-        <div className="absolute bottom-4 left-4 z-20 group/tip">
-          <div className="flex items-center gap-1.5 bg-black/50 backdrop-blur-sm border border-white/10 rounded-full pl-1.5 pr-3 py-1 hover:border-[#00E5FF]/50 transition-all cursor-help">
-            <Info size={10} className="text-[#00E5FF]" />
-            <span className="text-[8px] font-black uppercase tracking-widest text-white/70">Calce</span>
-          </div>
-          <div className="absolute bottom-full left-0 mb-2 w-48 p-3 bg-[#111] border border-[#00E5FF]/30 rounded-xl opacity-0 translate-y-2 pointer-events-none group-hover/tip:opacity-100 group-hover/tip:translate-y-0 transition-all z-50">
-            <p className="text-[10px] text-white/80 leading-relaxed font-bold italic">
-            &ldquo;Seleccioná el talle que usás habitualmente en tus zapatillas.&rdquo;
-            </p>
-            <div className="absolute -bottom-1.5 left-4 w-3 h-3 bg-[#111] border-b border-r border-[#00E5FF]/30 rotate-45" />
-          </div>
-        </div>
-
-        {/* Quick Add (hover) */}
-        {!showSizeSelector && (
-          <button
-            onClick={handleAddToCart}
-            className="absolute bottom-4 right-4 h-12 w-12 bg-white text-black flex items-center justify-center rounded-2xl opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:bg-[#00E5FF] shadow-[0_8px_30px_rgba(0,0,0,0.5)] z-30"
-          >
-            <ShoppingCart size={18} strokeWidth={2.5} />
-          </button>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="p-5 pt-4 flex flex-col flex-1">
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className="text-[10px] font-bold text-[#00E5FF] uppercase tracking-widest">
-            {product.category || 'Premium Collection'}
-          </span>
-          <span className="w-1 h-1 rounded-full bg-white/10" />
-          <span className="text-[9px] text-white/30 uppercase tracking-[0.2em]">Brasil</span>
-        </div>
-
-        <h3 className="text-base md:text-lg font-black text-white leading-snug mb-2 line-clamp-2 group-hover:text-[#00E5FF] transition-colors duration-300 uppercase tracking-tight">
-          {product.name}
-        </h3>
-
-        {/* Sizes visual indicator */}
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {availableSizes.slice(0, 6).map(size => (
-            <span 
-              key={size}
-              className="px-2 py-0.5 bg-white/[0.03] border border-white/[0.06] rounded text-[9px] font-bold text-white/40 group-hover:text-white/60 group-hover:border-[#00E5FF]/20 transition-all"
-            >
-              {size}
-            </span>
-          ))}
-          {availableSizes.length > 6 && (
-            <span className="text-[9px] font-bold text-white/20 ml-0.5">+{availableSizes.length - 6}</span>
-          )}
-        </div>
-
-        <div className="mt-auto flex items-center justify-between border-t border-white/[0.04] pt-4">
-          <div className="flex flex-col">
-            <span className="text-[9px] text-white/30 uppercase font-black tracking-widest mb-0.5">Precio Elite</span>
-            <span className="text-xl md:text-2xl font-black text-white tracking-tighter">
-              <span className="text-xs text-[#00E5FF] mr-0.5">$</span>
-              {product.basePrice.toLocaleString('es-AR')}
-            </span>
-          </div>
-
-          <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center group-hover:border-[#00E5FF]/30 group-hover:bg-[#00E5FF]/5 transition-all">
-            <ArrowUpRight size={18} className="text-white/20 group-hover:text-[#00E5FF] transition-all group-hover:rotate-45 duration-500" />
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
 }
