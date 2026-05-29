@@ -6,12 +6,18 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const ADMIN_KEY = (process.env.ADMIN_API_KEY || 'Feter').replace(/^"|"$/g, '');
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
-
 function normalizeToken(value: string) {
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+function getSupabase() {
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Missing Supabase environment variables');
+  }
+
+  return createClient(supabaseUrl, supabaseKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
 }
 
 function isAuthorized(req: Request) {
@@ -103,6 +109,8 @@ function announcementPayload(announcement: Record<string, unknown>) {
 }
 
 async function listAll() {
+  const supabase = getSupabase();
+
   const [pedidos, coupons, announcements, resellerLinks] = await Promise.all([
     supabase
       .from('pedidos')
@@ -161,6 +169,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const action = String(body.action || '');
+    const supabase = getSupabase();
 
     if (action === 'list_all') {
       return NextResponse.json({ success: true, ...(await listAll()) }, { headers: { 'Cache-Control': 'no-store' } });
@@ -180,7 +189,9 @@ export async function POST(req: Request) {
     }
 
     if (action === 'update_product') {
-      const stock = body.stockBySize ? Object.values(body.stockBySize).reduce((a: any, b: any) => Number(a) + Number(b), 0) : 0;
+      const stock = body.stockBySize
+        ? Object.values(body.stockBySize as Record<string, unknown>).reduce((total, value) => total + Number(value), 0)
+        : 0;
       const { data, error } = await supabase
         .from('productos')
         .update({
