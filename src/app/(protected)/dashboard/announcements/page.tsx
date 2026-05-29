@@ -22,6 +22,49 @@ import { processAITool } from '@/app/actions/ai-tools'
 import { toast } from 'sonner'
 import Image from 'next/image'
 
+const PAGE_TARGETS = [
+    { key: 'all', label: 'Toda la web' },
+    { key: 'home', label: 'Inicio' },
+    { key: 'catalog', label: 'Catalogo' },
+    { key: 'community', label: 'Comunidad' },
+    { key: 'about', label: 'Sobre ETER' },
+    { key: 'contact', label: 'Contacto' },
+] as const
+
+const DISPLAY_MODES = [
+    { key: 'floating', label: 'Flotante' },
+    { key: 'banner', label: 'Banner' },
+    { key: 'modal', label: 'Modal' },
+] as const
+
+type AnnouncementFormData = {
+    title: string
+    content: string
+    category: string
+    image_url: string
+    is_active: boolean
+    target_pages: string[]
+    display_mode: 'floating' | 'banner' | 'modal'
+    template_key: string
+    cta_label: string
+    cta_url: string
+    priority: number
+}
+
+const emptyFormData: AnnouncementFormData = {
+    title: '',
+    content: '',
+    category: '',
+    image_url: '',
+    is_active: true,
+    target_pages: ['home'],
+    display_mode: 'floating',
+    template_key: 'ETER',
+    cta_label: '',
+    cta_url: '',
+    priority: 0,
+}
+
 // --- TEMPLATES SYSTEM v2.0 ---
 const TEMPLATES = [
     {
@@ -279,13 +322,7 @@ export default function AnnouncementsAdminPage() {
     const { geminiApiKey, setGeminiApiKey } = useSettingsStore()
     const [isApiKeyValid, setIsApiKeyValid] = useState(!!geminiApiKey)
     const [activeTab, setActiveTab] = useState<'content' | 'design'>('content')
-    const [formData, setFormData] = useState({
-        title: '',
-        content: '',
-        category: '',
-        image_url: '',
-        is_active: true
-    })
+    const [formData, setFormData] = useState<AnnouncementFormData>(emptyFormData)
 
     const [designConfig, setDesignConfig] = useState({
         layout: 'cyber', // classic, minimal, cyber, bold
@@ -407,6 +444,20 @@ export default function AnnouncementsAdminPage() {
         toast.info('Template aplicado correctamente')
     }
 
+    const toggleTargetPage = (page: string) => {
+        setFormData(prev => {
+            if (page === 'all') {
+                return { ...prev, target_pages: ['all'] }
+            }
+
+            const withoutAll = prev.target_pages.filter(item => item !== 'all')
+            const exists = withoutAll.includes(page)
+            const nextPages = exists ? withoutAll.filter(item => item !== page) : [...withoutAll, page]
+
+            return { ...prev, target_pages: nextPages.length ? nextPages : ['home'] }
+        })
+    }
+
     const handleCreate = async () => {
         if (!formData.title) {
             toast.error('El título es obligatorio')
@@ -427,13 +478,7 @@ export default function AnnouncementsAdminPage() {
     }
 
     const resetForm = () => {
-        setFormData({
-            title: '',
-            content: '',
-            category: '',
-            image_url: '',
-            is_active: true
-        })
+        setFormData(emptyFormData)
         setCurrentAnnouncement(null)
     }
 
@@ -444,7 +489,13 @@ export default function AnnouncementsAdminPage() {
             content: announcement.content || '',
             category: announcement.category || '',
             image_url: announcement.image_url || '',
-            is_active: announcement.is_active
+            is_active: announcement.is_active,
+            target_pages: announcement.target_pages?.length ? announcement.target_pages : ['home'],
+            display_mode: announcement.display_mode || 'floating',
+            template_key: announcement.template_key || 'ETER',
+            cta_label: announcement.cta_label || '',
+            cta_url: announcement.cta_url || '',
+            priority: announcement.priority || 0,
         })
         setIsEditOpen(true)
     }
@@ -580,6 +631,40 @@ export default function AnnouncementsAdminPage() {
                                                                 value={formData.content}
                                                                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                                                             />
+                                                        </div>
+                                                        <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-4 space-y-4">
+                                                            <div className="grid grid-cols-2 gap-3">
+                                                                <div className="space-y-2">
+                                                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Modo</label>
+                                                                    <select className="h-10 w-full rounded-lg border border-white/10 bg-black/50 px-3 text-[10px] font-black uppercase text-white outline-none focus:border-[#00E5FF]" value={formData.display_mode} onChange={(e) => setFormData({ ...formData, display_mode: e.target.value as AnnouncementFormData['display_mode'] })}>
+                                                                        {DISPLAY_MODES.map(mode => <option key={mode.key} value={mode.key}>{mode.label}</option>)}
+                                                                    </select>
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Prioridad</label>
+                                                                    <Input type="number" className="h-10 bg-black/50 border-white/10 text-xs font-black text-white" value={formData.priority} onChange={(e) => setFormData({ ...formData, priority: Number(e.target.value || 0) })} />
+                                                                </div>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Mostrar en</label>
+                                                                <div className="flex flex-wrap gap-2">
+                                                                    {PAGE_TARGETS.map(page => (
+                                                                        <button key={page.key} type="button" onClick={() => toggleTargetPage(page.key)} className={`rounded-lg border px-3 py-2 text-[9px] font-black uppercase tracking-wider transition-all ${formData.target_pages.includes(page.key) ? 'border-[#00E5FF] bg-[#00E5FF] text-black' : 'border-white/10 bg-black/40 text-gray-500 hover:text-white'}`}>
+                                                                            {page.label}
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                            <div className="grid grid-cols-2 gap-3">
+                                                                <div className="space-y-2">
+                                                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">CTA</label>
+                                                                    <Input className="h-10 bg-black/50 border-white/10 text-xs text-white" placeholder="Ver catalogo" value={formData.cta_label} onChange={(e) => setFormData({ ...formData, cta_label: e.target.value })} />
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Link CTA</label>
+                                                                    <Input className="h-10 bg-black/50 border-white/10 text-xs text-white" placeholder="/resellers" value={formData.cta_url} onChange={(e) => setFormData({ ...formData, cta_url: e.target.value })} />
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -933,6 +1018,40 @@ export default function AnnouncementsAdminPage() {
                                             value={formData.content}
                                             onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                                         />
+                                    </div>
+                                    <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-4 space-y-4">
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-gray-400 uppercase">Modo</label>
+                                                <select className="h-10 w-full rounded-lg border border-white/10 bg-black/50 px-3 text-[10px] font-black uppercase text-white outline-none focus:border-[#00E5FF]" value={formData.display_mode} onChange={(e) => setFormData({ ...formData, display_mode: e.target.value as AnnouncementFormData['display_mode'] })}>
+                                                    {DISPLAY_MODES.map(mode => <option key={mode.key} value={mode.key}>{mode.label}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-gray-400 uppercase">Prioridad</label>
+                                                <Input type="number" className="h-10 bg-black/50 border-white/10 text-xs font-black text-white" value={formData.priority} onChange={(e) => setFormData({ ...formData, priority: Number(e.target.value || 0) })} />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-gray-400 uppercase">Mostrar en</label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {PAGE_TARGETS.map(page => (
+                                                    <button key={page.key} type="button" onClick={() => toggleTargetPage(page.key)} className={`rounded-lg border px-3 py-2 text-[9px] font-black uppercase tracking-wider transition-all ${formData.target_pages.includes(page.key) ? 'border-[#00E5FF] bg-[#00E5FF] text-black' : 'border-white/10 bg-black/40 text-gray-500 hover:text-white'}`}>
+                                                        {page.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-gray-400 uppercase">CTA</label>
+                                                <Input className="h-10 bg-black/50 border-white/10 text-xs text-white" placeholder="Ver catalogo" value={formData.cta_label} onChange={(e) => setFormData({ ...formData, cta_label: e.target.value })} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-gray-400 uppercase">Link CTA</label>
+                                                <Input className="h-10 bg-black/50 border-white/10 text-xs text-white" placeholder="/resellers" value={formData.cta_url} onChange={(e) => setFormData({ ...formData, cta_url: e.target.value })} />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ) : (

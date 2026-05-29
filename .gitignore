@@ -46,3 +46,14 @@ identidad eter/
 scratch/
 tmp/
 *.zip
+*.apk
+exports/
+hostinger-deploy/
+deploy-hostinger/
+ETER_STORE_FINAL/**/node_modules/
+MyApplication/.gradle/
+MyApplication/.idea/
+MyApplication/.kotlin/
+MyApplication/build/
+MyApplication/app/build/
+MyApplication/local.properties

@@ -10,6 +10,10 @@ import { CartSidebar } from '@/components/cart/CartSidebar';
 import { AiConcierge } from '@/components/ai/AiConcierge';
 import { AudioProvider } from '@/providers/AudioProvider';
 import { PulseManager } from '@/components/pulse/PulseManager';
+import { FloatingNavMenu } from '@/components/layout/FloatingNavMenu';
+import { CartNotificationContainer } from '@/components/cart/CartNotificationSystem';
+import { FloatingCartButton } from '@/components/cart/FloatingCartButton';
+import { FloatingAnnouncements } from '@/components/announcements/FloatingAnnouncements';
 
 
 const manrope = Manrope({
@@ -122,6 +126,11 @@ export default async function RootLayout({
               <CartSidebar />
               <AiConcierge />
               <PulseManager />
+              <FloatingAnnouncements />
+              {/* Global floating UI — always on top */}
+              <FloatingNavMenu />
+              <CartNotificationContainer />
+              <FloatingCartButton />
             </AudioProvider>
           </AuthInitializer>
           <Toaster position="top-center" theme="dark" richColors />
