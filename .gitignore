@@ -1,20 +1,19 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
-/node_modules
-/.pnp
+node_modules/
+.pnp
 .pnp.js
 .yarn/install-state.gz
 
 # testing
-/coverage
+coverage/
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build/
+dist/
 
 # misc
 .DS_Store
@@ -50,10 +49,11 @@ tmp/
 exports/
 hostinger-deploy/
 deploy-hostinger/
-ETER_STORE_FINAL/**/node_modules/
 MyApplication/.gradle/
 MyApplication/.idea/
 MyApplication/.kotlin/
 MyApplication/build/
 MyApplication/app/build/
 MyApplication/local.properties
+client_secret_*.json
+

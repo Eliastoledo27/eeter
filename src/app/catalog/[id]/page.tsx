@@ -5,7 +5,6 @@ import { notFound } from 'next/navigation'
 import { getProducts } from '@/app/actions/products'
 import { ProductGallery } from '@/components/product/ProductGallery'
 import { ProductInfo } from '@/components/product/ProductInfo'
-import { FloatingCartButton } from '@/components/cart/FloatingCartButton'
 import { ArchitecturalHeader } from '@/components/product/ArchitecturalHeader'
 
 import { Metadata } from 'next'
@@ -57,7 +56,7 @@ export default async function ProductDetailPage({
                         "@type": "Product",
                         "name": product.name,
                         "image": product.images,
-                        "description": `Adquiere ${product.name} en ÉTER Store. Calzado premium importado con calidad G5/OG.`,
+                        "description": `Adquiere ${product.name} en ÉTER Store. Calzado premium importado con selección y stock verificado.`,
                         "brand": {
                             "@type": "Brand",
                             "name": "ÉTER"
@@ -136,9 +135,6 @@ export default async function ProductDetailPage({
                     </div>
                 </div>
             </section>
-
-            {/* Floating Cart Button */}
-            <FloatingCartButton />
         </div>
     )
 }

@@ -10,7 +10,6 @@ import { BulkImportModal } from './BulkImportModal';
 import { cn } from '@/lib/utils';
 import { BulkImageUploadModal } from './BulkImageUploadModal';
 import { BulkEditToolbar } from './BulkEditToolbar';
-import BulkRenameModal from './BulkRenameModal';
 import { BulkStockModal } from './BulkStockModal';
 import { AIDescriptionModal } from './AIDescriptionModal';
 import { AISettingsModal } from './AISettingsModal';
@@ -37,7 +36,6 @@ export const ProductManager = () => {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showImageUploadModal, setShowImageUploadModal] = useState(false);
   const [showAISettingsModal, setShowAISettingsModal] = useState(false);
-  const [showRenameModal, setShowRenameModal] = useState(false);
   const [showStockModal, setShowStockModal] = useState(false);
   const [showAIModal, setShowAIModal] = useState(false);
   const [isExportingMeta, setIsExportingMeta] = useState(false);
@@ -658,7 +656,6 @@ export const ProductManager = () => {
                 products={products}
                 onClearSelection={() => setSelectedIds(new Set())}
                 onSuccess={handleSuccess}
-                onRename={() => setShowRenameModal(true)}
                 onStockEdit={() => setShowStockModal(true)}
                 onAIEdit={() => setShowAIModal(true)}
               />
@@ -840,15 +837,6 @@ export const ProductManager = () => {
           <AISettingsModal
             isOpen={showAISettingsModal}
             onClose={() => setShowAISettingsModal(false)}
-          />
-        )}
-
-        {showRenameModal && (
-          <BulkRenameModal
-            isOpen={showRenameModal}
-            onClose={() => setShowRenameModal(false)}
-            selectedProducts={selectedProductsObjs}
-            onSuccess={handleSuccess}
           />
         )}
 

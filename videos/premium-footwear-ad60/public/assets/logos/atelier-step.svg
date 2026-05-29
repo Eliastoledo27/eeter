@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Atelier Step">
+  <defs>
+    <linearGradient id="g" x1="90" x2="420" y1="70" y2="440" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F6EFE2"/>
+      <stop offset=".48" stop-color="#D8BE7B"/>
+      <stop offset="1" stop-color="#8A6A32"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="#020203"/>
+  <path d="M256 72 390 150v154L256 440 122 304V150L256 72Z" fill="none" stroke="url(#g)" stroke-width="18"/>
+  <path d="M164 292c52 26 128 24 184-8 22-12 33-4 20 13-32 42-122 62-201 25-26-12-25-43-3-30Z" fill="url(#g)"/>
+  <path d="M188 206c23-42 76-66 126-52 16 5 17 27 1 32-38 12-71 34-96 65-17 21-45-20-31-45Z" fill="url(#g)" opacity=".82"/>
+</svg>

@@ -54,6 +54,18 @@ function setStorage<T>(key: string, value: T) {
   localStorage.setItem(key, JSON.stringify(value))
 }
 
+function scheduleStorageWrite(callback: () => void) {
+  if (typeof window === 'undefined') return
+
+  const idle = window.requestIdleCallback as ((cb: IdleRequestCallback, options?: IdleRequestOptions) => number) | undefined
+  if (idle) {
+    idle(callback, { timeout: 1500 })
+    return
+  }
+
+  window.setTimeout(callback, 120)
+}
+
 export function getRecoVisitorId() {
   if (typeof window === 'undefined') return 'server'
   let id = localStorage.getItem(VISITOR_KEY)
@@ -89,7 +101,7 @@ export function getRecoVariant() {
 
 function pushEvent(event: RecoEvent) {
   const events = getStorage<RecoEvent[]>(STORAGE_KEY, [])
-  const trimmed = [...events, event].slice(-25000)
+  const trimmed = [...events, event].slice(-1200)
   setStorage(STORAGE_KEY, trimmed)
 }
 
@@ -101,34 +113,41 @@ export function trackRecoImpression(params: {
   productsMeta?: Array<{ id: string; category?: string; brand?: string }>
   catalogSize: number
 }) {
-  const visitorId = getRecoVisitorId()
-  const sessionId = getRecoSessionId()
-  const viewed = new Set(params.viewedIds)
+  scheduleStorageWrite(() => {
+    const visitorId = getRecoVisitorId()
+    const sessionId = getRecoSessionId()
+    const viewed = new Set(params.viewedIds)
+    const metaById = new Map(params.productsMeta?.map((product) => [product.id, product]) || [])
 
-  const coverage = getStorage<{ uniqueShownIds: string[]; maxCatalogSize: number }>(COVERAGE_KEY, {
-    uniqueShownIds: [],
-    maxCatalogSize: params.catalogSize,
-  })
-  coverage.maxCatalogSize = Math.max(coverage.maxCatalogSize, params.catalogSize)
-  coverage.uniqueShownIds = [...new Set([...coverage.uniqueShownIds, ...params.productIds])]
-  setStorage(COVERAGE_KEY, coverage)
-
-  for (const productId of params.productIds) {
-    const meta = params.productsMeta?.find((p) => p.id === productId)
-    pushEvent({
-      type: 'impression',
-      variant: params.variant,
-      timestamp: Date.now(),
-      sessionId,
-      visitorId,
-      productId,
-      isNewDiscovery: !viewed.has(productId),
-      segment: params.segment,
-      category: meta?.category,
-      brand: meta?.brand,
-      catalogSize: params.catalogSize,
+    const coverage = getStorage<{ uniqueShownIds: string[]; maxCatalogSize: number }>(COVERAGE_KEY, {
+      uniqueShownIds: [],
+      maxCatalogSize: params.catalogSize,
     })
-  }
+    coverage.maxCatalogSize = Math.max(coverage.maxCatalogSize, params.catalogSize)
+    coverage.uniqueShownIds = [...new Set([...coverage.uniqueShownIds, ...params.productIds])].slice(-500)
+    setStorage(COVERAGE_KEY, coverage)
+
+    const events = getStorage<RecoEvent[]>(STORAGE_KEY, [])
+    const timestamp = Date.now()
+    const impressionEvents = params.productIds.map((productId) => {
+      const meta = metaById.get(productId)
+      return {
+        type: 'impression' as const,
+        variant: params.variant,
+        timestamp,
+        sessionId,
+        visitorId,
+        productId,
+        isNewDiscovery: !viewed.has(productId),
+        segment: params.segment,
+        category: meta?.category,
+        brand: meta?.brand,
+        catalogSize: params.catalogSize,
+      }
+    })
+
+    setStorage(STORAGE_KEY, [...events, ...impressionEvents].slice(-1200))
+  })
 }
 
 export function trackRecoClick(params: {
@@ -172,7 +191,7 @@ export function trackRecoPurchase(params: {
 }
 
 export function getSegmentPopularity(segment?: string) {
-  const events = getStorage<RecoEvent[]>(STORAGE_KEY, [])
+  const events = getStorage<RecoEvent[]>(STORAGE_KEY, []).slice(-800)
   const cutoff = Date.now() - 1000 * 60 * 60 * 24 * 30
   const filtered = events.filter((e) => e.timestamp >= cutoff && e.type !== 'impression' && (!segment || e.segment === segment))
 
@@ -247,7 +266,7 @@ function revenueZTest(valuesA: number[], valuesB: number[]) {
 }
 
 export function getRecoExperimentMetrics() {
-  const events = getStorage<RecoEvent[]>(STORAGE_KEY, [])
+  const events = getStorage<RecoEvent[]>(STORAGE_KEY, []).slice(-800)
   const coverage = getStorage<{ uniqueShownIds: string[]; maxCatalogSize: number }>(COVERAGE_KEY, {
     uniqueShownIds: [],
     maxCatalogSize: 0,

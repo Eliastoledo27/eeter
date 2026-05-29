@@ -12,6 +12,7 @@ import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { cartNotify } from '@/components/cart/CartNotificationSystem';
 
 interface ProductGridProps {
   products: ProductType[];
@@ -121,13 +122,11 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
       const finalSize = size || getDefaultSize(product.stock_by_size || {});
       addItem(mapToCartProduct(product), finalSize);
       setIsCartOpen(true);
-      toast.success(`Agregado: ${product.name}`, {
-          description: `Talle ${finalSize} añadido con éxito.`,
-          style: {
-              background: '#020202',
-              color: '#fff',
-              border: '1px solid rgba(0, 229, 255, 0.2)'
-          }
+      cartNotify({
+          type: 'added',
+          title: 'Producto agregado',
+          productName: `${product.name} — Talle ${finalSize}`,
+          productImage: product.images?.[0],
       });
     },
     [addItem, setIsCartOpen]

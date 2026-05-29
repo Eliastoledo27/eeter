@@ -1,0 +1,16 @@
+export const colors = {
+  black: "#020203",
+  blackSoft: "#08090B",
+  graphite: "#15171A",
+  graphiteLight: "#2B2E31",
+  warmWhite: "#F6EFE2",
+  champagne: "#D8BE7B",
+  gold: "#B89145",
+  petrol: "#0E4A56",
+  deepGreen: "#0C332A",
+  oxblood: "#4A1717",
+  smoke: "rgba(246, 239, 226, 0.62)",
+  line: "rgba(246, 239, 226, 0.16)",
+  panel: "rgba(246, 239, 226, 0.07)",
+  panelStrong: "rgba(246, 239, 226, 0.12)",
+} as const;

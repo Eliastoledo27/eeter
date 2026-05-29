@@ -184,7 +184,7 @@ export function AiConcierge() {
         const parts = text.split(/(\*\*[^*]+\*\*)/g);
         return parts.map((part, i) => {
             if (part.startsWith('**') && part.endsWith('**')) {
-                return <strong key={i} className="text-[#00FFFF] font-bold">{part.slice(2, -2)}</strong>;
+                return <strong key={i} className="text-[#00E5FF] font-black drop-shadow-[0_0_6px_rgba(0,229,255,0.4)]">{part.slice(2, -2)}</strong>;
             }
             return <span key={i}>{part}</span>;
         });
@@ -210,35 +210,35 @@ export function AiConcierge() {
                         transition={{ type: 'spring', damping: 20 }}
                         className="relative max-w-[170px] sm:max-w-[260px]"
                     >
-                        <div className="relative bg-[#0A0A0A]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl p-4 shadow-[0_16px_48px_rgba(0,0,0,0.6)]">
-                            {/* Top accent line */}
-                            <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-[#8B5CF6]/50 to-transparent" />
+                        <div className="relative bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-[0_16px_48px_rgba(0,0,0,0.7)]">
+                            {/* Top accent line - cyan neon */}
+                            <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-[#00E5FF]/60 to-transparent" />
 
-                            <button onClick={() => setShowTeaser(false)} className="absolute top-2 right-2 text-white/15 hover:text-white/40 transition-colors">
+                            <button onClick={() => setShowTeaser(false)} className="absolute top-2 right-2 text-white/20 hover:text-white/60 transition-colors">
                                 <X size={12} />
                             </button>
 
                             <div className="flex items-start gap-3">
-                                <div className="w-8 h-8 shrink-0 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#00FFFF] flex items-center justify-center">
-                                    <Sparkles size={14} className="text-white" />
+                                <div className="w-8 h-8 shrink-0 rounded-xl bg-black border border-[#00E5FF]/30 flex items-center justify-center">
+                                    <Sparkles size={14} className="text-[#00E5FF]" />
                                 </div>
                                 <div>
-                                    <p className="text-white/80 text-[11px] sm:text-[13px] leading-relaxed">
-                                        ¿Buscás la <span className="text-[#00FFFF] font-semibold">solución</span> a tus problemas? Estoy acá para ayudarte.
+                                    <p className="text-white/80 text-[11px] sm:text-[13px] leading-relaxed font-medium">
+                                        ¿Buscás la <span className="text-[#00E5FF] font-black">solución</span>? Estoy acá para ayudarte.
                                     </p>
                                 </div>
                             </div>
 
                             <button
                                 onClick={() => { setIsOpen(true); setShowTeaser(false); triggerAuraSound(); }}
-                                className="mt-3 w-full py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[10px] font-bold uppercase tracking-[0.15em] text-white/50 hover:text-[#00FFFF] hover:border-[#00FFFF]/30 transition-all"
+                                className="mt-3 w-full py-2 rounded-xl bg-[#00E5FF]/10 border border-[#00E5FF]/20 text-[10px] font-black uppercase tracking-[0.15em] text-[#00E5FF] hover:bg-[#00E5FF] hover:text-black hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all duration-300"
                             >
                                 Hablar con Aura →
                             </button>
                         </div>
 
                         {/* Pointer triangle */}
-                        <div className="absolute -bottom-1.5 right-8 w-3 h-3 bg-[#0A0A0A]/95 border-r border-b border-white/[0.08] rotate-45" />
+                        <div className="absolute -bottom-1.5 right-8 w-3 h-3 bg-black border-r border-b border-white/10 rotate-45" />
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -252,33 +252,33 @@ export function AiConcierge() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.92, y: 30 }}
                         transition={{ type: 'spring', stiffness: 280, damping: 26 }}
-                        className="w-[92vw] sm:w-[420px] h-[min(80vh,700px)] flex flex-col bg-[#080808] border border-white/[0.06] rounded-3xl shadow-[0_40px_80px_-16px_rgba(0,0,0,0.8)] overflow-hidden relative"
+                        className="w-[92vw] sm:w-[420px] h-[min(80vh,700px)] flex flex-col bg-black/60 backdrop-blur-[30px] border border-white/10 rounded-3xl shadow-[0_40px_85px_-10px_rgba(0,229,255,0.12)] overflow-hidden relative"
                     >
                         {/* ── Ambient Background ── */}
                         <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-                            <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-[#8B5CF6]/15 rounded-full blur-[120px]" />
-                            <div className="absolute bottom-[-15%] right-[-15%] w-[50%] h-[50%] bg-[#00FFFF]/10 rounded-full blur-[100px]" />
+                            <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-[#00E5FF]/10 rounded-full blur-[120px]" />
+                            <div className="absolute bottom-[-15%] right-[-15%] w-[50%] h-[50%] bg-[#C6FF00]/5 rounded-full blur-[100px]" />
                             {/* Subtle noise texture */}
                             <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%270 0 256 256%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27noiseFilter%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.85%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23noiseFilter)%27/%3E%3C/svg%3E")' }} />
                         </div>
 
                         {/* ── HEADER ── */}
-                        <div className="flex items-center justify-between px-5 py-4 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-white/[0.04] relative z-10">
+                        <div className="flex items-center justify-between px-5 py-4 bg-black/40 backdrop-blur-xl border-b border-white/10 relative z-10">
                             <div className="flex items-center gap-3">
                                 {/* Avatar */}
                                 <div className="relative">
-                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#00FFFF] p-[1.5px]">
-                                        <div className="w-full h-full rounded-[10px] bg-[#0A0A0A] flex items-center justify-center">
-                                            <Sparkles size={16} className="text-[#00FFFF]" />
+                                    <div className="w-10 h-10 rounded-xl bg-black border border-[#00E5FF]/30 p-[1.5px] shadow-[0_0_15px_rgba(0,229,255,0.15)]">
+                                        <div className="w-full h-full rounded-[10px] bg-black flex items-center justify-center">
+                                            <Sparkles size={16} className="text-[#00E5FF]" />
                                         </div>
                                     </div>
-                                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#0A0A0A]" />
+                                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-black" />
                                 </div>
 
                                 <div>
                                     <div className="flex items-center gap-2">
                                         <h3 className="text-white font-bold text-sm tracking-tight">Aura</h3>
-                                        <span className="text-[8px] font-bold bg-gradient-to-r from-[#8B5CF6] to-[#00FFFF] text-transparent bg-clip-text uppercase tracking-widest">AI</span>
+                                        <span className="text-[8px] font-black text-[#00E5FF] uppercase tracking-widest">AI</span>
                                     </div>
                                     <span className="text-[10px] text-white/30 font-medium">La solución a tus problemas · En línea</span>
                                 </div>
@@ -334,10 +334,10 @@ export function AiConcierge() {
                                         {/* Aura avatar for assistant messages */}
                                         {m.role === 'assistant' && (
                                             <div className="flex items-center gap-2 pl-1">
-                                                <div className="w-5 h-5 rounded-md bg-gradient-to-br from-[#8B5CF6]/60 to-[#00FFFF]/60 flex items-center justify-center">
-                                                    <Sparkles size={10} className="text-white" />
+                                                <div className="w-5 h-5 rounded-md bg-black border border-[#00E5FF]/30 flex items-center justify-center">
+                                                    <Sparkles size={10} className="text-[#00E5FF]" />
                                                 </div>
-                                                <span className="text-[10px] font-semibold text-white/25 uppercase tracking-wider">Aura</span>
+                                                <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Aura</span>
                                             </div>
                                         )}
 
@@ -345,12 +345,12 @@ export function AiConcierge() {
                                         <div
                                             className={`px-4 py-3 text-[14px] leading-[1.6] relative ${
                                                 m.role === 'user'
-                                                    ? 'bg-gradient-to-br from-[#8B5CF6] to-[#6D28D9] text-white rounded-2xl rounded-br-md shadow-[0_4px_20px_rgba(139,92,246,0.25)]'
-                                                    : 'bg-white/[0.04] text-white/85 border border-white/[0.06] rounded-2xl rounded-tl-md'
+                                                    ? 'bg-gradient-to-br from-black/90 to-[#00E5FF]/20 text-white border border-[#00E5FF]/30 rounded-2xl rounded-br-md shadow-[0_4px_20px_rgba(0,229,255,0.08)]'
+                                                    : 'bg-white/[0.03] text-white/90 border border-white/10 rounded-2xl rounded-tl-md backdrop-blur-sm'
                                             }`}
                                         >
                                             {m.role === 'assistant' && (
-                                                <div className="absolute top-0 left-0 w-12 h-px bg-gradient-to-r from-[#00FFFF]/40 to-transparent" />
+                                                <div className="absolute top-0 left-0 w-12 h-px bg-gradient-to-r from-[#00E5FF]/40 to-transparent" />
                                             )}
                                             <div className="whitespace-pre-wrap">{formatContent(m.content)}</div>
                                         </div>
@@ -375,7 +375,7 @@ export function AiConcierge() {
                                                             transition={{ delay: idx * 0.08, type: 'spring', stiffness: 260, damping: 22 }}
                                                             whileHover={{ y: -3 }}
                                                             onClick={() => setSelectedProduct(p)}
-                                                            className="shrink-0 snap-start w-[140px] bg-[#0C0C0C] rounded-xl overflow-hidden cursor-pointer group relative border border-white/[0.05] hover:border-[#00FFFF]/25 transition-all duration-400 shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+                                                            className="shrink-0 snap-start w-[140px] bg-black/60 rounded-xl overflow-hidden cursor-pointer group relative border border-white/10 hover:border-[#00E5FF]/45 transition-all duration-400 shadow-[0_4px_25px_rgba(0,0,0,0.5)]"
                                                         >
                                                             {/* Image */}
                                                             <div className="w-full aspect-[4/5] relative bg-[#070707] overflow-hidden">
@@ -389,9 +389,9 @@ export function AiConcierge() {
 
                                                                 {/* Match indicator */}
                                                                 <div className="absolute top-2 left-2 z-10">
-                                                                    <div className="bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded-md border border-white/[0.08] flex items-center gap-1">
-                                                                        <div className="w-1 h-1 rounded-full bg-[#00FFFF] animate-pulse" />
-                                                                        <span className="text-[7px] font-bold text-[#00FFFF]">MATCH</span>
+                                                                    <div className="bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded-md border border-white/10 flex items-center gap-1">
+                                                                        <div className="w-1 h-1 rounded-full bg-[#00E5FF] animate-pulse" />
+                                                                        <span className="text-[7px] font-bold text-[#00E5FF]">MATCH</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -412,10 +412,10 @@ export function AiConcierge() {
                                                                     )}
                                                                 </div>
                                                                 <div className="flex items-center justify-between">
-                                                                    <p className="text-[#00FFFF] text-[13px] font-bold">
+                                                                    <p className="text-[#00E5FF] text-[13px] font-bold">
                                                                         ${p.price.toLocaleString('es-AR')}
                                                                     </p>
-                                                                    <div className="w-5 h-5 rounded-md bg-white/[0.04] flex items-center justify-center group-hover:bg-[#00FFFF] group-hover:text-black transition-all duration-300">
+                                                                    <div className="w-5 h-5 rounded-md bg-white/[0.04] flex items-center justify-center group-hover:bg-[#00E5FF] group-hover:text-black transition-all duration-300">
                                                                         <ChevronRight size={10} />
                                                                     </div>
                                                                 </div>
@@ -441,7 +441,7 @@ export function AiConcierge() {
                                             {[0, 1, 2].map(i => (
                                                 <motion.div
                                                     key={i}
-                                                    className="w-1.5 h-1.5 rounded-full bg-[#00FFFF]/60"
+                                                    className="w-1.5 h-1.5 rounded-full bg-[#00E5FF]"
                                                     animate={{ scale: [1, 1.4, 1], opacity: [0.4, 1, 0.4] }}
                                                     transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
                                                 />
@@ -461,7 +461,7 @@ export function AiConcierge() {
                                         <button
                                             key={q}
                                             onClick={() => sendMessage(q)}
-                                            className="whitespace-nowrap px-3 py-1.5 bg-white/[0.03] border border-white/[0.05] hover:border-[#8B5CF6]/30 hover:bg-[#8B5CF6]/[0.06] rounded-lg text-[11px] font-medium text-white/40 hover:text-white/70 transition-all shrink-0"
+                                            className="whitespace-nowrap px-3 py-1.5 bg-white/[0.03] border border-white/10 hover:border-[#00E5FF]/40 hover:bg-[#00E5FF]/10 rounded-lg text-[11px] font-bold uppercase tracking-wider text-white/40 hover:text-white/90 transition-all shrink-0"
                                         >
                                             {q}
                                         </button>
@@ -471,9 +471,9 @@ export function AiConcierge() {
                         )}
 
                         {/* ── INPUT ── */}
-                        <div className="px-4 py-3 bg-[#0A0A0A]/90 backdrop-blur-xl border-t border-white/[0.04] relative z-20">
+                        <div className="px-4 py-3 bg-black/60 backdrop-blur-xl border-t border-white/10 relative z-20">
                             <div className="flex items-center gap-2">
-                                <div className="flex-1 bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 flex items-center focus-within:border-[#8B5CF6]/30 focus-within:bg-white/[0.04] transition-all">
+                                <div className="flex-1 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 flex items-center focus-within:border-[#00E5FF]/40 focus-within:bg-white/[0.04] transition-all">
                                     <input
                                         ref={inputRef}
                                         type="text"
@@ -488,7 +488,7 @@ export function AiConcierge() {
                                 <button
                                     onClick={() => sendMessage(userInput)}
                                     disabled={isLoading || !userInput.trim()}
-                                    className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#6D28D9] text-white hover:shadow-[0_0_24px_rgba(139,92,246,0.4)] transition-all disabled:opacity-15 active:scale-95"
+                                    className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl bg-[#00E5FF] text-black hover:bg-[#C6FF00] hover:shadow-[0_0_20px_rgba(0,229,255,0.4)] transition-all disabled:opacity-30 disabled:hover:bg-[#00E5FF] disabled:hover:shadow-none disabled:text-black/40 active:scale-95"
                                 >
                                     <Send size={16} strokeWidth={2.5} />
                                 </button>
@@ -534,8 +534,8 @@ export function AiConcierge() {
 
                                             {/* Badge */}
                                             <div className="absolute top-4 left-4">
-                                                <div className="bg-[#00FFFF]/10 backdrop-blur-md px-2.5 py-1 rounded-full border border-[#00FFFF]/20">
-                                                    <span className="text-[9px] font-bold text-[#00FFFF] uppercase tracking-wider">Aura Match</span>
+                                                <div className="bg-[#00E5FF]/10 backdrop-blur-md px-2.5 py-1 rounded-full border border-[#00E5FF]/20">
+                                                    <span className="text-[9px] font-bold text-[#00E5FF] uppercase tracking-wider">Aura Match</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -544,7 +544,7 @@ export function AiConcierge() {
                                         <div className="px-5 pb-6 pt-4">
                                             <h2 className="text-lg font-bold text-white leading-tight mb-1">{selectedProduct.name}</h2>
                                             <div className="flex items-center gap-3 mb-6">
-                                                <p className="text-2xl font-black text-[#00FFFF]">
+                                                <p className="text-2xl font-black text-[#00E5FF]">
                                                     ${selectedProduct.price.toLocaleString('es-AR')}
                                                 </p>
                                                 <span className="text-[10px] font-medium text-white/25 uppercase tracking-wider border-l border-white/10 pl-3">
@@ -559,7 +559,7 @@ export function AiConcierge() {
                                                     {selectedProduct.sizes?.map(size => (
                                                         <div 
                                                             key={size}
-                                                            className="w-10 h-10 rounded-lg border border-white/5 bg-white/[0.03] flex items-center justify-center text-xs font-bold text-white/60"
+                                                            className="w-10 h-10 rounded-lg border border-white/10 bg-[#0C0C0C] flex items-center justify-center text-xs font-bold text-white/65"
                                                         >
                                                             {size}
                                                         </div>
@@ -569,7 +569,7 @@ export function AiConcierge() {
 
                                             <button
                                                 onClick={() => window.open(`/catalog/${selectedProduct.id}`, '_self')}
-                                                className="w-full py-4 bg-gradient-to-r from-[#8B5CF6] to-[#6D28D9] text-white font-bold uppercase tracking-[0.15em] text-[12px] rounded-2xl hover:shadow-[0_0_40px_rgba(139,92,246,0.4)] transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+                                                className="w-full py-4 bg-[#00E5FF] text-black font-black uppercase tracking-[0.15em] text-[11px] rounded-2xl hover:bg-[#C6FF00] hover:shadow-[0_0_30px_rgba(0,229,255,0.3)] transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
                                             >
                                                 Comprar Ahora <ArrowUpRight size={14} />
                                             </button>
@@ -586,22 +586,26 @@ export function AiConcierge() {
                         key="fab"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        whileHover={{ scale: 1.08 }}
-                        whileTap={{ scale: 0.92 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => { setIsOpen(true); setShowTeaser(false); triggerAuraSound(); }}
-                        className="relative w-[60px] h-[60px] group"
+                        className="relative w-[56px] h-[56px] group"
+                        aria-label="Abrir Aura AI"
                     >
-                        {/* Glow layers */}
-                        <div className="absolute inset-[-4px] bg-gradient-to-br from-[#8B5CF6] to-[#00FFFF] rounded-full blur-[16px] opacity-40 group-hover:opacity-70 transition-opacity duration-500" />
+                        {/* Glow layer - cyan neons pulse shadow */}
+                        <div className="absolute inset-0 bg-[#00E5FF] rounded-full blur-[12px] opacity-20 group-hover:opacity-55 transition-all duration-500" />
 
-                        <div className="relative w-full h-full rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#6D28D9] flex items-center justify-center shadow-[0_8px_32px_rgba(139,92,246,0.3)] border border-white/10 overflow-hidden">
-                            {/* Inner shine */}
-                            <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/[0.12] to-transparent rounded-t-full" />
-                            <MessageCircle size={22} className="text-white relative z-10" strokeWidth={2.2} />
+                        {/* Floating bubble container - glassmorphism */}
+                        <div className="relative w-full h-full rounded-full bg-black/80 backdrop-blur-xl flex items-center justify-center border border-white/10 overflow-hidden shadow-[0_0_25px_rgba(0,229,255,0.15)] group-hover:border-[#00E5FF]/45 transition-colors duration-500">
+                            {/* Inner glow accent */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-[#00E5FF]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            
+                            <MessageCircle size={20} className="text-white relative z-10 group-hover:text-[#00E5FF] transition-colors duration-300" strokeWidth={2} />
+                            <Sparkles size={8} className="text-[#C6FF00] absolute top-2 right-2 animate-pulse pointer-events-none" />
                         </div>
 
                         {/* Notification dot */}
-                        <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-[#00FFFF] rounded-full border-2 border-[#0A0A0A] shadow-[0_0_8px_#00FFFF]" />
+                        <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#00E5FF] rounded-full border-2 border-[#0A0A0A] shadow-[0_0_10px_#00E5FF]" />
                     </motion.button>
                 )}
             </AnimatePresence>

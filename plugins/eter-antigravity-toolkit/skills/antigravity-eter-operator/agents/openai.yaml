@@ -1,0 +1,4 @@
+interface:
+  display_name: "Antigravity Eter Operator"
+  short_description: "Operate Eter repo skills in Antigravity"
+  default_prompt: "Use $antigravity-eter-operator to plan and execute Eter repo work with the local skills ecosystem."

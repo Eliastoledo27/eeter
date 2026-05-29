@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Eye, BadgePercent, Flame, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { motion } from 'framer-motion';
 import type { Product } from '@/types';
 
 function getDiscount(basePrice: number, liquidationPrice: number) {
@@ -18,15 +17,30 @@ interface Props {
   title?: string;
 }
 
-export function LiquidationCardsSection({ products, title = 'Productos en Liquidación' }: Props) {
+export function LiquidationCardsSection({ products, title = 'Ofertas Flash' }: Props) {
   const [selected, setSelected] = useState<Product | null>(null);
   const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
 
-  const liquidated = useMemo(
-    () =>
-      products.filter((p) => p.liquidationActive || (p.liquidationPrice && p.liquidationPrice > 0)).slice(0, 8),
-    [products]
-  );
+  const liquidated = useMemo(() => {
+    const activeProducts = products.filter((product) => product.status === 'active');
+    const sortedPrices = activeProducts.map((product) => product.basePrice || 0).sort((a, b) => a - b);
+    const cheapestThreshold = sortedPrices[Math.min(7, sortedPrices.length - 1)] || 0;
+
+    return activeProducts
+      .filter((product) => {
+        const isFlash = product.productSections?.includes('flash');
+        const isRealLiquidation = product.liquidationActive === true;
+        const isCheap = cheapestThreshold > 0 && product.basePrice <= cheapestThreshold;
+        return isFlash || (!isRealLiquidation && isCheap);
+      })
+      .sort((a, b) => {
+        const flashA = a.productSections?.includes('flash') ? 0 : 1;
+        const flashB = b.productSections?.includes('flash') ? 0 : 1;
+        if (flashA !== flashB) return flashA - flashB;
+        return (a.liquidationPrice || a.basePrice) - (b.liquidationPrice || b.basePrice);
+      })
+      .slice(0, 8);
+  }, [products]);
 
   if (liquidated.length === 0) return null;
 
@@ -51,18 +65,14 @@ export function LiquidationCardsSection({ products, title = 'Productos en Liquid
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        {liquidated.map((p, idx) => {
+        {liquidated.map((p) => {
           const priceNow = p.liquidationPrice || p.basePrice;
           const discount = p.liquidationDiscountPercent || getDiscount(p.basePrice, priceNow);
           const src = !imgErrors[p.id] && p.images?.[0] ? p.images[0] : null;
           
           return (
-            <motion.article 
+            <article
               key={p.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
               className="group relative flex flex-col overflow-hidden rounded-3xl border border-white/5 bg-black/40 transition-all hover:-translate-y-2 hover:border-rose-500/30 hover:shadow-[0_20px_40px_rgba(244,63,94,0.1)]"
             >
               <div className="relative aspect-[4/5] w-full overflow-hidden">
@@ -117,7 +127,7 @@ export function LiquidationCardsSection({ products, title = 'Productos en Liquid
                   </Link>
                 </div>
               </div>
-            </motion.article>
+            </article>
           );
         })}
       </div>
@@ -135,7 +145,7 @@ export function LiquidationCardsSection({ products, title = 'Productos en Liquid
                 <div className="absolute top-6 left-6">
                   <div className="flex items-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-xs font-black text-white shadow-2xl">
                     <Flame size={14} />
-                    LIQUIDACIÓN ACTIVA
+                    OFERTA FLASH
                   </div>
                 </div>
               </div>
@@ -161,7 +171,7 @@ export function LiquidationCardsSection({ products, title = 'Productos en Liquid
                         -{selected.liquidationDiscountPercent || getDiscount(selected.basePrice, selected.liquidationPrice || selected.basePrice)}%
                       </span>
                    </div>
-                   <p className="text-sm leading-relaxed text-white/50">{selected.description || 'Este producto forma parte de nuestra liquidación exclusiva de temporada. Stock limitado.'}</p>
+                   <p className="text-sm leading-relaxed text-white/50">{selected.description || 'Este producto forma parte de nuestras Ofertas Flash. Stock limitado y precio bajo por tiempo acotado.'}</p>
                 </div>
 
                 <div className="mt-auto space-y-4">

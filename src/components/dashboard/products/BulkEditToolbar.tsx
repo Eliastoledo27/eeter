@@ -19,7 +19,6 @@ interface BulkEditToolbarProps {
     products: ProductType[];
     onClearSelection: () => void;
     onSuccess: () => void;
-    onRename: () => void;
     onStockEdit: () => void;
     onAIEdit: () => void;
 }
@@ -33,7 +32,7 @@ const ACTION_CONFIG = {
     status: { label: 'Estado', icon: Power, color: '#EF4444' },
 } as const;
 
-export function BulkEditToolbar({ selectedIds, products, onClearSelection, onSuccess, onRename, onStockEdit, onAIEdit }: BulkEditToolbarProps) {
+export function BulkEditToolbar({ selectedIds, products, onClearSelection, onSuccess, onStockEdit, onAIEdit }: BulkEditToolbarProps) {
     const [actionType, setActionType] = useState<keyof typeof ACTION_CONFIG>('price');
     const [value, setValue] = useState('');
     const [modificationType, setModificationType] = useState<'fixed' | 'percent_inc' | 'percent_dec' | 'add' | 'set' | 'append'>('fixed');

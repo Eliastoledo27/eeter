@@ -177,6 +177,7 @@ export function ProductForm({ initialData, onSubmit, onCancel }: ProductFormProp
         category: data.category,
         basePrice: data.basePrice,
         images: data.images ? [data.images] : [],
+        brand: initialData?.brand || 'ÉTER',
         stockBySize: { 'Unique': data.totalStock },
         totalStock: data.totalStock,
         status: 'active',

@@ -1,0 +1,6 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="120" fill="#000000" />
+  <text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="280" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">
+    É<tspan fill="#00E5FF">.</tspan>
+  </text>
+</svg>

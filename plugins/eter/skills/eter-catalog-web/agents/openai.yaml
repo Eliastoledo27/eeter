@@ -1,0 +1,4 @@
+interface:
+  display_name: "Éter Catalog Web"
+  short_description: "Catalog sections, cart, quick view, and reseller links"
+  default_prompt: "Use $eter-catalog-web to update the Éter web catalog safely."

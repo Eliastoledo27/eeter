@@ -16,8 +16,12 @@ import {
     CircleDot,
     TrendingUp,
     Sparkles,
+    X,
+    SlidersHorizontal,
 } from 'lucide-react';
 import { useCatalog } from '@/hooks/useCatalog';
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
 import { useState, useMemo, useDeferredValue, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FilterSidebar } from '@/components/catalog/FilterSidebar';
@@ -69,6 +73,9 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
     const [sortBy, setSortBy] = useState('popular');
     const [visibleCount, setVisibleCount] = useState(12);
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+    const [isFetchingMore, setIsFetchingMore] = useState(false);
+    const loaderRef = useRef<HTMLDivElement | null>(null);
 
     // Hydration management
     const mappedInitial = useMemo(() => initialProducts?.map(mapProductTypeToProduct) || [], [initialProducts]);
@@ -79,6 +86,11 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
     const categories = useMemo(() => 
         dbCategories?.length > 1 ? dbCategories : (products.length ? ['Todos', ...Array.from(new Set(products.map(p => p.category)))] : ['Todos']),
     [dbCategories, products]);
+
+    const cleanCategories = useMemo(() => {
+        const list = categories.filter(c => c !== 'Todos');
+        return ['Todos', ...list];
+    }, [categories]);
 
     const loading = catalogLoading && products.length === 0;
     
@@ -191,6 +203,35 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
     [filteredAndSortedProducts, visibleCount]);
     const hasMore = visibleCount < filteredAndSortedProducts.length;
 
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const target = entries[0];
+                if (target.isIntersecting && hasMore && !isFetchingMore && !loading) {
+                    setIsFetchingMore(true);
+                    setTimeout(() => {
+                        setVisibleCount((prev) => prev + 12);
+                        setIsFetchingMore(false);
+                    }, 800); // 800ms natural latency for premium feel
+                }
+            },
+            {
+                rootMargin: '200px', // Trigger loading before user reaches the bottom
+            }
+        );
+
+        const currentLoader = loaderRef.current;
+        if (currentLoader) {
+            observer.observe(currentLoader);
+        }
+
+        return () => {
+            if (currentLoader) {
+                observer.unobserve(currentLoader);
+            }
+        };
+    }, [hasMore, isFetchingMore, loading]);
+
     const lastServedIdsRef = useRef<string>('');
 
     useEffect(() => {
@@ -261,10 +302,134 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
             {/* Eliminated global fixed backdrop to match clean Index aesthetic */}
 
             <div className="relative z-[2] flex-1">
-                <CatalogHero />
-                <LiquidationCarousel products={products} />
+                <div className="hidden md:block">
+                    <CatalogHero />
+                </div>
+                <div className="hidden md:block">
+                    <LiquidationCarousel products={products} />
+                </div>
 
-                <section className="relative z-0 border-t border-white/10 bg-[#050505] px-4 py-8 lg:px-6">
+                {/* Mobile Search & Filter Button */}
+                <div className="block md:hidden px-4 pt-28 pb-4 bg-[#050505]">
+                    <div className="flex items-center gap-3">
+                        <div className="group relative flex-1">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 transition-colors group-focus-within:text-[#00E5FF]" size={18} />
+                            <input
+                                type="text"
+                                placeholder="Buscar en catálogo..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="h-12 w-full rounded-full border border-white/15 bg-black/45 pl-11 pr-4 text-xs font-bold tracking-[0.14em] text-white placeholder:text-white/30 focus:border-[#00E5FF]/50 focus:outline-none"
+                            />
+                        </div>
+                        <button
+                            onClick={() => setIsMobileFilterOpen(true)}
+                            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#C6FF00] text-black hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(198,255,0,0.25)]"
+                            aria-label="Abrir filtros"
+                        >
+                            <SlidersHorizontal size={18} strokeWidth={2.5} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Mobile Promo Banner Card */}
+                <div className="block md:hidden px-4 py-3 bg-[#050505]">
+                    <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#0A0A0A] via-black to-[#050505] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.6)]">
+                        {/* Background glow and subtle graphic */}
+                        <div className="absolute right-0 bottom-0 h-40 w-40 rounded-full bg-[#00E5FF]/10 blur-3xl pointer-events-none" />
+                        <div className="absolute right-0 bottom-0 top-0 w-1/2 opacity-35 pointer-events-none">
+                            <div className="relative w-full h-full">
+                                <Image
+                                    src="/zapa_cat.png"
+                                    alt="Zapatillas Éter"
+                                    fill
+                                    className="object-contain object-right-bottom scale-110 rotate-[-10deg]"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="relative z-10 max-w-[65%] space-y-3">
+                            <div className="flex items-center gap-1.5">
+                                <span className="h-1.5 w-1.5 rounded-full bg-[#C6FF00] animate-pulse" />
+                                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-[#C6FF00]">
+                                    ÉTER EXPERIENCE
+                                </span>
+                            </div>
+                            <h2 className="text-xl font-black uppercase leading-tight tracking-tight text-white font-sans">
+                                STOCK URBANO. <br />
+                                COMPRA RÁPIDA. <br />
+                                <span className="text-[#C6FF00]">VENDE HOY.</span>
+                            </h2>
+                            <p className="text-[9px] font-medium leading-relaxed text-white/50">
+                                Encuentra lo mejor del streetwear urbano. Compra rápido, vende rápido.
+                            </p>
+                            <button
+                                onClick={() => {
+                                    document.getElementById('catalog-grid-section')?.scrollIntoView({ behavior: 'smooth' });
+                                }}
+                                className="inline-flex items-center gap-2 rounded-full bg-[#C6FF00] px-4 py-2.5 text-[9px] font-black uppercase tracking-[0.15em] text-black shadow-[0_5px_15px_rgba(198,255,0,0.25)] transition-all hover:scale-105"
+                            >
+                                VER STOCK <ArrowUpRight size={12} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Mobile Categories Selector */}
+                <div className="block md:hidden px-4 py-4 bg-[#050505] space-y-3">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-black uppercase tracking-wider text-white font-sans">Categorías</h3>
+                        <button
+                            onClick={() => setActiveCategory('Todos')}
+                            className="text-[10px] font-black uppercase tracking-wider text-[#C6FF00] hover:brightness-110 flex items-center gap-1"
+                        >
+                            Ver todas <ChevronDown size={12} className="-rotate-95" />
+                        </button>
+                    </div>
+                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none scroll-smooth">
+                        {cleanCategories.map((cat) => {
+                            const isActive = activeCategory === cat;
+                            const getIcon = (category: string) => {
+                                switch(category.toLowerCase()) {
+                                    case 'todos': return '🔥';
+                                    case 'remeras': return '👕';
+                                    case 'hoodies': return '🧥';
+                                    case 'pantalones': return '👖';
+                                    case 'zapatillas': return '👟';
+                                    case 'accesorios': return '🎒';
+                                    default: return '🏷️';
+                                }
+                            };
+                            return (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveCategory(cat)}
+                                    className={cn(
+                                        "flex items-center gap-2 shrink-0 rounded-full px-5 py-3 text-xs font-bold border transition-all duration-300",
+                                        isActive
+                                            ? "bg-black text-[#C6FF00] border-[#C6FF00] shadow-[0_0_15px_rgba(198,255,0,0.15)]"
+                                            : "bg-white/[0.03] text-white/60 border-white/5 hover:border-white/20"
+                                    )}
+                                >
+                                    <span>{getIcon(cat)}</span>
+                                    <span className="uppercase tracking-[0.12em] text-[10px] font-black">{cat}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Mobile Product Section Header */}
+                <div id="catalog-grid-section" className="block md:hidden px-4 pt-4 pb-2 bg-[#050505] flex items-center justify-between">
+                    <h3 className="text-sm font-black uppercase tracking-wider text-white font-sans">
+                        {activeCategory === 'Todos' ? 'Nuevos en ÉTER' : activeCategory}
+                    </h3>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-white/40">
+                        {filteredAndSortedProducts.length} Modelos
+                    </span>
+                </div>
+
+                <section className="relative z-0 border-t-0 md:border-t border-white/10 bg-[#050505] px-4 py-8 lg:px-6">
                     <div className="paint-splatter splat-green -left-14 top-10 hidden md:block" />
                     <div className="paint-splatter splat-purple -right-10 bottom-20 hidden opacity-40 md:block" />
                     <div className="mx-auto max-w-[1600px] relative z-10">
@@ -274,7 +439,7 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.6, ease: easeOut }}
-                                    className="eter-card mb-8 p-6 md:p-8"
+                                    className="eter-card mb-8 p-6 md:p-8 hidden md:block"
                                 >
                                     <div className="mb-5 flex flex-col justify-between gap-5 md:flex-row md:items-center">
                                         <div>
@@ -390,7 +555,9 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
                                         </>
                                     )}
                                 </motion.div>
-                                <LiquidationCardsSection products={products} title="Productos en Liquidación" />
+                                <div className="hidden md:block">
+                                    <LiquidationCardsSection products={products} title="Productos en Liquidación" />
+                                </div>
 
                                 <AnimatePresence mode="wait">
                                      {loading ? (
@@ -404,8 +571,8 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
                                              animate={{ opacity: 1, y: 0 }}
                                              exit={{ opacity: 0, y: 24 }}
                                              transition={{ duration: 0.55, ease: easeOut }}
-                                             className={`grid gap-6 ${
-                                                 viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4' : 'grid-cols-1'
+                                             className={`grid gap-3 md:gap-6 ${
+                                                 viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4' : 'grid-cols-1'
                                              }`}
                                          >
                                              {displayProducts.map((product, idx) => (
@@ -447,23 +614,24 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
                                      )}
                                 </AnimatePresence>
 
-                                {hasMore && !loading && (
-                                    <div className="mt-12 flex justify-center">
-                                        <button
-                                            onClick={() => setVisibleCount((prev) => prev + 12)}
-                                            className="group relative overflow-hidden rounded-full px-10 py-4"
-                                        >
-                                            <div className="absolute inset-0 bg-[#00E5FF] transition-transform duration-500 group-hover:scale-110" />
-                                            <div className="relative inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] text-black">
-                                                Cargar mas modelos
-                                                <ChevronDown size={16} className="transition-transform group-hover:translate-y-1" />
-                                            </div>
-                                        </button>
-                                    </div>
-                                )}
+                                {/* Target for Infinite Scroll */}
+                                <div ref={loaderRef} className="h-10 w-full" />
+
+                                {/* Premium Loading Spinner Indicator */}
+                                {isFetchingMore && (
+                                     <div className="mt-8 flex flex-col items-center justify-center gap-3 py-6">
+                                         <div className="relative h-10 w-10">
+                                             <div className="absolute inset-0 rounded-full border-2 border-[#00E5FF]/20" />
+                                             <div className="absolute inset-0 rounded-full border-t-2 border-[#00E5FF] animate-spin" />
+                                         </div>
+                                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00E5FF]/80 animate-pulse">
+                                             Cargando stock de lujo...
+                                         </span>
+                                     </div>
+                                 )}
                             </div>
 
-                            <aside className="order-2 lg:order-2 lg:pl-10 lg:border-l lg:border-white/5 relative h-full space-y-12">
+                            <aside className="hidden lg:block lg:order-2 lg:pl-10 lg:border-l lg:border-white/5 relative h-full space-y-12">
                                 <div className="absolute -left-[1px] top-0 bottom-0 w-[1px] bg-gradient-to-b from-[#00E5FF]/20 via-[#00E5FF]/5 to-transparent hidden lg:block" />
                                 
                                 <FilterSidebar
@@ -515,6 +683,60 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
                     </div>
                 </section>
             </div>
+
+            {/* Mobile Filter Drawer */}
+            <AnimatePresence>
+                {isMobileFilterOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setIsMobileFilterOpen(false)}
+                        className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md block md:hidden"
+                    >
+                        <motion.div
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="absolute right-0 top-0 bottom-0 w-[85%] max-w-[400px] bg-[#050505] border-l border-white/10 p-6 overflow-y-auto flex flex-col text-white"
+                        >
+                            <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+                                <h3 className="text-sm font-black uppercase tracking-wider text-white">Filtros</h3>
+                                <button
+                                    onClick={() => setIsMobileFilterOpen(false)}
+                                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white hover:text-[#C6FF00] hover:border-[#C6FF00]/40 transition-all"
+                                    aria-label="Cerrar filtros"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+                            
+                            <div className="flex-1 space-y-6">
+                                <FilterSidebar
+                                    categories={categories}
+                                    activeCategory={activeCategory}
+                                    onCategoryChange={setActiveCategory}
+                                    occasions={['Casual', 'Deporte', 'Streetwear']}
+                                    activeOccasion="Todos"
+                                    onOccasionChange={() => {}}
+                                    priceRange={priceRange}
+                                    onPriceChange={setPriceRange}
+                                    selectedSizes={selectedSizes}
+                                    onSizesChange={setSelectedSizes}
+                                    sortBy={sortBy}
+                                    onSortChange={setSortBy}
+                                    onReset={resetFilters}
+                                    brands={['Nike', 'Jordan', 'Adidas', 'Yeezy', 'New Balance']}
+                                    activeBrand={activeBrand}
+                                    onBrandChange={setActiveBrand}
+                                />
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <AuraQuiz />
             <PulseTicker />

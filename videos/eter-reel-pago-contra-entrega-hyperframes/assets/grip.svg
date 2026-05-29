@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1700" viewBox="0 0 1200 1700">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#000"/>
+      <stop offset=".55" stop-color="#333"/>
+      <stop offset="1" stop-color="#050505"/>
+    </linearGradient>
+    <filter id="rough"><feTurbulence baseFrequency=".045" numOctaves="4" seed="8"/><feDisplacementMap in="SourceGraphic" scale="18"/></filter>
+  </defs>
+  <rect width="1200" height="1700" fill="url(#bg)"/>
+  <g transform="translate(80 110) rotate(-9 520 720)" filter="url(#rough)">
+    <rect x="70" y="60" width="900" height="1450" rx="220" fill="#080808" stroke="#515151" stroke-width="18"/>
+    <g fill="#242428" stroke="#050505" stroke-width="8">
+      <path d="M260 125 h250 l-84 170 h-250z"/>
+      <path d="M570 128 h250 l-82 168 h-250z"/>
+      <path d="M185 375 h260 l-88 180 h-260z"/>
+      <path d="M515 385 h290 l-92 184 h-290z"/>
+      <path d="M220 645 h250 l-92 185 h-250z"/>
+      <path d="M560 655 h250 l-92 185 h-250z"/>
+      <path d="M165 920 h300 l-95 196 h-300z"/>
+      <path d="M540 940 h300 l-92 192 h-300z"/>
+      <path d="M270 1210 h260 l-84 178 h-260z"/>
+    </g>
+    <path d="M110 265 C380 205 690 192 965 265" fill="none" stroke="#39FF14" stroke-width="12" opacity=".65"/>
+    <path d="M78 1360 C350 1460 650 1454 910 1345" fill="none" stroke="#A020F0" stroke-width="14" opacity=".7"/>
+  </g>
+</svg>

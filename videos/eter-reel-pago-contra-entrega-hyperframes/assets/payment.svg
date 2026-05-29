@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1700" viewBox="0 0 1200 1700">
+  <defs>
+    <radialGradient id="halo" cx=".5" cy=".38" r=".62"><stop stop-color="#A020F0" stop-opacity=".55"/><stop offset=".62" stop-color="#111" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="1700" fill="#000"/>
+  <rect width="1200" height="1700" fill="url(#halo)"/>
+  <g transform="translate(250 235)">
+    <rect x="60" y="80" width="580" height="1120" rx="84" fill="#111114" stroke="#555" stroke-width="16"/>
+    <rect x="125" y="165" width="450" height="270" rx="42" fill="#050505" stroke="#39FF14" stroke-width="8"/>
+    <text x="350" y="288" text-anchor="middle" fill="#39FF14" font-family="Inter,Arial,sans-serif" font-size="48" font-weight="900">PAGO SEGURO</text>
+    <text x="350" y="354" text-anchor="middle" fill="#fff" font-family="Inter,Arial,sans-serif" font-size="34" font-weight="700">AL RECIBIR</text>
+    <g fill="#26262b">
+      <rect x="135" y="530" width="115" height="90" rx="24"/>
+      <rect x="290" y="530" width="115" height="90" rx="24"/>
+      <rect x="445" y="530" width="115" height="90" rx="24"/>
+      <rect x="135" y="675" width="115" height="90" rx="24"/>
+      <rect x="290" y="675" width="115" height="90" rx="24"/>
+      <rect x="445" y="675" width="115" height="90" rx="24"/>
+      <rect x="135" y="820" width="115" height="90" rx="24"/>
+      <rect x="290" y="820" width="115" height="90" rx="24"/>
+      <rect x="445" y="820" width="115" height="90" rx="24"/>
+    </g>
+    <rect x="195" y="1000" width="310" height="92" rx="46" fill="#39FF14"/>
+  </g>
+  <g transform="translate(453 520)">
+    <path d="M147 0 L294 62 V190 C294 330 215 410 147 445 C79 410 0 330 0 190 V62 Z" fill="#080808" stroke="#A020F0" stroke-width="15"/>
+    <path d="M84 213 L130 260 L214 145" fill="none" stroke="#39FF14" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

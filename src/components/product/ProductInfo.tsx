@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { useAuraStore } from '@/hooks/useAuraStore'
 import { Product } from '@/domain/entities/Product'
 import { cn } from '@/lib/utils'
+import { cartNotify } from '@/components/cart/CartNotificationSystem'
 
 interface ProductInfoProps {
     product: ProductType
@@ -58,15 +59,11 @@ export function ProductInfo({ product, hideOutboundLinks }: ProductInfoProps) {
         addItem(productToCart, selectedSize, quantity);
 
         if (!silent) {
-            toast.success('¡Agregado al ecosistema ÉTER!', {
-                description: `${product.name} — Talle ${selectedSize}`,
-                action: {
-                    label: 'Ver Carrito',
-                    onClick: () => {
-                        setCartStep('items');
-                        toggleCart();
-                    }
-                }
+            cartNotify({
+                type: 'added',
+                title: 'Producto agregado',
+                productName: `${product.name} — Talle ${selectedSize}`,
+                productImage: product.images?.[0],
             });
         }
         return true;

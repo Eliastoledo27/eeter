@@ -11,7 +11,7 @@ export const mapProductTypeToProduct = (p: ProductType): Product => ({
     category: p.category || 'General',
     basePrice: p.base_price,
     images: p.images,
-    brand: p.brand || p.category || 'ÉTER',
+    brand: p.brand || p.category || 'Éter',
     stockBySize: p.stock_by_size as Record<string, number>,
     totalStock: Object.values(p.stock_by_size || {}).reduce((a, b) => a + (Number(b) || 0), 0),
     status: p.is_active ? 'active' : 'inactive',
@@ -19,4 +19,5 @@ export const mapProductTypeToProduct = (p: ProductType): Product => ({
     liquidationActive: p.liquidation_active,
     liquidationPrice: p.liquidation_price,
     liquidationDiscountPercent: p.liquidation_discount_percent,
+    productSections: p.product_sections || ['catalog'],
 });

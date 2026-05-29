@@ -8,18 +8,24 @@ export const metadata: Metadata = {
     openGraph: {
         title: 'Comunidad ÉTER | El Ecosistema Elite',
         description: 'No vendés solo. Tenés sistema. Unite a la red de reventa de calzado premium más sólida de Argentina.',
-        url: 'https://eter.store/comunidad',
+        url: 'https://xn--ter-9la.store/comunidad',
         siteName: 'Éter Store',
         locale: 'es_AR',
         type: 'website',
         images: [
             {
-                url: '/og-image.jpg',
+                url: '/community-og.jpg',
                 width: 1200,
                 height: 630,
                 alt: 'Comunidad Éter Elite Network',
             },
         ],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Comunidad ÉTER | El Ecosistema Elite',
+        description: 'No vendés solo. Tenés sistema. Unite a la red de reventa de calzado premium.',
+        images: ['/community-og.jpg'],
     },
 };
 

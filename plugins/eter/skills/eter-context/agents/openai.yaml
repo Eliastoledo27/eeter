@@ -1,0 +1,4 @@
+interface:
+  display_name: "Éter Context"
+  short_description: "Route work through Éter operating context"
+  default_prompt: "Use $eter-context to orient this task inside the Éter ecosystem before acting."

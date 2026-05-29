@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     keywords: ['ofertas zapatillas Mar del Plata', 'best sellers sneakers Argentina', 'zapatillas importadas liquidación', 'calzado premium ofertas', 'Éter Store descuentos'],
     openGraph: {
         title: 'Ofertas & Best Sellers | Éter Store',
-        description: 'Los modelos más buscados de Mar del Plata al mejor precio. Calidad G5/OG con disponibilidad inmediata.',
+        description: 'Los modelos más buscados de Mar del Plata al mejor precio. Selección premium con disponibilidad inmediata.',
         url: 'https://eter.store/catalog/best',
         siteName: 'Éter Store',
         locale: 'es_AR',

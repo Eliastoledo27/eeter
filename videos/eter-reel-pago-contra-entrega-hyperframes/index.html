@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>ETER - Pago contra entrega</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="root" data-composition-id="eter-reel-pago-entrega" data-start="0" data-duration="15" data-width="1080" data-height="1920">
+      <audio id="beat" data-start="0" data-duration="15" data-track-index="30" src="./assets/eter-original-beat.wav" data-volume="0.42"></audio>
+
+      <div class="grain" data-layout-ignore></div>
+      <div class="scan" data-layout-ignore></div>
+      <div class="grid" data-layout-ignore></div>
+      <div class="neon neon-lime" data-layout-ignore></div>
+      <div class="neon neon-violet" data-layout-ignore></div>
+
+      <section id="scene-1a" class="scene clip scene-macro" data-start="0" data-duration="0.25" data-track-index="1">
+        <img class="macro grip" src="./assets/grip.svg" alt="" data-layout-ignore />
+      </section>
+      <section id="scene-1b" class="scene clip scene-macro" data-start="0.25" data-duration="0.25" data-track-index="2">
+        <img class="macro leather" src="./assets/leather.svg" alt="" data-layout-ignore />
+      </section>
+      <section id="brand-pop" class="scene clip center" data-start="0" data-duration="0.85" data-track-index="5">
+        <h1 class="brand-hit">ETER</h1>
+      </section>
+
+      <section id="scene-2" class="scene clip" data-start="0.5" data-duration="3.5" data-track-index="6">
+        <img class="split-img left-img" src="./assets/leather.svg" alt="" data-layout-ignore />
+        <img class="split-img right-img" src="./assets/grip.svg" alt="" data-layout-ignore />
+        <div class="stitch-glow" data-layout-ignore></div>
+        <div class="copy copy-top">
+          <div class="kicker">HECHAS PARA MIRARSE DOS VECES.</div>
+          <div class="headline alt">TEXTURA. CORTE. CALLE.</div>
+        </div>
+      </section>
+
+      <section id="scene-3" class="scene clip" data-start="4" data-duration="3" data-track-index="7">
+        <img class="street" src="./assets/mdp-street.svg" alt="" data-layout-ignore />
+        <div class="glitch-bars" data-layout-ignore></div>
+        <div class="copy local">
+          <div class="headline neon-text">MDP EN LOS PIES.</div>
+          <div class="sub">PARES URBANOS. STOCK REAL.</div>
+        </div>
+      </section>
+
+      <section id="scene-4" class="scene clip" data-start="7" data-duration="5" data-track-index="8">
+        <img class="payment" src="./assets/payment.svg" alt="" data-layout-ignore />
+        <div class="shield-pulse" data-layout-ignore></div>
+        <div class="copy secure">
+          <div class="headline">PRIMERO LAS VES. DESPUES PAGAS.</div>
+          <div class="steps">
+            <span>MIRAS.</span>
+            <span>CONFIRMAS.</span>
+            <span>ESTRENAS.</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene-5" class="scene clip center" data-start="12" data-duration="3" data-track-index="9">
+        <img class="logo" src="./assets/logo.svg" alt="" data-layout-ignore />
+        <div class="final-copy">
+          <div class="headline">TU PROXIMO PAR YA ESTA CERCA.</div>
+          <div class="cta">PEDI EL CATALOGO.</div>
+          <div class="note">Confirma stock antes de pedir</div>
+        </div>
+      </section>
+
+      <div id="wipe-product-to-mdp" class="wipe wipe-a clip" data-start="3.8" data-duration="0.32" data-track-index="20" data-layout-ignore></div>
+      <div id="wipe-mdp-to-payment" class="wipe wipe-b clip" data-start="6.82" data-duration="0.36" data-track-index="20" data-layout-ignore></div>
+      <div id="wipe-payment-to-cta" class="wipe wipe-c clip" data-start="11.78" data-duration="0.36" data-track-index="20" data-layout-ignore></div>
+    </main>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      const pop = (selector, at) => tl.from(selector, { opacity: 0, scale: 0.72, y: 42, duration: 0.22, ease: "back.out(2.5)" }, at);
+
+      tl.from(".brand-hit", { opacity: 0, scale: 0.18, rotation: -4, duration: 0.18, ease: "power4.out" }, 0.04);
+      tl.to(".brand-hit", { scale: 1.1, textShadow: "0 0 70px rgba(57,255,20,.95)", duration: 0.18, ease: "power2.out" }, 0.22);
+      tl.to(".brand-hit", { opacity: 0, scale: 1.45, duration: 0.25, ease: "power3.in" }, 0.55);
+      tl.from(".grip", { x: -170, scale: 1.42, rotation: -4, duration: 0.25, ease: "none" }, 0);
+      tl.from(".leather", { x: 160, scale: 1.36, rotation: 3, duration: 0.25, ease: "none" }, 0.25);
+
+      tl.from(".left-img", { x: -210, scale: 1.2, duration: 0.8, ease: "power4.out" }, 0.56);
+      tl.from(".right-img", { x: 210, scale: 1.18, duration: 0.8, ease: "power4.out" }, 0.62);
+      tl.to(".left-img", { y: -90, scale: 1.1, duration: 3.0, ease: "sine.inOut", overwrite: "auto" }, 1.36);
+      tl.to(".right-img", { y: 85, scale: 1.12, duration: 2.95, ease: "sine.inOut", overwrite: "auto" }, 1.42);
+      tl.from(".stitch-glow", { opacity: 0, x: -380, duration: 0.4, ease: "expo.out" }, 0.82);
+      tl.to(".stitch-glow", { x: 500, duration: 2.45, ease: "sine.inOut", overwrite: "auto" }, 1.22);
+      pop("#scene-2 .kicker", 0.95);
+      tl.from("#scene-2 .alt", { opacity: 0, y: 64, skewX: -8, duration: 0.34, ease: "expo.out" }, 2.24);
+
+      tl.fromTo(".wipe-a", { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, duration: 0.16, ease: "power4.in" }, 3.8);
+      tl.to(".wipe-a", { scaleX: 0, transformOrigin: "100% 50%", duration: 0.16, ease: "power4.out" }, 3.96);
+
+      tl.from(".street", { opacity: 0, scale: 1.18, x: -80, filter: "blur(12px)", duration: 0.26, ease: "steps(3)" }, 4);
+      tl.to(".street", { scale: 1.05, x: 34, duration: 2.55, ease: "sine.inOut", overwrite: "auto" }, 4.28);
+      tl.from(".glitch-bars", { opacity: 0, x: -900, duration: 0.16, ease: "none", repeat: 4, yoyo: true }, 4.04);
+      pop("#scene-3 .headline", 4.28);
+      tl.from("#scene-3 .sub", { opacity: 0, y: 52, duration: 0.28, ease: "expo.out" }, 4.78);
+
+      tl.fromTo(".wipe-b", { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, duration: 0.18, ease: "power4.in" }, 6.82);
+      tl.to(".wipe-b", { scaleX: 0, transformOrigin: "100% 50%", duration: 0.18, ease: "power4.out" }, 7.0);
+
+      tl.from(".payment", { opacity: 0, scale: 1.12, y: 120, duration: 0.62, ease: "expo.out" }, 7.08);
+      tl.to(".payment", { y: -38, scale: 1.04, duration: 4.15, ease: "sine.inOut", overwrite: "auto" }, 7.72);
+      tl.from(".shield-pulse", { opacity: 0, scale: 0.55, duration: 0.34, ease: "back.out(2)" }, 7.42);
+      tl.to(".shield-pulse", { scale: 1.2, opacity: 0.3, duration: 0.7, ease: "sine.inOut", repeat: 5, yoyo: true, overwrite: "auto" }, 7.78);
+      pop("#scene-4 .headline", 7.78);
+      tl.from("#scene-4 .steps span", { opacity: 0, y: 42, scale: 0.9, duration: 0.24, stagger: 0.36, ease: "back.out(2)" }, 9.1);
+
+      tl.fromTo(".wipe-c", { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, duration: 0.18, ease: "power4.in" }, 11.78);
+      tl.to(".wipe-c", { scaleX: 0, transformOrigin: "100% 50%", duration: 0.18, ease: "power4.out" }, 11.96);
+
+      tl.from(".logo", { opacity: 0, scale: 0.58, rotation: -4, duration: 0.42, ease: "back.out(1.8)" }, 12.08);
+      tl.to(".logo", { scale: 1.06, filter: "drop-shadow(0 0 58px rgba(57,255,20,.9))", duration: 0.55, repeat: 3, yoyo: true, ease: "sine.inOut", overwrite: "auto" }, 12.52);
+      tl.from(".final-copy .headline", { opacity: 0, y: 54, duration: 0.34, ease: "expo.out" }, 12.62);
+      tl.from(".cta", { opacity: 0, y: 45, scale: 0.94, duration: 0.3, ease: "back.out(1.6)" }, 13.18);
+      tl.from(".note", { opacity: 0, y: 24, duration: 0.26, ease: "power3.out" }, 13.72);
+      tl.to("#scene-5", { opacity: 0, scale: 1.04, duration: 0.35, ease: "power2.in" }, 14.65);
+
+      window.__timelines["eter-reel-pago-entrega"] = tl;
+    </script>
+  </body>
+</html>

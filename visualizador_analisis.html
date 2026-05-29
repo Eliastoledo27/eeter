@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ÉTER STORE - Explorador Interactivo de Estructura y Potencial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================================================
+       1. DISEÑO DE SISTEMA Y VARIABLES (Tema por Defecto: Cyan Neon High-End)
+       ========================================================================== */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #050811 0%, #0c1226 100%);
+      --panel-bg: rgba(10, 16, 32, 0.6);
+      --panel-border: rgba(0, 229, 255, 0.15);
+      --panel-border-hover: rgba(0, 229, 255, 0.4);
+      --accent: #00E5FF;
+      --accent-rgb: 0, 229, 255;
+      --accent-secondary: #00B8D9;
+      --text-main: #FFFFFF;
+      --text-muted: #8E9BB4;
+      --font-title: 'Space Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --glow: 0 0 20px rgba(0, 229, 255, 0.25);
+      --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Tema Vignelli Minimalist */
+    [data-theme="vignelli"] {
+      --bg-gradient: linear-gradient(135deg, #121212 0%, #1a1a1a 100%);
+      --panel-bg: rgba(25, 25, 25, 0.85);
+      --panel-border: rgba(255, 255, 255, 0.1);
+      --panel-border-hover: rgba(255, 255, 255, 0.3);
+      --accent: #FF3B30; /* Rojo Vignelli */
+      --accent-rgb: 255, 59, 48;
+      --accent-secondary: #E03027;
+      --text-main: #FFFFFF;
+      --text-muted: #999999;
+      --font-title: 'Manrope', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --glow: 0 0 15px rgba(255, 59, 48, 0.15);
+    }
+
+    /* Tema Warm Grain */
+    [data-theme="warm-grain"] {
+      --bg-gradient: linear-gradient(135deg, #1C1917 0%, #12100E 100%);
+      --panel-bg: rgba(44, 40, 37, 0.7);
+      --panel-border: rgba(217, 119, 6, 0.15);
+      --panel-border-hover: rgba(217, 119, 6, 0.4);
+      --accent: #F59E0B; /* Ámbar cálido */
+      --accent-rgb: 245, 158, 11;
+      --accent-secondary: #D97706;
+      --text-main: #FAFAF9;
+      --text-muted: #A8A29E;
+      --font-title: 'Manrope', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --glow: 0 0 20px rgba(245, 158, 11, 0.2);
+    }
+
+    /* Reset & Estilos Base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background 0.5s ease;
+    }
+
+    /* Efecto de grano Warm Grain */
+    .grain-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      opacity: 0.04;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    [data-theme="warm-grain"] .grain-overlay {
+      display: block;
+    }
+
+    /* Header */
+    header {
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--panel-border);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #000;
+      font-family: var(--font-title);
+      box-shadow: var(--glow);
+    }
+
+    .brand h1 {
+      font-family: var(--font-title);
+      font-size: 1.4rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .theme-selector {
+      display: flex;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px;
+      border-radius: 20px;
+      border: 1px solid var(--panel-border);
+    }
+
+    .theme-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .theme-btn.active {
+      background: var(--accent);
+      color: #000;
+      box-shadow: var(--glow);
+    }
+
+    /* Layout Principal */
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      flex: 1;
+      height: calc(100vh - 73px);
+      overflow: hidden;
+    }
+
+    /* Sidebar (Árbol) */
+    .sidebar {
+      border-right: 1px solid var(--panel-border);
+      background: rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      font-family: var(--font-title);
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      margin-bottom: 20px;
+      padding-left: 10px;
+    }
+
+    /* Estructura del Árbol */
+    .tree-node {
+      margin-left: 12px;
+      position: relative;
+    }
+
+    .tree-toggle {
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+      font-size: 0.9rem;
+      gap: 8px;
+    }
+
+    .tree-toggle:hover {
+      background: rgba(var(--accent-rgb), 0.08);
+      color: var(--accent);
+    }
+
+    .tree-toggle.active {
+      background: rgba(var(--accent-rgb), 0.12);
+      border-left: 3px solid var(--accent);
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .tree-children {
+      margin-left: 14px;
+      border-left: 1px dashed rgba(255, 255, 255, 0.1);
+      padding-left: 8px;
+      display: none;
+    }
+
+    .tree-children.open {
+      display: block;
+      animation: slideDown 0.25s ease-out;
+    }
+
+    .icon-folder, .icon-file {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* Contenido Detalle */
+    .content-area {
+      padding: 40px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .glass-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 30px;
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .glass-card:hover {
+      border-color: var(--panel-border-hover);
+    }
+
+    .welcome-section h2 {
+      font-family: var(--font-title);
+      font-size: 2.2rem;
+      margin-bottom: 12px;
+      background: linear-gradient(90deg, #FFFFFF 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .welcome-section p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    /* Tarjeta de Detalle del Nodo */
+    .detail-card {
+      display: none;
+    }
+
+    .detail-card.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .node-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+
+    .node-title {
+      font-family: var(--font-title);
+      font-size: 1.8rem;
+      color: var(--accent);
+    }
+
+    .node-type-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .info-section {
+      margin-bottom: 25px;
+    }
+
+    .info-section h4 {
+      font-family: var(--font-title);
+      font-size: 1.05rem;
+      text-transform: uppercase;
+      color: var(--accent-secondary);
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    .info-section p {
+      color: var(--text-main);
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    /* Lista de Subelementos */
+    .subfiles-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .subfile-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+
+    .subfile-item:hover {
+      background: rgba(var(--accent-rgb), 0.05);
+      border-color: rgba(var(--accent-rgb), 0.2);
+    }
+
+    /* Badge de Potencial */
+    .potential-gauge {
+      background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.15) 0%, rgba(var(--accent-rgb), 0.02) 100%);
+      border-left: 4px solid var(--accent);
+      padding: 15px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 15px;
+    }
+
+    .potential-gauge h5 {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Animaciones */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideDown {
+      from { height: 0; opacity: 0; }
+      to { height: auto; opacity: 1; }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+    /* Contenedor de visualización Mermaid alternativo */
+    .diagram-tab {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .mermaid-node {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grain-overlay"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">É</div>
+      <h1>Éter Store — Interactive Explorer</h1>
+    </div>
+    
+    <div class="theme-selector">
+      <button class="theme-btn active" onclick="setTheme('default', this)">Neon Cyan</button>
+      <button class="theme-btn" onclick="setTheme('vignelli', this)">Vignelli Red</button>
+      <button class="theme-btn" onclick="setTheme('warm-grain', this)">Warm Grain</button>
+    </div>
+  </header>
+
+  <!-- Contenedor Principal -->
+  <div class="dashboard-container">
+    
+    <!-- Sidebar / Árbol -->
+    <aside class="sidebar">
+      <h2>Estructura del Proyecto</h2>
+      
+      <div id="tree-container">
+        <!-- Generado dinámicamente -->
+      </div>
+    </aside>
+
+    <!-- Área de Contenido Detallado -->
+    <main class="content-area">
+      
+      <!-- Sección de Bienvenida -->
+      <section class="glass-card welcome-section">
+        <h2>Ecosistema Éter Store 2026</h2>
+        <p>Haz clic en cualquier carpeta o sección en el menú lateral para explorar en tiempo real la arquitectura de archivos, el potencial de desarrollo, las integraciones comerciales de Meta/WhatsApp y las variaciones estéticas de la marca.</p>
+      </section>
+
+      <!-- Panel de Detalles Dinámicos -->
+      <section class="glass-card detail-card" id="detail-panel">
+        <div class="node-header">
+          <h3 class="node-title" id="panel-title">Nombre de Carpeta</h3>
+          <span class="node-type-badge" id="panel-type">Carpeta</span>
+        </div>
+        
+        <div class="info-section">
+          <h4>Descripción & Propósito</h4>
+          <p id="panel-desc">Selecciona un elemento para cargar su descripción de arquitectura.</p>
+        </div>
+
+        <div class="info-section">
+          <h4>Potencial de Negocio & Escalabilidad</h4>
+          <div class="potential-gauge">
+            <h5 id="panel-potential-title">🚀 Alta Escalabilidad</h5>
+            <p id="panel-potential-desc">Detalles del potencial para integraciones, automatizaciones y crecimiento de ventas.</p>
+          </div>
+        </div>
+
+        <div class="info-section" id="subfiles-section">
+          <h4>Archivos y Componentes Clave</h4>
+          <div class="subfiles-list" id="panel-subfiles">
+            <!-- Archivos -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel de Arquitectura Relacional -->
+      <section class="glass-card diagram-tab">
+        <h3 style="font-family: var(--font-title); color: var(--accent);">Estructura de Flujo e Integración</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">El sistema Éter Store acopla experiencias estéticas exclusivas en el front-end con procesos robustos de automatización backend y mensajería en la nube:</p>
+        
+        <div class="mermaid-node">
+          <strong style="color: var(--accent);">🌐 Capa del Revendedor [P2P Commerce]</strong>
+          <p style="font-size: 0.85rem; margin-top: 6px; color: var(--text-muted);">Usa el enrutamiento dinámico `[reseller_slug]` para renderizar catálogos independientes. Permite a los afiliados compartir enlaces directos de compra y traccionar leads automáticos.</p>
+        </div>
+
+        <div class="mermaid-node">
+          <strong style="color: var(--accent);">💬 Integración Meta Business Cloud API</strong>
+          <p style="font-size: 0.85rem; margin-top: 6px; color: var(--text-muted);">Sincroniza el catálogo de la tienda mediante endpoints JSON (`api/bot-catalog-*`) con catálogos oficiales de Instagram y webhooks de automatización de WhatsApp.</p>
+        </div>
+
+        <div class="mermaid-node">
+          <strong style="color: var(--accent);">🎨 Variaciones de Identidad (Themes)</strong>
+          <p style="font-size: 0.85rem; margin-top: 6px; color: var(--text-muted);">Las carpetas `eter-warm-grain`, `eter-vignelli` y `eter-kinetic-type` demuestran la flexibilidad de diseño del sistema, permitiendo cambiar la experiencia de marca sin alterar el motor de base de datos ni los procesos de pago.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Lógica de Datos e Interactividad -->
+  <script>
+    // 1. Datos del análisis y potencial
+    const projectData = {
+      root: {
+        title: "eter-store (Raíz)",
+        type: "Directorio Raíz",
+        desc: "El punto de entrada del proyecto. Contiene configuraciones de TypeScript, compilación, entornos e integración con Supabase y Tailwind CSS.",
+        potentialTitle: "Control de Configuración Unificado",
+        potentialDesc: "Centraliza las variables de entorno para producción, pruebas locales y configuración de despliegue en Vercel, Hostinger o Docker.",
+        files: ["package.json", "tailwind.config.ts", "tsconfig.json", "next.config.mjs", ".env", "schema_dump.sql"]
+      },
+      src_app: {
+        title: "src/app (Rutas y APIs)",
+        type: "Módulo Next.js Router",
+        desc: "Contiene las páginas de cliente (SSR/Client Components) y las rutas API para webhooks, pasarelas de pago y automatización de catálogo.",
+        potentialTitle: "Automatización Omnicanal & Dropshipping",
+        potentialDesc: "Permite a través de api/webhooks recibir compras y consultas directas desde WhatsApp Business API, y con [reseller_slug] escalar un modelo de distribución masivo.",
+        files: ["(auth)", "(protected)", "[reseller_slug]", "api/webhooks", "api/bot-catalog-e8a2b3c4", "globals.css", "layout.tsx", "page.tsx"]
+      },
+      src_components: {
+        title: "src/components (Librería UI)",
+        type: "Biblioteca de Componentes",
+        desc: "Contiene todos los componentes modulares interactivos de la aplicación. Diseñados con Glassmorphism premium y animaciones Framer Motion.",
+        potentialTitle: "UX de Alta Conversión y Fidelización",
+        potentialDesc: "Ofrece hovers dinámicos en el catálogo, transiciones sin parpadeo e interactividad lúdica, disminuyendo la tasa de rebote del usuario final.",
+        files: ["ui/Button.tsx", "ui/Card.tsx", "catalog/ProductGrid.tsx", "reseller/Dashboard.tsx", "video/VideoPlayer.tsx", "video-editor"]
+      },
+      src_remotion: {
+        title: "src/remotion (Generador de Video)",
+        type: "Motor de Renders Dinámicos",
+        desc: "Permite definir composiciones de video dinámicas usando React. Se utiliza para generar publicidad de productos de forma automatizada.",
+        potentialTitle: "Generación de Anuncios a Gran Escala",
+        potentialDesc: "Permite crear videos personalizados automáticos para cada revendedor. Cada afiliado puede tener sus propios clips de sneakers con su logotipo y contacto en segundos.",
+        files: ["Root.tsx", "compositions/", "package.json"]
+      },
+      eter_kinetic: {
+        title: "eter-kinetic-type",
+        type: "Exploración Tipográfica",
+        desc: "Módulo independiente de experimentación visual enfocado en tipografía animada e interactiva (Kinetic Typography).",
+        potentialTitle: "Branding Premium de Generación Z/Alpha",
+        potentialDesc: "Atrae atención inmediata. Ideal para integrarse en la pantalla de bienvenida o en promociones de marcas coleccionables.",
+        files: ["compositions/", "index.html", "meta.json", "package.json"]
+      },
+      eter_vignelli: {
+        title: "eter-vignelli",
+        type: "Tema de Diseño Vignelli",
+        desc: "Variación de maquetación limpia e interactiva basada en los principios de Massimo Vignelli: grillas rigurosas, fuerte contraste y rojo vibrante.",
+        potentialTitle: "Variante de Identidad para Nicho de Lujo",
+        potentialDesc: "Permite a los usuarios amantes del diseño clásico cambiar a una interfaz ultra-limpia y estructurada con un solo interruptor.",
+        files: ["compositions/", "index.html", "package.json"]
+      },
+      eter_warm_grain: {
+        title: "eter-warm-grain",
+        type: "Tema de Diseño Cálido / Retro-Lujo",
+        desc: "Variación de interfaz alternativa inspirada en tonos tierra y texturas analógicas con grano retro.",
+        potentialTitle: "Segmentación Estética para Coleccionables",
+        potentialDesc: "Ideal para colecciones especiales o líneas vintage. Cambia por completo la percepción de exclusividad de la tienda.",
+        files: ["styles/", "index.html", "package.json"]
+      },
+      app_celu: {
+        title: "app celu",
+        type: "Ecosistema Móvil",
+        desc: "Directorio enfocado en empaquetar o proveer la experiencia móvil híbrida o nativa para dispositivos celulares.",
+        potentialTitle: "Fidelización de Revendedores",
+        potentialDesc: "Facilita notificaciones push en tiempo real sobre ventas, drops de productos y stock directo en el celular de los afiliados.",
+        files: ["config.xml", "www/", "assets/"]
+      },
+      supabase: {
+        title: "supabase (Base de Datos)",
+        type: "Configuración Backend & SQL",
+        desc: "Contiene esquemas SQL, políticas RLS de Supabase y scripts para asegurar la integridad y la separación de roles.",
+        potentialTitle: "Seguridad y Multitenancy Segura",
+        potentialDesc: "Garantiza que la base de datos sea segura por diseño, separando los perfiles de administradores, revendedores y clientes de forma nativa.",
+        files: ["migrations/20260207_fix_profiles_rls.sql", "seed.sql", "supabase_schema.sql", "verify_rls_fix.sql"]
+      }
+    };
+
+    // 2. Definición de la estructura del árbol
+    const treeStructure = [
+      { id: "root", name: "eter-store (Raíz)", isFolder: true, children: [
+        { id: "src_app", name: "src/app (Rutas y APIs)", isFolder: true, children: [] },
+        { id: "src_components", name: "src/components (UI)", isFolder: true, children: [] },
+        { id: "src_remotion", name: "src/remotion (Video)", isFolder: true, children: [] },
+        { id: "eter_kinetic", name: "eter-kinetic-type", isFolder: true, children: [] },
+        { id: "eter_vignelli", name: "eter-vignelli", isFolder: true, children: [] },
+        { id: "eter_warm_grain", name: "eter-warm-grain", isFolder: true, children: [] },
+        { id: "app_celu", name: "app celu", isFolder: true, children: [] },
+        { id: "supabase", name: "supabase (Backend)", isFolder: true, children: [] }
+      ]}
+    ];
+
+    // 3. Renderizar el árbol
+    function renderTree(nodes, container) {
+      nodes.forEach(node => {
+        const nodeEl = document.createElement("div");
+        nodeEl.className = "tree-node";
+        
+        const toggleEl = document.createElement("div");
+        toggleEl.className = "tree-toggle";
+        
+        // Icono de carpeta o archivo
+        const icon = node.isFolder ? 
+          `<svg class="icon-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>` : 
+          `<svg class="icon-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
+        
+        toggleEl.innerHTML = `${icon} <span>${node.name}</span>`;
+        toggleEl.onclick = () => selectNode(node.id, toggleEl);
+        
+        nodeEl.appendChild(toggleEl);
+        
+        if (node.children && node.children.length > 0) {
+          const childrenEl = document.createElement("div");
+          childrenEl.className = "tree-children";
+          renderTree(node.children, childrenEl);
+          nodeEl.appendChild(childrenEl);
+          
+          // Comportamiento de despliegue al hacer clic
+          toggleEl.onclick = (e) => {
+            childrenEl.classList.toggle("open");
+            selectNode(node.id, toggleEl);
+          };
+        }
+        
+        container.appendChild(nodeEl);
+      });
+    }
+
+    // 4. Seleccionar un nodo y actualizar la información
+    function selectNode(id, element) {
+      // Activar estilo en sidebar
+      document.querySelectorAll(".tree-toggle").forEach(el => el.classList.remove("active"));
+      element.classList.add("active");
+
+      // Buscar datos
+      const data = projectData[id];
+      if (!data) return;
+
+      // Mostrar panel de detalle
+      const panel = document.getElementById("detail-panel");
+      panel.classList.add("active");
+
+      // Actualizar campos
+      document.getElementById("panel-title").innerText = data.title;
+      document.getElementById("panel-type").innerText = data.type;
+      document.getElementById("panel-desc").innerText = data.desc;
+      document.getElementById("panel-potential-title").innerText = `🚀 ${data.potentialTitle}`;
+      document.getElementById("panel-potential-desc").innerText = data.potentialDesc;
+
+      // Renderizar subarchivos
+      const subfilesContainer = document.getElementById("panel-subfiles");
+      subfilesContainer.innerHTML = "";
+      
+      data.files.forEach(file => {
+        const item = document.createElement("div");
+        item.className = "subfile-item";
+        item.innerHTML = `
+          <svg class="icon-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; color: var(--accent);"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+          <span>${file}</span>
+        `;
+        subfilesContainer.appendChild(item);
+      });
+    }
+
+    // 5. Configurar Temas
+    function setTheme(themeName, btn) {
+      document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      
+      if (themeName === "default") {
+        document.documentElement.removeAttribute("data-theme");
+      } else {
+        document.documentElement.setAttribute("data-theme", themeName);
+      }
+    }
+
+    // Inicializar
+    document.addEventListener("DOMContentLoaded", () => {
+      const container = document.getElementById("tree-container");
+      renderTree(treeStructure, container);
+      
+      // Auto-seleccionar primer elemento (root)
+      const firstToggle = container.querySelector(".tree-toggle");
+      if (firstToggle) {
+        firstToggle.click();
+      }
+    });
+  </script>
+</body>
+</html>

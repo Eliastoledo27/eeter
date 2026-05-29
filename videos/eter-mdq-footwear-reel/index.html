@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ÉTER MDQ - Reel Calzado</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main
+      id="root"
+      data-composition-id="eter-mdq-footwear-reel"
+      data-start="0"
+      data-duration="36"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div class="grain"></div>
+      <div class="scan"></div>
+      <div class="coast-glow"></div>
+      <div class="city-grid"></div>
+
+      <img class="texture texture-a" src="./assets/grafiti-cian.png" alt="" />
+      <img class="texture texture-b" src="./assets/grafiti-verde.png" alt="" />
+      <img class="texture texture-c" src="./assets/grafiti-violeta.png" alt="" />
+      <img class="texture texture-lines" src="./assets/lineas-grafiti-tricolor.png" alt="" />
+
+      <img class="logo-mark" src="./assets/logo.png" alt="ÉTER" />
+      <img class="shoe-main" src="./assets/zapa_cat.png" alt="Zapatilla ÉTER" />
+
+      <section id="hook-la-perla" class="scene scene-hook clip" data-start="0" data-duration="3" data-track-index="1">
+        <div class="location-chip">La Perla · Mar del Plata</div>
+        <h1>MDQ se pisa distinto</h1>
+        <div class="sunrise-line"></div>
+      </section>
+
+      <section id="city-contexts" class="scene scene-contexts clip" data-start="3" data-duration="6" data-track-index="2">
+        <h2>Playa. Ciudad. Noche.</h2>
+        <div class="context-row">
+          <span>Costa</span>
+          <span>Peatonal San Martín</span>
+          <span>Puerto</span>
+        </div>
+      </section>
+
+      <section id="product-detail" class="scene scene-product clip" data-start="9" data-duration="6" data-track-index="3">
+        <div class="detail-card">
+          <div class="detail-shoe"></div>
+        </div>
+        <div class="benefits">
+          <span>Calzado urbano premium</span>
+          <span>Línea brasilera</span>
+          <span>Calidad G5</span>
+        </div>
+      </section>
+
+      <section id="mdq-versatility" class="scene scene-versatility clip" data-start="15" data-duration="7" data-track-index="4">
+        <h2>Un par para cada plan</h2>
+        <div class="plans">
+          <div><strong>Amanecer</strong><span>La Perla</span></div>
+          <div><strong>Paseo</strong><span>San Martín</span></div>
+          <div><strong>Salida</strong><span>Noche MDQ</span></div>
+        </div>
+      </section>
+
+      <section id="commercial-proof" class="scene scene-commerce clip" data-start="22" data-duration="6" data-track-index="5">
+        <div class="commerce-list">
+          <span>Precios por MD</span>
+          <span>Disponibilidad por modelo</span>
+          <span>Promos de temporada</span>
+        </div>
+        <div class="stock-note">Consultá antes de reservar</div>
+      </section>
+
+      <section id="interactive-sticker" class="scene scene-poll clip" data-start="28" data-duration="4" data-track-index="6">
+        <div class="poll">
+          <span class="poll-title">¿Qué modelo te gusta más?</span>
+          <span class="poll-option">Costa</span>
+          <span class="poll-option">Noche</span>
+        </div>
+      </section>
+
+      <section id="final-cta" class="scene scene-final clip" data-start="32" data-duration="4" data-track-index="7">
+        <div class="final-copy">
+          <h2>ÉTER</h2>
+          <p>Deslizá para ver modelos</p>
+          <p>Escribinos al MD y reservá el tuyo</p>
+          <strong>#ZapatillasMDQ</strong>
+        </div>
+      </section>
+
+      <div class="brand-footer">ÉTER · Calzado urbano premium · Mar del Plata</div>
+
+      <script>
+        (() => {
+          const duration = 36;
+          const root = document.getElementById("root");
+          const scenes = [...root.querySelectorAll(".scene")];
+
+          const setTime = (time) => {
+            const t = Math.max(0, Math.min(duration, Number(time) || 0));
+            root.style.setProperty("--t", String(t));
+            root.dataset.scene =
+              t < 3 ? "hook" :
+              t < 9 ? "contexts" :
+              t < 15 ? "product" :
+              t < 22 ? "versatility" :
+              t < 28 ? "commerce" :
+              t < 32 ? "poll" : "final";
+
+            for (const scene of scenes) {
+              const start = Number(scene.dataset.start);
+              const end = start + Number(scene.dataset.duration);
+              const active = t >= start && t < end;
+              scene.classList.toggle("is-active", active);
+              scene.style.setProperty("--local", String(Math.max(0, Math.min(1, (t - start) / (end - start)))));
+            }
+          };
+
+          const timeline = {
+            duration: () => duration,
+            totalDuration: () => duration,
+            seek: setTime,
+            time: setTime,
+            progress: (p) => setTime(p * duration),
+            pause: () => timeline,
+            play: () => timeline,
+            resume: () => timeline,
+            kill: () => undefined,
+            paused: () => true,
+          };
+
+          window.__timelines = window.__timelines || {};
+          window.__timelines["eter-mdq-footwear-reel"] = timeline;
+          setTime(0);
+        })();
+      </script>
+    </main>
+  </body>
+</html>

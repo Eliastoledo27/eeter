@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <rect width="900" height="900" fill="none"/>
+  <circle cx="450" cy="450" r="338" fill="#000" stroke="#39FF14" stroke-width="18"/>
+  <circle cx="450" cy="450" r="285" fill="none" stroke="#A020F0" stroke-width="8" opacity=".85"/>
+  <text x="450" y="490" text-anchor="middle" fill="#39FF14" font-family="Montserrat,Arial,sans-serif" font-size="170" font-weight="900" letter-spacing="8">ETER</text>
+  <text x="450" y="585" text-anchor="middle" fill="#fff" font-family="Inter,Arial,sans-serif" font-size="34" font-weight="800" letter-spacing="10">MAR DEL PLATA</text>
+</svg>

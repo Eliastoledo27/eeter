@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=2160, height=3840" />
+    <title>Premium Footwear Ad 60 - HyperFrames</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main
+      id="root"
+      data-composition-id="premium-footwear-ad60-hf"
+      data-start="0"
+      data-duration="60"
+      data-width="2160"
+      data-height="3840"
+    >
+      <audio id="bed" data-start="0" data-duration="60" data-track-index="40" src="../public/assets/audio/premium-bed.wav" data-volume="0.42"></audio>
+      <audio id="voice" data-start="0" data-duration="60" data-track-index="41" src="../public/assets/audio/voiceover.wav" data-volume="0.95"></audio>
+
+      <div class="grain" data-layout-ignore></div>
+      <div class="rim rim-a" data-layout-ignore></div>
+      <div class="rim rim-b" data-layout-ignore></div>
+      <div class="floor-light" data-layout-ignore></div>
+
+      <section id="opening" class="scene scene-opening clip" data-start="0" data-duration="5" data-track-index="1">
+        <div class="scene-content center">
+          <div class="brand-chip">ATELIER STEP</div>
+          <img class="product product-large" src="../public/assets/products/urban-sneaker.svg" alt="" data-layout-ignore />
+          <p class="eyebrow">NUEVA SELECCION</p>
+          <h1>TU ESTILO. TU RITMO. TU ELECCION.</h1>
+          <p class="subline">CALZADO PARA CADA ESTILO</p>
+        </div>
+      </section>
+
+      <section id="urban" class="scene clip" data-start="5" data-duration="10" data-track-index="2">
+        <div class="scene-content category">
+          <div class="copy">
+            <p class="eyebrow">URBANAS</p>
+            <h2>Comodidad diaria</h2>
+            <p>Diseno con presencia</p>
+          </div>
+          <img class="product" src="../public/assets/products/urban-sneaker.svg" alt="" />
+        </div>
+      </section>
+
+      <section id="formal" class="scene clip warm" data-start="15" data-duration="10" data-track-index="3">
+        <div class="scene-content category">
+          <div class="copy">
+            <p class="eyebrow">FORMAL</p>
+            <h2>Elegancia sin esfuerzo</h2>
+            <p>Detalles que elevan</p>
+          </div>
+          <img class="product" src="../public/assets/products/formal-shoe.svg" alt="" />
+        </div>
+      </section>
+
+      <section id="casual" class="scene clip calm" data-start="25" data-duration="10" data-track-index="4">
+        <div class="scene-content category">
+          <div class="copy">
+            <p class="eyebrow">CASUAL</p>
+            <h2>Versatil para todos los dias</h2>
+            <p>Liviano, simple, combinable</p>
+          </div>
+          <img class="product" src="../public/assets/products/casual-slip.svg" alt="" />
+        </div>
+      </section>
+
+      <section id="boots" class="scene clip strong" data-start="35" data-duration="10" data-track-index="5">
+        <div class="scene-content category">
+          <div class="copy">
+            <p class="eyebrow">BOTAS</p>
+            <h2>Caracter y resistencia</h2>
+            <p>Preparadas para destacar</p>
+          </div>
+          <img class="product" src="../public/assets/products/premium-boot.svg" alt="" />
+        </div>
+      </section>
+
+      <section id="cta" class="scene clip" data-start="45" data-duration="10" data-track-index="6">
+        <div class="scene-content cta">
+          <div class="catalog-grid">
+            <img src="../public/assets/products/urban-sneaker.svg" alt="" />
+            <img src="../public/assets/products/formal-shoe.svg" alt="" />
+            <img src="../public/assets/products/casual-slip.svg" alt="" />
+            <img src="../public/assets/products/premium-boot.svg" alt="" />
+          </div>
+          <h2>ELEGI TU PAR</h2>
+          <p>CONSULTA DISPONIBILIDAD</p>
+          <p>MODELOS PARA CADA OCASION</p>
+        </div>
+      </section>
+
+      <section id="closing" class="scene clip" data-start="55" data-duration="5" data-track-index="7">
+        <div class="scene-content center closing">
+          <img class="logo" src="../public/assets/logos/atelier-step.svg" alt="" />
+          <h2>ATELIER STEP</h2>
+          <p>CALZADO PREMIUM PARA CADA ESTILO</p>
+          <strong>CONSULTA HOY</strong>
+        </div>
+      </section>
+
+      <div id="wipe-opening-urban" class="wipe wipe-1 clip" data-start="4.6" data-duration="0.55" data-track-index="20" data-layout-ignore></div>
+      <div id="wipe-urban-formal" class="wipe wipe-2 clip" data-start="14.6" data-duration="0.55" data-track-index="20" data-layout-ignore></div>
+      <div id="wipe-formal-casual" class="wipe wipe-3 clip" data-start="24.6" data-duration="0.55" data-track-index="20" data-layout-ignore></div>
+      <div id="wipe-casual-boots" class="wipe wipe-4 clip" data-start="34.6" data-duration="0.55" data-track-index="20" data-layout-ignore></div>
+      <div id="wipe-boots-cta" class="wipe wipe-5 clip" data-start="44.6" data-duration="0.55" data-track-index="20" data-layout-ignore></div>
+      <div id="wipe-cta-closing" class="wipe wipe-6 clip" data-start="54.6" data-duration="0.55" data-track-index="20" data-layout-ignore></div>
+    </main>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      const enter = (selector, vars, at) => tl.from(selector, { duration: 0.72, ease: "expo.out", ...vars }, at);
+
+      tl.to(".rim-a", { x: 220, duration: 60, ease: "none" }, 0);
+      tl.to(".rim-b", { x: -180, duration: 60, ease: "none" }, 0);
+
+      enter("#opening .brand-chip", { opacity: 0, y: -40, scale: 0.92 }, 0.18);
+      enter("#opening .product-large", { opacity: 0, scale: 1.3, rotation: -8, y: 140 }, 0.24);
+      enter("#opening .eyebrow", { opacity: 0, y: 42 }, 0.75);
+      enter("#opening h1", { opacity: 0, y: 76, scale: 0.96 }, 0.94);
+      enter("#opening .subline", { opacity: 0, y: 50 }, 1.18);
+
+      ["urban", "formal", "casual", "boots"].forEach((id, index) => {
+        const at = 5 + index * 10 + 0.16;
+        enter(`#${id} .eyebrow`, { opacity: 0, x: -80 }, at);
+        enter(`#${id} h2`, { opacity: 0, y: 82, scale: 0.95 }, at + 0.18);
+        enter(`#${id} .copy p:last-child`, { opacity: 0, y: 54 }, at + 0.42);
+        enter(`#${id} .product`, { opacity: 0, x: 120, rotation: index % 2 ? 5 : -5, scale: 0.88 }, at + 0.2);
+      });
+
+      enter("#cta .catalog-grid img", { opacity: 0, y: 80, scale: 0.86, stagger: 0.12 }, 45.18);
+      enter("#cta h2", { opacity: 0, y: 80, scale: 0.95 }, 46.05);
+      enter("#cta p", { opacity: 0, y: 44, stagger: 0.16 }, 46.36);
+
+      enter("#closing .logo", { opacity: 0, scale: 0.72, rotation: -4 }, 55.14);
+      enter("#closing h2", { opacity: 0, y: 70 }, 55.42);
+      enter("#closing p", { opacity: 0, y: 44 }, 55.74);
+      enter("#closing strong", { opacity: 0, y: 38 }, 56.04);
+      tl.to("#closing .scene-content", { opacity: 0, scale: 0.98, duration: 0.75, ease: "power2.in" }, 59.12);
+
+      [1, 2, 3, 4, 5, 6].forEach((n, i) => {
+        const at = [4.6, 14.6, 24.6, 34.6, 44.6, 54.6][i];
+        tl.fromTo(`.wipe-${n}`, { scaleY: 0, transformOrigin: "50% 0%" }, { scaleY: 1, duration: 0.26, ease: "power4.in" }, at);
+        tl.to(`.wipe-${n}`, { scaleY: 0, transformOrigin: "50% 100%", duration: 0.26, ease: "power4.out" }, at + 0.27);
+      });
+
+      window.__timelines["premium-footwear-ad60-hf"] = tl;
+    </script>
+  </body>
+</html>

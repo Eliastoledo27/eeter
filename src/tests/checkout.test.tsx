@@ -1,15 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { OneStepCheckout } from '../components/checkout/OneStepCheckout';
 import '@testing-library/jest-dom';
+import { describe, it, expect, vi } from 'vitest';
 
 // Mock the Zustand store
-jest.mock('../store/cart-store', () => ({
+vi.mock('../store/cart-store', () => ({
     useCartStore: () => ({
         items: [],
         getTotal: () => 10000,
         getSubtotal: () => 10000,
         appliedCoupon: null,
-        clearCart: jest.fn()
+        clearCart: vi.fn()
     })
 }));
 

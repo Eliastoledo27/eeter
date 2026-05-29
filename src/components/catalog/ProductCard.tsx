@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { cartNotify } from '@/components/cart/CartNotificationSystem';
 
 interface ProductCardProps {
     product: Product;
@@ -37,6 +38,7 @@ export function ProductCard({ product, href, index = 0, onProductClick }: Produc
     // Memoized size processing for performance
     const availableSizes = useMemo(() => {
         return Object.entries(product.stockBySize || {})
+            .filter(([, stock]) => Number(stock || 0) > 0)
             .sort(([a], [b]) => {
                 const numA = parseInt(a);
                 const numB = parseInt(b);
@@ -72,19 +74,12 @@ export function ProductCard({ product, href, index = 0, onProductClick }: Produc
             addItem(product, selectedSize, 1);
             setIsAdding(false);
             
-            toast.success('PROTOCOLO COMPLETADO', {
-                description: `${product.name} (Talle ${selectedSize}) añadido al clúster.`,
-                icon: <CheckCircle2 className="text-[#00E5FF]" size={16} />,
-                action: {
-                    label: 'VER CARRITO',
-                    onClick: () => toggleCart()
-                },
-                style: { 
-                    background: '#050505', 
-                    color: '#fff',
-                    border: '1px solid rgba(0, 229, 255, 0.2)',
-                    borderRadius: '1.25rem'
-                }
+            // Cart notification system
+            cartNotify({
+                type: 'added',
+                title: 'Producto agregado',
+                productName: `${product.name} — Talle ${selectedSize}`,
+                productImage: product.images?.[0],
             });
         }, 800);
     };
@@ -98,7 +93,7 @@ export function ProductCard({ product, href, index = 0, onProductClick }: Produc
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: index * 0.05, ease: [0.23, 1, 0.32, 1] }}
             style={{ willChange: 'transform' }}
-            className="group relative flex flex-col h-full overflow-hidden rounded-[2.5rem] border border-white/5 bg-[#050505] p-3 transition-all duration-700 hover:border-[#00E5FF]/30"
+            className="group relative flex flex-col h-full overflow-hidden rounded-[1.75rem] md:rounded-[2.5rem] border border-white/5 bg-[#050505] p-2.5 md:p-3 transition-all duration-700 hover:border-[#00E5FF]/30"
         >
             {/* Glassmorphism Background Effects */}
             <div className="absolute inset-0 z-0 bg-gradient-to-b from-white/[0.03] to-transparent opacity-50 pointer-events-none" />
@@ -106,7 +101,7 @@ export function ProductCard({ product, href, index = 0, onProductClick }: Produc
             <div className="texture-grain absolute inset-0 opacity-10 pointer-events-none" />
             
             {/* Media Content Wrapper */}
-            <div className="relative z-10 w-full mb-6 aspect-[4/5] overflow-hidden rounded-[2rem] bg-[#0A0A0A] border border-white/[0.03]">
+            <div className="relative z-10 w-full mb-3 md:mb-6 aspect-[4/5] overflow-hidden rounded-[1.25rem] md:rounded-[2rem] bg-[#0A0A0A] border border-white/[0.03]">
                 {/* Tactical Status Badges */}
                 <div className="absolute left-4 top-4 z-30 flex flex-col gap-2">
                     <AnimatePresence>
@@ -167,26 +162,26 @@ export function ProductCard({ product, href, index = 0, onProductClick }: Produc
             </div>
 
             {/* Product Structural Data */}
-            <div className="relative z-10 flex flex-col flex-1 px-3 pb-2">
-                <div className="mb-6">
-                    <div className="flex items-center justify-between mb-1">
+            <div className="relative z-10 flex flex-col flex-1 px-1 pb-1 md:px-3 md:pb-2">
+                <div className="mb-3 md:mb-6">
+                    <div className="flex items-center justify-between mb-0.5 md:mb-1">
                         <div className="flex items-center gap-2">
                             <Box size={10} className="text-white/20" />
-                            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
+                            <p className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
                                 {product.brand || 'ÉTER ORIGINAL'}
                             </p>
                         </div>
                         <div className="h-1.5 w-1.5 rounded-full bg-white/10" />
                     </div>
-                    <h3 className="text-xl font-black uppercase tracking-tight text-white italic group-hover:text-[#00E5FF] transition-colors duration-500 leading-tight">
+                    <h3 className="text-xs md:text-xl font-black uppercase tracking-tight text-white italic group-hover:text-[#00E5FF] transition-colors duration-500 leading-tight">
                         {product.name}
                     </h3>
                 </div>
 
                 {/* Tactical Size Selection Matrix */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-between mb-4 px-1">
-                        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/30">
+                <div className="mb-4 md:mb-8">
+                    <div className="flex items-center justify-between mb-2 md:mb-4 px-1 min-h-[16px]">
+                        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/30 hidden md:block">
                             Matriz de Talles
                         </span>
                         <AnimatePresence mode="wait">
@@ -206,53 +201,59 @@ export function ProductCard({ product, href, index = 0, onProductClick }: Produc
                         </AnimatePresence>
                     </div>
                     
-                    <div className="grid grid-cols-5 gap-2">
-                        {availableSizes.map(([size, stock]) => {
-                            const status = getStockStatus(size);
-                            const isSelected = selectedSize === size;
-                            
-                            return (
-                                <button
-                                    key={size}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        if (status !== 'out') setSelectedSize(isSelected ? null : size);
-                                    }}
-                                    disabled={status === 'out'}
-                                    className={cn(
-                                        "relative aspect-square flex items-center justify-center rounded-xl border text-[10px] font-black transition-all duration-300",
-                                        status === 'out'
-                                            ? 'opacity-10 cursor-not-allowed border-white/5 grayscale'
-                                            : isSelected
-                                            ? 'bg-white text-black border-white shadow-[0_0_25px_rgba(255,255,255,0.3)] scale-110 z-20'
-                                            : 'bg-white/[0.02] border-white/5 text-white/40 hover:border-[#00E5FF]/40 hover:text-[#00E5FF] group/size'
-                                    )}
-                                >
-                                    {size}
-                                    {status === 'critical' && !isSelected && (
-                                        <div className="absolute top-1 right-1 h-1 w-1 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)]" />
-                                    )}
-                                    {isSelected && (
-                                        <motion.div 
-                                            layoutId={`active-size-${product.id}`}
-                                            className="absolute inset-0 bg-[#00E5FF]/10 mix-blend-overlay pointer-events-none rounded-xl"
-                                        />
-                                    )}
-                                </button>
-                            );
-                        })}
+                    <div className="flex flex-wrap gap-1 md:grid md:grid-cols-5 md:gap-2">
+                        {availableSizes.length > 0 ? (
+                            availableSizes.map(([size, stock]) => {
+                                const status = getStockStatus(size);
+                                const isSelected = selectedSize === size;
+                                
+                                return (
+                                    <button
+                                        key={size}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            if (status !== 'out') setSelectedSize(isSelected ? null : size);
+                                        }}
+                                        disabled={status === 'out'}
+                                        className={cn(
+                                            "relative flex items-center justify-center rounded-lg md:rounded-xl border text-[9px] md:text-[10px] font-black transition-all duration-300 h-7 w-7 md:h-auto md:aspect-square",
+                                            status === 'out'
+                                                ? 'opacity-10 cursor-not-allowed border-white/5 grayscale'
+                                                : isSelected
+                                                ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.3)] scale-105 z-20'
+                                                : 'bg-white/[0.02] border-white/5 text-white/40 hover:border-[#00E5FF]/40 hover:text-[#00E5FF] group/size'
+                                        )}
+                                    >
+                                        {size}
+                                        {status === 'critical' && !isSelected && (
+                                            <div className="absolute top-1 right-1 h-1 w-1 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)]" />
+                                        )}
+                                        {isSelected && (
+                                            <motion.div 
+                                                layoutId={`active-size-${product.id}`}
+                                                className="absolute inset-0 bg-[#00E5FF]/10 mix-blend-overlay pointer-events-none rounded-xl"
+                                            />
+                                        )}
+                                    </button>
+                                );
+                            })
+                        ) : (
+                            <span className="text-[10px] font-black uppercase tracking-widest text-red-500/80 px-1 py-1.5">
+                                Agotado / Sin stock
+                            </span>
+                        )}
                     </div>
                 </div>
                 
                 {/* Pricing & Deployment Hub */}
-                <div className="mt-auto pt-6 flex items-center justify-between border-t border-white/5">
+                <div className="mt-auto pt-3 md:pt-6 flex items-center justify-between border-t border-white/5">
                     <div className="flex flex-col">
-                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 mb-1">
+                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 mb-1 hidden md:block">
                             Valuación
                         </span>
-                        <div className="flex items-baseline gap-1.5">
-                            <span className="text-sm font-black text-[#00E5FF]">$</span>
-                            <span className="text-2xl font-black tracking-tighter text-white italic">
+                        <div className="flex items-baseline gap-0.5 md:gap-1.5">
+                            <span className="text-xs md:text-sm font-black text-[#00E5FF]">$</span>
+                            <span className="text-lg md:text-2xl font-black tracking-tighter text-white italic">
                                 {product.basePrice.toLocaleString('es-AR')}
                             </span>
                         </div>
@@ -264,7 +265,7 @@ export function ProductCard({ product, href, index = 0, onProductClick }: Produc
                         onClick={handleAddToCart}
                         disabled={!selectedSize || isAdding}
                         className={cn(
-                            "relative flex h-14 w-14 items-center justify-center rounded-[1.25rem] transition-all duration-500 overflow-hidden",
+                            "relative flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-xl md:rounded-[1.25rem] transition-all duration-500 overflow-hidden shrink-0",
                             selectedSize 
                                 ? "bg-[#00E5FF] text-black shadow-[0_0_40px_rgba(0,229,255,0.25)]" 
                                 : "bg-white/[0.03] text-white/10 border border-white/5 grayscale"
@@ -278,7 +279,7 @@ export function ProductCard({ product, href, index = 0, onProductClick }: Produc
                                     initial={{ opacity: 0, rotate: -180 }}
                                     animate={{ opacity: 1, rotate: 0 }}
                                     exit={{ opacity: 0, rotate: 180 }}
-                                    className="h-5 w-5 border-2 border-black/30 border-t-black rounded-full animate-spin"
+                                    className="h-4 w-4 md:h-5 md:w-5 border-2 border-black/30 border-t-black rounded-full animate-spin"
                                 />
                             ) : (
                                 <motion.div
@@ -287,7 +288,7 @@ export function ProductCard({ product, href, index = 0, onProductClick }: Produc
                                     animate={{ opacity: 1, scale: 1 }}
                                     className="flex items-center justify-center"
                                 >
-                                    <ShoppingCart size={22} strokeWidth={2.5} />
+                                    <ShoppingCart className="h-4 w-4 md:h-[22px] md:w-[22px]" strokeWidth={2.5} />
                                 </motion.div>
                             )}
                         </AnimatePresence>

@@ -20,6 +20,7 @@ function SuccessContent() {
   const markPurchased = useAuraStore((state) => state.markPurchased);
   const profile = useAuraStore((state) => state.profile);
   const [showConfetti, setShowConfetti] = useState(false);
+  const isPending = status === 'pending';
 
   useEffect(() => {
     setShowConfetti(true);
@@ -40,8 +41,6 @@ function SuccessContent() {
       });
     }
   }, [isPending, lastOrder, markPurchased, profile?.budget, profile?.occasion, profile?.style]);
-
-  const isPending = status === 'pending';
 
   const generateWhatsAppTicket = () => {
     if (!lastOrder) return '';

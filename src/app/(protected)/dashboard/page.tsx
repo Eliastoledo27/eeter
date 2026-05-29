@@ -1,21 +1,30 @@
-'use client';
+import { Metadata } from 'next';
+import DashboardPageClient from './DashboardPageClient';
 
-import { Suspense } from 'react';
-import { Loader2 } from 'lucide-react';
-import { DashboardWelcome } from '@/components/dashboard/DashboardWelcome';
-
-function DashboardContent() {
-    return (
-        <div className="animate-in fade-in duration-700 pb-20">
-            <DashboardWelcome />
-        </div>
-    );
-}
+export const metadata: Metadata = {
+    title: 'Dashboard de Revendedor | ÉTER Store',
+    description: 'Gestioná tus pedidos, márgenes de ganancia y material de marketing. La central operativa para hacer crecer tu negocio de reventa de zapatillas premium.',
+    openGraph: {
+        title: 'Dashboard de Revendedor | ÉTER Store',
+        description: 'Gestioná tus pedidos, márgenes de ganancia y material de marketing. La central operativa para hacer crecer tu negocio de reventa.',
+        url: 'https://xn--ter-9la.store/dashboard',
+        images: [
+            {
+                url: '/dashboard-og.jpg',
+                width: 1200,
+                height: 630,
+                alt: 'Dashboard de Revendedor Éter Store',
+            }
+        ],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Dashboard de Revendedor | ÉTER Store',
+        description: 'Gestioná tus pedidos, márgenes de ganancia y material de marketing.',
+        images: ['/dashboard-og.jpg'],
+    }
+};
 
 export default function DashboardPage() {
-    return (
-        <Suspense fallback={<div className="p-8"><Loader2 className="w-8 h-8 animate-spin text-cyan-500 mx-auto" /></div>}>
-            <DashboardContent />
-        </Suspense>
-    );
+    return <DashboardPageClient />;
 }

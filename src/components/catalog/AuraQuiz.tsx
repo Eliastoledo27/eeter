@@ -153,14 +153,14 @@ export function AuraQuiz({ onComplete }: { onComplete?: () => void }) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-3xl p-4 md:p-8"
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-[40px] p-4 md:p-8"
                 >
                     <button
                         onClick={() => {
                             closeQuiz()
                             if (onComplete) onComplete()
                         }}
-                        className="absolute top-6 right-6 z-[110] text-white/30 hover:text-[#00E5FF] transition-all hover:rotate-90 duration-300"
+                        className="absolute top-6 right-6 z-[110] text-white/20 hover:text-[#00E5FF] transition-all hover:rotate-90 duration-300 hover:scale-110"
                     >
                         <X size={28} />
                     </button>
@@ -170,7 +170,7 @@ export function AuraQuiz({ onComplete }: { onComplete?: () => void }) {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: -30 }}
                         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                        className="relative w-full max-w-3xl rounded-[2.5rem] border border-white/5 bg-black/40 p-8 md:p-14 shadow-2xl overflow-hidden glassmorphism"
+                        className="relative w-full max-w-3xl rounded-[2.5rem] border border-white/10 bg-black/50 p-8 md:p-14 shadow-[0_0_50px_rgba(0,229,255,0.12)] overflow-hidden glassmorphism"
                     >
                         {/* Animated background energy */}
                         <div className="absolute -top-1/4 -right-1/4 w-[500px] h-[500px] bg-[#00E5FF]/10 blur-[100px] rounded-full animate-pulse" />
@@ -183,13 +183,13 @@ export function AuraQuiz({ onComplete }: { onComplete?: () => void }) {
                                     animate={{ opacity: 1 }}
                                     className="flex flex-col items-center justify-center py-20 text-center"
                                 >
-                                    <div className="relative mb-10 h-24 w-24">
+                                    <div className="relative mb-10 h-20 w-20">
                                         <motion.div 
                                             animate={{ rotate: 360 }}
-                                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                            className="absolute inset-0 rounded-full border-t-2 border-r-2 border-[#00E5FF]" 
+                                            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                            className="absolute inset-0 rounded-full border-2 border-white/5 border-t-2 border-t-[#00E5FF] border-r-2 border-r-[#C6FF00]" 
                                         />
-                                        <Sparkles className="absolute inset-0 m-auto h-10 w-10 text-[#00E5FF]" />
+                                        <Sparkles className="absolute inset-0 m-auto h-8 w-8 text-[#00E5FF] animate-pulse" />
                                     </div>
                                     <h2 className="text-3xl font-black uppercase tracking-tight text-white">Sincronizando Aura</h2>
                                     <p className="mt-4 text-xs font-black uppercase tracking-[0.2em] text-white/40">Calibrando algoritmos de recomendación...</p>
@@ -244,8 +244,8 @@ export function AuraQuiz({ onComplete }: { onComplete?: () => void }) {
                                                             onClick={() => handleOptionSelect(option.value)}
                                                             className={`group relative flex items-center gap-4 rounded-3xl border px-6 py-5 text-left transition-all duration-300 ${
                                                                 isSelected
-                                                                    ? 'bg-[#00E5FF] border-[#00E5FF] text-black shadow-[0_0_40px_rgba(0,229,255,0.2)]'
-                                                                    : 'bg-white/5 border-white/5 text-white/50 hover:bg-white/10 hover:border-white/20'
+                                                                    ? 'bg-[#00E5FF] border-[#00E5FF] text-black shadow-[0_0_30px_rgba(0,229,255,0.25)]'
+                                                                    : 'bg-white/[0.03] border-white/10 text-white/50 hover:text-white hover:border-[#00E5FF] hover:bg-[#00E5FF]/5 hover:shadow-[0_0_20px_rgba(0,229,255,0.1)]'
                                                             }`}
                                                         >
                                                             {option.icon && (

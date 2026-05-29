@@ -1,0 +1,4 @@
+﻿interface:
+  display_name: "Eter Editor Expert"
+  short_description: "Edita Eter con contexto experto"
+  default_prompt: "Usa @eter para editar, auditar o extender el proyecto Eter con contexto real del repo."

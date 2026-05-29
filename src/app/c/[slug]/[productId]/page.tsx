@@ -5,7 +5,6 @@ import { ResellerNavbar } from '@/components/layout/reseller/ResellerNavbar';
 import { ResellerFooter } from '@/components/layout/reseller/ResellerFooter';
 import { ProductGallery } from '@/components/product/ProductGallery';
 import { ProductInfo } from '@/components/product/ProductInfo';
-import { FloatingCartButton } from '@/components/cart/FloatingCartButton';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Shield, Package, Truck } from 'lucide-react';
 import Link from 'next/link';
@@ -117,8 +116,6 @@ export default async function ResellerProductDetailPage({
                     </div>
                 </div>
             </section>
-
-            <FloatingCartButton />
             <ResellerFooter
                 resellerSlug={params.slug}
                 resellerName={reseller.full_name || ''}

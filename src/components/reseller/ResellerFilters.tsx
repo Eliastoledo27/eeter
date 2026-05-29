@@ -1,17 +1,22 @@
 'use client';
 
-import { Search, SlidersHorizontal, Ruler, X, ChevronDown, Check } from 'lucide-react';
+import { Check, ChevronDown, Ruler, Search, SlidersHorizontal, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface Props {
-    search: string; setSearch: (v: string) => void;
-    category: string; setCategory: (v: string) => void;
+    search: string;
+    setSearch: (value: string) => void;
+    category: string;
+    setCategory: (value: string) => void;
     categories: string[];
-    stockFilter: 'all' | 'available' | 'low'; setStockFilter: (v: 'all' | 'available' | 'low') => void;
-    sortBy: 'name' | 'price_asc' | 'price_desc' | 'stock'; setSortBy: (v: 'name' | 'price_asc' | 'price_desc' | 'stock') => void;
-    sizeFilter: string; setSizeFilter: (v: string) => void;
+    stockFilter: 'all' | 'available' | 'low';
+    setStockFilter: (value: 'all' | 'available' | 'low') => void;
+    sortBy: 'name' | 'price_asc' | 'price_desc' | 'stock';
+    setSortBy: (value: 'name' | 'price_asc' | 'price_desc' | 'stock') => void;
+    sizeFilter: string;
+    setSizeFilter: (value: string) => void;
     allSizes: string[];
     sizeStockMap: Record<string, number>;
     resultCount: number;
@@ -20,7 +25,8 @@ interface Props {
 function naturalSizeSort(a: string, b: string): number {
     const numA = parseFloat(a);
     const numB = parseFloat(b);
-    if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+    if (!Number.isNaN(numA) && !Number.isNaN(numB)) return numA - numB;
+
     const letterOrder = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', '2XL', '3XL'];
     const idxA = letterOrder.indexOf(a.toUpperCase());
     const idxB = letterOrder.indexOf(b.toUpperCase());
@@ -31,30 +37,34 @@ function naturalSizeSort(a: string, b: string): number {
 }
 
 export function ResellerFilters({
-    search, setSearch,
-    category, setCategory,
+    search,
+    setSearch,
+    category,
+    setCategory,
     categories,
-    stockFilter, setStockFilter,
-    sortBy, setSortBy,
-    sizeFilter, setSizeFilter,
+    stockFilter,
+    setStockFilter,
+    sortBy,
+    setSortBy,
+    sizeFilter,
+    setSizeFilter,
     allSizes,
     sizeStockMap,
-    resultCount
+    resultCount,
 }: Props) {
     const [showAllFilters, setShowAllFilters] = useState(false);
     const [showSortDropdown, setShowSortDropdown] = useState(false);
     const sortRef = useRef<HTMLDivElement>(null);
     const sortedSizes = [...allSizes].sort(naturalSizeSort);
 
-    // Close sort dropdown when clicking outside
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
                 setShowSortDropdown(false);
             }
         }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     const activeFilterCount = [
@@ -73,84 +83,82 @@ export function ResellerFilters({
 
     const sortOptions = [
         { id: 'name', label: 'A-Z' },
-        { id: 'price_asc', label: 'Menor Precio' },
-        { id: 'price_desc', label: 'Mayor Precio' },
-        { id: 'stock', label: 'Mayor Stock' },
+        { id: 'price_asc', label: 'Menor precio' },
+        { id: 'price_desc', label: 'Mayor precio' },
+        { id: 'stock', label: 'Mayor stock' },
     ] as const;
 
-    const currentSortLabel = sortOptions.find(o => o.id === sortBy)?.label || 'Ordenar';
+    const currentSortLabel = sortOptions.find((option) => option.id === sortBy)?.label || 'Ordenar';
+    const uniqueCategories = ['Todos', ...categories].filter((value, index, array) => array.indexOf(value) === index);
 
     return (
-        <div className="sticky top-0 z-40 -mx-5 md:-mx-10 px-5 md:px-10 bg-[#0a0a0a]/90 backdrop-blur-2xl border-b border-white/[0.06]">
-
-            {/* ═══════ ROW 1: Search + Quick Actions ═══════ */}
-            <div className="flex items-center gap-3 pt-5 pb-3">
-                {/* Search */}
-                <div className="relative flex-1">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" size={16} />
+        <div className="sticky top-0 z-40 -mx-3 max-w-[100vw] overflow-x-hidden rounded-b-[1.15rem] border-b border-white/[0.06] bg-[#070707]/[0.97] px-3 shadow-[0_18px_45px_rgba(0,0,0,0.34)] backdrop-blur-2xl sm:-mx-5 sm:px-5 md:-mx-10 md:max-w-none md:px-10">
+            <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_42px_56px] items-center gap-1.5 pb-2.5 pt-2.5 sm:flex sm:gap-3 sm:pt-5">
+                <div className="relative min-w-0 flex-1">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/25 sm:left-4" size={15} />
                     <input
-                        value={search} onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Buscar modelo, marca o categoría..."
-                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl py-3 pl-11 pr-10 text-[13px] font-medium text-white outline-none focus:border-[#00E5FF]/40 focus:bg-white/[0.06] transition-all duration-300 placeholder:text-white/20"
+                        value={search}
+                        onChange={(event) => setSearch(event.target.value)}
+                        placeholder="Buscar modelo, marca o categoria..."
+                        className="h-10 w-full rounded-xl border border-white/[0.06] bg-white/[0.04] pl-9 pr-8 text-[11px] font-bold text-white outline-none transition-all duration-300 placeholder:text-white/25 focus:border-[#00E5FF]/40 focus:bg-white/[0.06] min-[380px]:text-[12px] sm:h-12 sm:pl-11 sm:text-[13px]"
                     />
                     {search && (
-                        <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/60 transition-colors">
+                        <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25 transition-colors hover:text-white/70">
                             <X size={14} />
                         </button>
                     )}
                 </div>
 
-                {/* Toggle extra filters */}
                 <button
-                    onClick={() => setShowAllFilters(v => !v)}
+                    onClick={() => setShowAllFilters((value) => !value)}
                     className={cn(
-                        "relative flex items-center gap-2 px-4 py-3 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all duration-300 shrink-0",
+                        'relative flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border px-3 text-[10px] font-black uppercase tracking-widest transition-all duration-300 sm:h-12 sm:px-4',
                         showAllFilters
-                            ? "bg-[#00E5FF]/10 border-[#00E5FF]/30 text-[#00E5FF]"
-                            : "bg-white/[0.04] border-white/[0.06] text-white/40 hover:border-white/15 hover:text-white/60"
+                            ? 'border-[#00E5FF]/30 bg-[#00E5FF]/10 text-[#00E5FF]'
+                            : 'border-white/[0.06] bg-white/[0.04] text-white/45 hover:border-white/15 hover:text-white/65'
                     )}
                 >
                     <SlidersHorizontal size={14} />
                     <span className="hidden sm:inline">Filtros</span>
                     {activeFilterCount > 0 && (
-                        <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#00E5FF] text-black rounded-full text-[8px] font-black flex items-center justify-center shadow-[0_0_8px_#00E5FF]">
+                        <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#00E5FF] text-[8px] font-black text-black shadow-[0_0_8px_#00E5FF]">
                             {activeFilterCount}
                         </span>
                     )}
                 </button>
 
-                {/* Custom Sort Dropdown */}
                 <div className="relative shrink-0" ref={sortRef}>
-                    <button 
+                    <button
                         onClick={() => setShowSortDropdown(!showSortDropdown)}
-                        className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/40 outline-none hover:border-white/15 transition-all"
+                        className="flex h-10 w-full min-w-0 items-center justify-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.04] px-2 text-[9px] font-black uppercase tracking-[0.08em] text-white/50 outline-none transition-all hover:border-white/15 sm:h-12 sm:w-auto sm:justify-start sm:gap-2 sm:px-4 sm:text-[10px] sm:tracking-widest"
                     >
-                        <span>{currentSortLabel}</span>
-                        <ChevronDown size={12} className={cn("text-white/20 transition-transform duration-300", showSortDropdown && "rotate-180")} />
+                        <span className="max-w-[34px] truncate sm:max-w-none">{currentSortLabel}</span>
+                        <ChevronDown size={12} className={cn('text-white/25 transition-transform duration-300', showSortDropdown && 'rotate-180')} />
                     </button>
 
                     <AnimatePresence>
                         {showSortDropdown && (
-                            <motion.div 
+                            <motion.div
                                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                                className="absolute right-0 top-full mt-2 w-48 bg-[#121212] border border-white/[0.08] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden p-1.5 backdrop-blur-xl z-50"
+                                className="absolute right-0 top-full z-50 mt-2 w-48 max-w-[calc(100vw-24px)] overflow-hidden rounded-xl border border-white/[0.08] bg-[#121212] p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl"
                             >
-                                {sortOptions.map(opt => (
-                                    <button 
-                                        key={opt.id}
-                                        onClick={() => { setSortBy(opt.id); setShowSortDropdown(false); }}
+                                {sortOptions.map((option) => (
+                                    <button
+                                        key={option.id}
+                                        onClick={() => {
+                                            setSortBy(option.id);
+                                            setShowSortDropdown(false);
+                                        }}
                                         className={cn(
-                                            "w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                                            sortBy === opt.id 
-                                                ? "bg-[#00E5FF]/10 text-[#00E5FF]" 
-                                                : "text-white/40 hover:bg-white/[0.04] hover:text-white"
+                                            'flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all',
+                                            sortBy === option.id ? 'bg-[#00E5FF]/10 text-[#00E5FF]' : 'text-white/45 hover:bg-white/[0.04] hover:text-white'
                                         )}
                                     >
-                                        {opt.label}
-                                        {sortBy === opt.id && <Check size={12} />}
+                                        {option.label}
+                                        {sortBy === option.id && <Check size={12} />}
                                     </button>
                                 ))}
                             </motion.div>
@@ -158,44 +166,39 @@ export function ResellerFilters({
                     </AnimatePresence>
                 </div>
 
-                {/* Result Count */}
-                <div className="hidden lg:flex items-center gap-2 text-white/20 shrink-0">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] shadow-[0_0_6px_#00E5FF]" />
+                <div className="hidden shrink-0 items-center gap-2 text-white/25 lg:flex">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#00E5FF] shadow-[0_0_6px_#00E5FF]" />
                     <span className="text-[10px] font-black uppercase tracking-widest">{resultCount}</span>
                 </div>
             </div>
 
-            {/* ═══════ ROW 2: SIZE SELECTOR ═══════ */}
-            <div className="pb-4">
-                <div className="flex items-center gap-3 mb-2.5">
-                    <div className="flex items-center gap-1.5 text-white/30">
+            <div className="pb-2.5 sm:pb-4">
+                <div className="mb-2 flex items-center gap-3">
+                    <div className="flex items-center gap-1.5 text-white/35">
                         <Ruler size={12} />
                         <span className="text-[9px] font-black uppercase tracking-[0.15em]">Talle</span>
                     </div>
                     {sizeFilter !== 'all' && (
-                        <button
-                            onClick={() => setSizeFilter('all')}
-                            className="flex items-center gap-1 text-[9px] font-bold text-[#00E5FF]/60 hover:text-[#00E5FF] transition-colors"
-                        >
+                        <button onClick={() => setSizeFilter('all')} className="flex items-center gap-1 text-[9px] font-bold text-[#00E5FF]/65 transition-colors hover:text-[#00E5FF]">
                             <X size={10} />
                             Limpiar
                         </button>
                     )}
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="-mx-3 flex max-w-[100vw] snap-x gap-1.5 overflow-x-auto px-3 pb-1 [scrollbar-width:none] sm:mx-0 sm:max-w-none sm:flex-wrap sm:gap-2 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
                     <button
                         onClick={() => setSizeFilter('all')}
                         className={cn(
-                            "relative px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all duration-300 border",
+                            'relative min-h-9 snap-start whitespace-nowrap rounded-xl border px-4 text-[10px] font-black uppercase tracking-wider transition-all duration-300 sm:min-h-10 sm:px-5 sm:text-[11px]',
                             sizeFilter === 'all'
-                                ? "bg-[#00E5FF] text-black border-[#00E5FF] shadow-[0_0_20px_rgba(0,229,255,0.3)]"
-                                : "bg-white/[0.04] text-white/35 border-white/[0.06] hover:border-white/15 hover:text-white/60"
+                                ? 'border-[#00E5FF] bg-[#00E5FF] text-black shadow-[0_0_20px_rgba(0,229,255,0.3)]'
+                                : 'border-white/[0.06] bg-white/[0.04] text-white/40 hover:border-white/15 hover:text-white/65'
                         )}
                     >
                         Todos
                     </button>
 
-                    {sortedSizes.map(size => {
+                    {sortedSizes.map((size) => {
                         const stockCount = sizeStockMap[size] || 0;
                         const isActive = sizeFilter === size;
                         const isOutOfStock = stockCount === 0;
@@ -207,25 +210,18 @@ export function ResellerFilters({
                                 onClick={() => setSizeFilter(isActive ? 'all' : size)}
                                 disabled={isOutOfStock}
                                 className={cn(
-                                    "relative group px-4 py-2.5 rounded-xl text-[12px] font-black transition-all duration-300 border min-w-[48px] text-center flex items-center justify-center",
+                                    'relative flex min-h-9 min-w-[43px] snap-start items-center justify-center rounded-xl border px-3.5 text-center text-[11px] font-black transition-all duration-300 sm:min-h-10 sm:min-w-[48px] sm:px-4 sm:text-[12px]',
                                     isActive
-                                        ? "bg-[#00E5FF] text-black border-[#00E5FF] shadow-[0_0_20px_rgba(0,229,255,0.3)] scale-[1.05] z-10"
+                                        ? 'z-10 scale-[1.03] border-[#00E5FF] bg-[#00E5FF] text-black shadow-[0_0_20px_rgba(0,229,255,0.3)]'
                                         : isOutOfStock
-                                            ? "bg-white/[0.02] text-white/10 border-white/[0.03] cursor-not-allowed line-through"
-                                            : "bg-white/[0.04] text-white/50 border-white/[0.06] hover:border-[#00E5FF]/40 hover:text-white/80 hover:bg-[#00E5FF]/[0.05]",
-                                    isLong && "px-6"
+                                          ? 'cursor-not-allowed border-white/[0.03] bg-white/[0.02] text-white/10 line-through'
+                                          : 'border-white/[0.06] bg-white/[0.04] text-white/55 hover:border-[#00E5FF]/40 hover:bg-[#00E5FF]/[0.05] hover:text-white/85',
+                                    isLong && 'px-6'
                                 )}
                             >
                                 <span className="relative z-10">{size}</span>
-                                
-                                {!isOutOfStock && !isActive && (
-                                    <span className="absolute -top-1 -right-1 min-w-[14px] h-3.5 px-1 bg-white/10 rounded-full text-[7px] font-bold text-white/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-white/5">
-                                        {stockCount}
-                                    </span>
-                                )}
-                                
                                 {isActive && (
-                                    <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 bg-[#0a0a0a] rounded-full text-[8px] font-black text-[#00E5FF] flex items-center justify-center border border-[#00E5FF] shadow-[0_0_10px_rgba(0,229,255,0.2)] z-20">
+                                    <span className="absolute -right-1.5 -top-1.5 z-20 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border border-[#00E5FF] bg-[#0a0a0a] px-1 text-[8px] font-black text-[#00E5FF] shadow-[0_0_10px_rgba(0,229,255,0.2)]">
                                         {stockCount}
                                     </span>
                                 )}
@@ -235,50 +231,55 @@ export function ResellerFilters({
                 </div>
             </div>
 
-            {/* ═══════ ROW 3: Expandable Category + Stock Filters ═══════ */}
-            <div className={cn(
-                "overflow-hidden transition-all duration-500 ease-out",
-                showAllFilters ? "max-h-[200px] pb-4 opacity-100" : "max-h-0 pb-0 opacity-0"
-            )}>
-                <div className="flex flex-wrap items-center gap-3">
+            <div className={cn('overflow-hidden transition-all duration-500 ease-out', showAllFilters ? 'max-h-[260px] overflow-y-auto pb-4 opacity-100 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden' : 'max-h-0 pb-0 opacity-0')}>
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                     <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="text-[9px] font-black uppercase tracking-[0.15em] text-white/20 mr-1">Cat.</span>
-                        {['Todos', ...categories].filter((v, i, a) => a.indexOf(v) === i).map(cat => (
-                            <button key={cat} onClick={() => setCategory(cat)}
+                        <span className="mr-1 text-[9px] font-black uppercase tracking-[0.15em] text-white/25">Cat.</span>
+                        {uniqueCategories.map((cat) => (
+                            <button
+                                key={cat}
+                                onClick={() => setCategory(cat)}
                                 className={cn(
-                                    "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all duration-300 border",
+                                    'rounded-lg border px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all duration-300',
                                     category === cat
-                                        ? "bg-white text-black border-white shadow-[0_0_12px_rgba(255,255,255,0.1)]"
-                                        : "bg-white/[0.04] text-white/30 border-white/[0.06] hover:border-white/15 hover:text-white/50"
+                                        ? 'border-white bg-white text-black shadow-[0_0_12px_rgba(255,255,255,0.1)]'
+                                        : 'border-white/[0.06] bg-white/[0.04] text-white/35 hover:border-white/15 hover:text-white/55'
                                 )}
-                            >{cat}</button>
+                            >
+                                {cat}
+                            </button>
                         ))}
                     </div>
 
-                    <div className="w-px h-6 bg-white/[0.06]" />
+                    <div className="hidden h-6 w-px bg-white/[0.06] sm:block" />
 
-                    <div className="flex items-center gap-1.5">
-                        <span className="text-[9px] font-black uppercase tracking-[0.15em] text-white/20 mr-1">Stock</span>
-                        {([['all', 'Todo'], ['available', 'Disponible'], ['low', 'Últimas U.']] as const).map(([val, label]) => (
-                            <button key={val} onClick={() => setStockFilter(val)}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="mr-1 text-[9px] font-black uppercase tracking-[0.15em] text-white/25">Stock</span>
+                        {([
+                            ['all', 'Todo'],
+                            ['available', 'Disponible'],
+                            ['low', 'Ultimas u.'],
+                        ] as const).map(([value, label]) => (
+                            <button
+                                key={value}
+                                onClick={() => setStockFilter(value)}
                                 className={cn(
-                                    "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all duration-300 border",
-                                    stockFilter === val
-                                        ? "bg-[#C6FF00] text-black border-[#C6FF00] shadow-[0_0_12px_rgba(198,255,0,0.15)]"
-                                        : "bg-white/[0.04] text-white/30 border-white/[0.06] hover:border-white/15 hover:text-white/50"
+                                    'rounded-lg border px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all duration-300',
+                                    stockFilter === value
+                                        ? 'border-[#C6FF00] bg-[#C6FF00] text-black shadow-[0_0_12px_rgba(198,255,0,0.15)]'
+                                        : 'border-white/[0.06] bg-white/[0.04] text-white/35 hover:border-white/15 hover:text-white/55'
                                 )}
-                            >{label}</button>
+                            >
+                                {label}
+                            </button>
                         ))}
                     </div>
 
                     {activeFilterCount > 0 && (
-                        <>
-                            <div className="w-px h-6 bg-white/[0.06]" />
-                            <button onClick={clearAll} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider text-red-400/60 hover:text-red-400 border border-red-400/10 hover:border-red-400/30 bg-red-400/[0.04] transition-all duration-300">
-                                <X size={10} />
-                                Limpiar todo
-                            </button>
-                        </>
+                        <button onClick={clearAll} className="flex items-center gap-1.5 rounded-lg border border-red-400/10 bg-red-400/[0.04] px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-red-400/65 transition-all duration-300 hover:border-red-400/30 hover:text-red-400">
+                            <X size={10} />
+                            Limpiar todo
+                        </button>
                     )}
                 </div>
             </div>

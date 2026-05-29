@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
     'checkout', 'cart', 'collection', 'press', 'careers',
     'sustainability', 'order-confirmation', 'gift-cards', 'logout',
     'resellers', 'api', 'admin', 'profile', 'ai-knowledge-base-d7f9e2a4c6b8',
-    'comunidad', 'contacto', 'community', 'contact'
+    'comunidad', 'contacto', 'community', 'contact', 'google-playground'
   ];
 
   const pathParts = pathname.split('/').filter(Boolean);

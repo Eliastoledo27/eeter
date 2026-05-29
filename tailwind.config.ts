@@ -14,21 +14,21 @@ const config: Config = {
 				surface: {
 					DEFAULT: '#1a1a1a',
 					hover: '#262626',
-					active: '#00E5FF'
+					active: '#00E0FF'
 				},
 				border: '#262626',
 				primary: {
-					DEFAULT: '#00E5FF',
+					DEFAULT: '#00E0FF',
 					foreground: '#000000',
 					hover: '#00B8D4'
 				},
 				accent: {
 					blue: '#0EA5E9',
 					purple: '#D946EF',
-					cyan: '#00E5FF',
+					cyan: '#00E0FF',
 					teal: '#14B8A6',
 					rose: '#F43F5E',
-					DEFAULT: '#00E5FF',
+					DEFAULT: '#00E0FF',
 					foreground: '#000000'
 				},
 				'background-dark': '#050505',
@@ -42,13 +42,13 @@ const config: Config = {
 				success: '#00FF94',
 				warning: '#FFB800',
 				error: '#FF3B30',
-				'accent-cyan': '#00E5FF',
+				'accent-cyan': '#00E0FF',
 				cyan: {
-					DEFAULT: '#00E5FF',
+					DEFAULT: '#00E0FF',
 					dim: '#008394',
 					light: '#80F2FF',
 				},
-				'electric-blue': '#00E5FF',
+				'electric-blue': '#00E0FF',
 				'slate-panel': 'rgba(10, 10, 10, 0.7)',
 				foreground: '#FFFFFF',
 				card: {
@@ -72,7 +72,7 @@ const config: Config = {
 					foreground: '#FFFFFF'
 				},
 				input: '#0D0D0D',
-				ring: '#00E5FF',
+				ring: '#00E0FF',
 				chart: {
 					'1': 'hsl(var(--chart-1))',
 					'2': 'hsl(var(--chart-2))',
@@ -83,7 +83,7 @@ const config: Config = {
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-				'gradient-glow': 'conic-gradient(from 180deg at 50% 50%, #00E5FF 0deg, #0EA5E9 180deg, #00FF94 360deg)',
+				'gradient-glow': 'conic-gradient(from 180deg at 50% 50%, #00E0FF 0deg, #0EA5E9 180deg, #00FF94 360deg)',
 				'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
 				'glass-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%)',
 			},

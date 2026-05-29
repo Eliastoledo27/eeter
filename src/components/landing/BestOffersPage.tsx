@@ -102,7 +102,7 @@ function Hero() {
                     <div className="absolute bottom-12 left-4 right-0 mx-auto h-[120px] max-w-[700px] bg-[#C6FF00]/10 blur-3xl" />
                     <motion.div animate={{ y: [0, -10, 0], rotate: [0, 1.5, 0] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}>
                         <Image
-                            src="/hero.png"
+                            src="/hero.webp"
                             alt="Top Sneakers ÉTER Mar del Plata"
                             width={1024}
                             height={1024}

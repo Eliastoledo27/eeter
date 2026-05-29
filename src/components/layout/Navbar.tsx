@@ -53,25 +53,7 @@ export function Navbar() {
         >
             <div className="mx-auto flex h-24 max-w-[1440px] items-center justify-between px-5 md:px-10">
                 <LogoMark compact />
-                <motion.nav initial="hidden" animate="visible" variants={stagger} className="hidden items-center gap-10 lg:flex">
-                    {['Inicio', 'Catálogo', 'Comunidad', 'Sobre ÉTER', 'Contacto'].map((item, index) => {
-                        const href = index === 0 ? '/' : index === 1 ? '/catalog' : index === 2 ? '/comunidad' : index === 3 ? '/about' : '/contacto';
-                        const isActive = pathname === href || (pathname.startsWith('/catalog') && index === 1);
-                        
-                        return (
-                            <motion.div key={item} variants={fadeUp} transition={{ duration: 0.55, ease: easeOut }}>
-                                <Link
-                                    href={href}
-                                    className={`text-[11px] font-black uppercase tracking-[0.12em] transition-colors ${
-                                        isActive ? 'text-[#00E5FF] underline decoration-[#00E5FF] underline-offset-8' : 'text-white hover:text-[#00E5FF]'
-                                    }`}
-                                >
-                                    {item}
-                                </Link>
-                            </motion.div>
-                        );
-                    })}
-                </motion.nav>
+
                 <div className="flex items-center gap-5">
                     <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
                     <Link
@@ -103,23 +85,7 @@ export function Navbar() {
                             </button>
                         </div>
                         <nav className="mt-12 flex flex-col items-center gap-8">
-                            {['Inicio', 'Catálogo', 'Comunidad', 'Sobre ÉTER', 'Contacto'].map((item, index) => {
-                                const href = index === 0 ? '/' : index === 1 ? '/catalog' : index === 2 ? '/comunidad' : index === 3 ? '/about' : '/contacto';
-                                const isActive = pathname === href || (pathname.startsWith('/catalog') && index === 1);
 
-                                return (
-                                    <Link
-                                        key={item}
-                                        href={href}
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className={`text-lg font-black uppercase tracking-[0.12em] transition-colors ${
-                                            isActive ? 'text-[#00E5FF]' : 'text-white hover:text-[#00E5FF]'
-                                        }`}
-                                    >
-                                        {item}
-                                    </Link>
-                                );
-                            })}
                             <Link
                                 href="/register"
                                 onClick={() => setIsMobileMenuOpen(false)}

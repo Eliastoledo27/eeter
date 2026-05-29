@@ -1,0 +1,40 @@
+{
+  "name": "eter-antigravity-toolkit",
+  "version": "0.1.0",
+  "description": "Repo-local toolkit for running the Eter skill ecosystem professionally inside Antigravity and Codex-style agent environments.",
+  "author": {
+    "name": "Eter",
+    "email": "dev@eter.local",
+    "url": "https://github.com/Eliastoledo27/eeter"
+  },
+  "homepage": "https://github.com/Eliastoledo27/eeter",
+  "repository": "https://github.com/Eliastoledo27/eeter",
+  "license": "UNLICENSED",
+  "keywords": [
+    "antigravity",
+    "eter",
+    "skills",
+    "agent-workflows"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Eter Antigravity Toolkit",
+    "shortDescription": "Professional Eter skills for Antigravity",
+    "longDescription": "Packages the Eter Antigravity operating workflow, skill routing rules, and creator tooling so agents can work against this repository with consistent context, validation, and plugin metadata.",
+    "developerName": "Eter",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/Eliastoledo27/eeter",
+    "privacyPolicyURL": "https://github.com/Eliastoledo27/eeter",
+    "termsOfServiceURL": "https://github.com/Eliastoledo27/eeter",
+    "defaultPrompt": [
+      "Use Eter skills to implement this professionally.",
+      "Repair the local skills and validate them.",
+      "Create a repo-local plugin for this workflow."
+    ],
+    "brandColor": "#00E5FF"
+  }
+}

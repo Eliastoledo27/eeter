@@ -15,6 +15,7 @@ export interface Product {
   liquidationActive?: boolean;
   liquidationPrice?: number;
   liquidationDiscountPercent?: number;
+  productSections?: Array<'home' | 'catalog' | 'liquidation' | 'flash'>;
   createdAt: Date;
   updatedAt?: Date;
 }

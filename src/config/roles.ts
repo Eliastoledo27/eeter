@@ -1,7 +1,7 @@
 import {
   Home, ShoppingBag, BookOpen, Trophy, Users, Package,
   MessageSquare, BarChart2, ClipboardList, Settings, LayoutDashboard,
-  Megaphone,
+  Megaphone, Film,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -49,6 +49,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
 export const ROUTE_PERMISSIONS: Record<string, string> = {
   '/dashboard/analytics': 'view_analytics',
   '/dashboard/catalogue': 'view_catalog',
+  '/dashboard/video-generator': 'view_dashboard',
   '/dashboard/profiles': 'view_profiles',
   '/dashboard/purchases': 'manage_purchases',
   '/dashboard/settings': 'manage_settings',
@@ -68,6 +69,7 @@ export const ROUTE_PERMISSIONS: Record<string, string> = {
 export const ROUTE_ROLES: Record<string, UserRole[]> = {
   '/dashboard/analytics': ['admin'],
   '/dashboard/catalogue': ['admin', 'support', 'reseller', 'user'],
+  '/dashboard/video-generator': ['admin', 'support', 'reseller', 'user'],
   '/dashboard/profiles': ['admin', 'support'],
   '/dashboard/purchases': ['admin', 'support', 'reseller', 'user'],
   '/dashboard/settings': ['admin'],
@@ -89,6 +91,7 @@ export const DASHBOARD_MODULES: NavItem[] = [
   { id: 'analytics', label: 'Análisis', icon: BarChart2, href: '/dashboard/analytics', requiredPermission: 'view_analytics' },
   { id: 'catalog', label: 'Catálogo', icon: ShoppingBag, href: '/dashboard/catalogue', requiredPermission: 'view_catalog' },
   { id: 'myshop', label: 'Mi Tienda', icon: BarChart2, href: '/dashboard/myshop', requiredPermission: 'manage_reseller_shop' },
+  { id: 'video_generator', label: 'Video Promo', icon: Film, href: '/dashboard/video-generator', requiredPermission: 'view_dashboard' },
   { id: 'orders', label: 'Pedidos', icon: ClipboardList, href: '/dashboard/orders', requiredPermission: 'view_orders' },
   { id: 'academy', label: 'Academia VIP', icon: BookOpen, href: '/academy', requiredPermission: 'view_academy' },
   { id: 'ranking', label: 'Ranking', icon: Trophy, href: '/dashboard/ranking', requiredPermission: 'view_ranking' },

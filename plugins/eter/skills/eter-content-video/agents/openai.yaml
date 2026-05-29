@@ -1,0 +1,4 @@
+interface:
+  display_name: "Éter Content Video"
+  short_description: "Remotion, Hyperframes, reels, and campaign assets"
+  default_prompt: "Use $eter-content-video to create or edit Éter videos and campaign assets."

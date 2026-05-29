@@ -1,12 +1,31 @@
-import { SupabaseProductRepository } from '@/infrastructure/repositories/SupabaseProductRepository';
 import { headers } from 'next/headers';
 import CatalogClient from './CatalogClient';
 import { Metadata } from 'next';
 import { getProducts } from '@/app/actions/products';
+import { getActiveResellerCatalogLinks } from '@/app/actions/reseller-catalog';
 
 export const metadata: Metadata = {
     title: 'Catálogo Oficial Éter Store | Zapatillas Importadas y Stock Inmediato',
-    description: 'Comprá las mejores zapatillas premium de Brasil en Mar del Plata. Modelos exclusivos, calidad G5/Espejo y envíos express a toda Argentina. ¡Entrá y llevate las tuyas!',
+    description: 'Comprá zapatillas premium de Brasil en Mar del Plata. Modelos seleccionados, stock claro y envíos express a toda Argentina. ¡Entrá y llevate las tuyas!',
+    openGraph: {
+        title: 'Catálogo Oficial Éter Store | Zapatillas Importadas y Stock Inmediato',
+        description: 'Comprá zapatillas premium de Brasil en Mar del Plata. Modelos seleccionados, stock claro y envíos express a toda Argentina. ¡Entrá y llevate las tuyas!',
+        url: 'https://xn--ter-9la.store/catalog',
+        images: [
+            {
+                url: '/catalog-og.jpg',
+                width: 1200,
+                height: 630,
+                alt: 'Catálogo Oficial Éter Store',
+            }
+        ],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Catálogo Oficial Éter Store | Zapatillas Importadas y Stock Inmediato',
+        description: 'Comprá zapatillas premium de Brasil en Mar del Plata.',
+        images: ['/catalog-og.jpg'],
+    }
 };
 
 export const revalidate = 300; // Fresh stock every 5 minutes
@@ -23,7 +42,10 @@ export default async function CatalogPage({
     const isBot = /Chatfuel|ManyChat|curl|bot|googlebot|crawler/i.test(userAgent) || searchParams.format === 'text';
 
     // Fetch products for both bots and normal users (for SSR/Hydration)
-    const products = await getProducts(undefined, undefined, 'active');
+    const [products, resellerCatalogLinks] = await Promise.all([
+        getProducts(undefined, undefined, 'active'),
+        getActiveResellerCatalogLinks(),
+    ]);
 
     if (isBot) {
         const catalogData = products.map((product) => {
@@ -65,8 +87,8 @@ export default async function CatalogPage({
         "@context": "https://schema.org",
         "@type": "CollectionPage",
         "name": "Catálogo Oficial Éter Store",
-        "description": "Comprá las mejores zapatillas premium de Brasil en Mar del Plata. Modelos exclusivos, calidad G5/Espejo y envíos express a toda Argentina.",
-        "url": "https://eter.store/catalog"
+        "description": "Comprá zapatillas premium de Brasil en Mar del Plata. Modelos seleccionados, stock claro y envíos express a toda Argentina.",
+        "url": "https://xn--ter-9la.store/catalog"
     };
 
     // For normal users, we serve the premium visual experience
@@ -77,7 +99,7 @@ export default async function CatalogPage({
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            <CatalogClient initialProducts={products} />
+            <CatalogClient initialProducts={products} resellerCatalogLinks={resellerCatalogLinks} />
         </>
     );
 }

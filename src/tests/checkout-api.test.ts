@@ -43,7 +43,7 @@ const runTests = async () => {
     // TEST 1: Credit Purchase Flow
     try {
         const res = await mockFetch('https://eter.store/api/checkout?credits=75000');
-        const data = await res.json();
+        const data = await res.json() as any;
 
         if (data.transaction_type !== 'credit_purchase') throw new Error('Expected credit_purchase');
         if (data.credits_amount !== 75000) throw new Error(`Expected 75000 credits, got ${data.credits_amount}`);
@@ -58,7 +58,7 @@ const runTests = async () => {
     // TEST 2: Product Purchase Flow
     try {
         const res = await mockFetch('https://eter.store/api/checkout?products=prod_123:1');
-        const data = await res.json();
+        const data = await res.json() as any;
 
         if (data.transaction_type !== 'product_purchase') throw new Error('Expected product_purchase');
         if (data.gateway_id !== 'meta') throw new Error('Expected meta gateway');

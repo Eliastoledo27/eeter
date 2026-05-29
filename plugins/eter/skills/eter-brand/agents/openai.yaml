@@ -1,0 +1,4 @@
+interface:
+  display_name: "Éter Brand"
+  short_description: "Brand names, tone, UI, and copy"
+  default_prompt: "Use $eter-brand to keep Éter naming, tone, visuals, and copy consistent."

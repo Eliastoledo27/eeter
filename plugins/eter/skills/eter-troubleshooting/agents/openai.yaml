@@ -1,0 +1,4 @@
+interface:
+  display_name: "Éter Troubleshooting"
+  short_description: "Known Éter errors and fixes"
+  default_prompt: "Use $eter-troubleshooting to diagnose known Éter Android, Supabase, catalog, build, and upload errors."

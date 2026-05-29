@@ -13,24 +13,11 @@ export function useEterPulse(onNewEvent?: (event: PulseEvent) => void) {
     
     // Refs to manage intervals autonomously
     const timersRef = useRef<{ [key in PulseChannel]?: NodeJS.Timeout }>({});
-
-    const isWithinHours = (start: string, end: string) => {
-        const now = new Date();
-        const currentHour = now.getHours() + now.getMinutes() / 60;
-        
-        const [startH, startM] = start.split(':').map(Number);
-        const [endH, endM] = end.split(':').map(Number);
-        
-        const startVal = startH + (startM || 0) / 60;
-        const endVal = endH + (endM || 0) / 60;
-
-        if (startVal < endVal) {
-            return currentHour >= startVal && currentHour < endVal;
-        } else {
-            // Handle overnight hours (e.g., 08:30 to 02:00)
-            return currentHour >= startVal || currentHour < endVal;
-        }
-    };
+    const isFirstRun = useRef<{ [key in PulseChannel]: boolean }>({
+        SALES: true,
+        LOCAL_DELIVERY: true,
+        NATIONAL_SHIPMENT: true
+    });
 
     const generateRandomEvent = useCallback((channel: PulseChannel): PulseEvent => {
         const id = Math.random().toString(36).substring(2, 11);
@@ -61,30 +48,29 @@ export function useEterPulse(onNewEvent?: (event: PulseEvent) => void) {
         }
 
         let delay = 0;
-        let active = false;
 
-        const now = new Date();
-        const hour = now.getHours();
-
-        if (channel === 'SALES') {
-            active = isWithinHours("08:30", "02:00");
-            // Random between 10 and 45 min (in ms)
-            // Low intensity after 22:00 (increase delay)
-            const min = hour >= 22 || hour < 2 ? 30 : 10;
-            const max = hour >= 22 || hour < 2 ? 60 : 45;
-            delay = (Math.floor(Math.random() * (max - min + 1)) + min) * 60 * 1000;
-        } else if (channel === 'LOCAL_DELIVERY') {
-            active = isWithinHours("09:00", "18:00");
-            delay = (Math.floor(Math.random() * (120 - 40 + 1)) + 40) * 60 * 1000; // MDQ deliveries are less frequent
-        } else if (channel === 'NATIONAL_SHIPMENT') {
-            active = isWithinHours("09:00", "18:00");
-            delay = (Math.floor(Math.random() * (90 - 30 + 1)) + 30) * 60 * 1000;
-        }
-
-        if (!active) {
-            // Check again in 15 minutes if it's within hours
-            timersRef.current[channel] = setTimeout(() => scheduleNext(channel), 15 * 60 * 1000);
-            return;
+        // First run initial delays (5s for SALES, 20s for SHIPMENT, 45s for DELIVERY)
+        if (isFirstRun.current[channel]) {
+            isFirstRun.current[channel] = false;
+            if (channel === 'SALES') {
+                delay = 5000;
+            } else if (channel === 'NATIONAL_SHIPMENT') {
+                delay = 20000;
+            } else {
+                delay = 45000;
+            }
+        } else {
+            // Subsequent runs - regular realistic delays (faster for active visual feedback)
+            if (channel === 'SALES') {
+                // Random between 45 seconds and 3 minutes
+                delay = (Math.floor(Math.random() * (180 - 45 + 1)) + 45) * 1000;
+            } else if (channel === 'LOCAL_DELIVERY') {
+                // Random between 4 minutes and 10 minutes
+                delay = (Math.floor(Math.random() * (600 - 240 + 1)) + 240) * 1000;
+            } else if (channel === 'NATIONAL_SHIPMENT') {
+                // Random between 2 minutes and 6 minutes
+                delay = (Math.floor(Math.random() * (360 - 120 + 1)) + 120) * 1000;
+            }
         }
 
         timersRef.current[channel] = setTimeout(() => {

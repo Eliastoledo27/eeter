@@ -11,6 +11,12 @@ export interface Announcement {
     is_active: boolean
     published_at: string
     created_at: string
+    target_pages?: string[]
+    template_key?: string
+    display_mode?: 'floating' | 'banner' | 'modal'
+    cta_label?: string | null
+    cta_url?: string | null
+    priority?: number
 }
 
 export function useAnnouncements() {
@@ -24,6 +30,7 @@ export function useAnnouncements() {
             const { data, error } = await supabase
                 .from('announcements')
                 .select('*')
+                .order('priority', { ascending: false })
                 .order('published_at', { ascending: false })
 
             if (error) throw error

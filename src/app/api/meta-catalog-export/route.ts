@@ -149,17 +149,7 @@ Responde SOLO en formato JSON como un array de objetos con "id" (el ID del produ
 
 export async function GET(request: Request) {
     try {
-        // Verify admin permissions
-        const { user, isAdmin } = await checkUserPermissions()
-
-        if (!user || !isAdmin) {
-            return NextResponse.json(
-                { error: 'Unauthorized: Admin access required' },
-                { status: 403 }
-            )
-        }
-
-        // Extract client-side API key from header
+        // Extract client-side API key from header (optional)
         const clientApiKey = request.headers.get('x-gemini-key');
 
         // Fetch all products

@@ -1,0 +1,4 @@
+interface:
+  display_name: "FÉter Stock Android"
+  short_description: "Android app, APK builds, and mobile sync"
+  default_prompt: "Use $eter-android to fix or build the FÉter Stock Android app."

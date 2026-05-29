@@ -1,0 +1,81 @@
+{
+  "nota": "Modelo sugerido para catalogo mobile ETER. No inventar productos reales. Los ejemplos marcados como seed_demo provienen de archivos SQL/mock y deben confirmarse antes de usarse como catalogo vigente.",
+  "fuentes_detectadas": [
+    "src/domain/entities/Product.ts",
+    "src/app/actions/products.ts",
+    "src/lib/product-mapping.ts",
+    "supabase_schema.sql",
+    "supabase_seed.sql",
+    "src/lib/mock-db.ts",
+    "src/app/api/catalog/route.ts"
+  ],
+  "modelo": {
+    "id": "string",
+    "nombre": "string",
+    "categoria": "string",
+    "descripcion": "string",
+    "imagenes": ["string"],
+    "precio_base": "number",
+    "precio_publico": "number | null",
+    "talles": ["string"],
+    "stock": {
+      "total": "number",
+      "por_talle": {
+        "40": 0
+      }
+    },
+    "disponibilidad": "disponible | ultimas_unidades | agotado | consultar_stock",
+    "etiquetas": ["string"],
+    "destacado": "boolean",
+    "fecha_actualizacion": "ISO-8601 | PENDIENTE_DE_CONFIRMAR",
+    "fuente": "supabase.productos | seed_demo | placeholder"
+  },
+  "ejemplos": [
+    {
+      "id": "PENDIENTE_DE_CONFIRMAR",
+      "nombre": "ETER Phantom Black",
+      "categoria": "Sneakers",
+      "descripcion": "Sneakers de diseno minimalista con acabado negro mate y suela translucida. Ejemplo detectado en seed SQL; confirmar vigencia antes de publicar.",
+      "imagenes": [
+        "https://images.unsplash.com/photo-1491553895911-0055eca6402d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      ],
+      "precio_base": 120,
+      "precio_publico": null,
+      "talles": ["40", "41", "42", "43"],
+      "stock": {
+        "total": 25,
+        "por_talle": {
+          "40": 5,
+          "41": 10,
+          "42": 8,
+          "43": 2
+        }
+      },
+      "disponibilidad": "disponible",
+      "etiquetas": ["seed_demo", "sneakers"],
+      "destacado": false,
+      "fecha_actualizacion": "PENDIENTE_DE_CONFIRMAR",
+      "fuente": "supabase_seed.sql"
+    },
+    {
+      "id": "placeholder_mobile",
+      "nombre": "PENDIENTE_DE_CONFIRMAR",
+      "categoria": "PENDIENTE_DE_CONFIRMAR",
+      "descripcion": "Producto real pendiente de cargar desde Supabase.",
+      "imagenes": [],
+      "precio_base": 0,
+      "precio_publico": null,
+      "talles": [],
+      "stock": {
+        "total": 0,
+        "por_talle": {}
+      },
+      "disponibilidad": "consultar_stock",
+      "etiquetas": ["placeholder"],
+      "destacado": false,
+      "fecha_actualizacion": "PENDIENTE_DE_CONFIRMAR",
+      "fuente": "placeholder"
+    }
+  ]
+}
+

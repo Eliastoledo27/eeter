@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Eter usa IA - Silent HyperFrames</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main
+      id="root"
+      data-composition-id="eter-ia-silent"
+      data-start="0"
+      data-duration="24"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div class="grain" data-layout-ignore></div>
+      <div class="scan" data-layout-ignore></div>
+      <div class="mesh" data-layout-ignore></div>
+      <div class="orbital orbital-a" data-layout-ignore></div>
+      <div class="orbital orbital-b" data-layout-ignore></div>
+      <div class="brand-mark">&Eacute;TER<span>/IA</span></div>
+
+      <section id="scene-1" class="scene clip" data-start="0" data-duration="6" data-track-index="1">
+        <div class="ai-core" data-layout-ignore>
+          <div class="core-ring"></div>
+          <div class="core-ring"></div>
+          <div class="core-ring"></div>
+          <div class="core-dot"></div>
+        </div>
+        <div class="scene-content">
+          <div class="eyebrow">Sistema activo</div>
+          <h1 class="headline">Eter usa <span class="accent">IA</span></h1>
+          <p class="subline">Para convertir catalogo, mensajes y decisiones en una operacion mas rapida.</p>
+          <div class="signal-lines" data-layout-ignore>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene-2" class="scene clip" data-start="6" data-duration="6" data-track-index="2">
+        <div class="scene-content">
+          <div class="eyebrow">Inteligencia comercial</div>
+          <h2 class="headline">Del dato a la <span class="pink">accion</span></h2>
+          <div class="panel-stack">
+            <div class="panel">
+              <div class="panel-label">Catalogo</div>
+              <div class="panel-copy">Productos mejor ordenados</div>
+            </div>
+            <div class="panel">
+              <div class="panel-label">Mensajes</div>
+              <div class="panel-copy">Respuestas mas claras</div>
+            </div>
+            <div class="panel">
+              <div class="panel-label">Gestion</div>
+              <div class="panel-copy">Menos friccion diaria</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene-3" class="scene clip" data-start="12" data-duration="6" data-track-index="3">
+        <div class="scene-content">
+          <div class="eyebrow">Motor silencioso</div>
+          <h2 class="headline">IA que conecta el <span class="accent">sistema</span></h2>
+          <div class="flow-map">
+            <div class="connector connector-one" data-layout-ignore></div>
+            <div class="connector connector-two" data-layout-ignore></div>
+            <div class="node node-a">
+              <b>Stock</b>
+              <span>Lectura de disponibilidad y rotacion.</span>
+            </div>
+            <div class="node node-b">
+              <b>Venta</b>
+              <span>Asistencia para publicar, responder y cerrar.</span>
+            </div>
+            <div class="node node-c">
+              <b>Contenido</b>
+              <span>Ideas visuales y textos listos para redes.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene-4" class="scene clip" data-start="18" data-duration="6" data-track-index="4">
+        <div class="scene-content final-lockup">
+          <div class="final-pill">Comercio premium + IA aplicada</div>
+          <h2 class="eter-title">&Eacute;TER</h2>
+          <p class="subline">Una marca que aprende, automatiza y vende con mas precision.</p>
+          <div class="decision-grid">
+            <div class="metric">
+              <strong>01</strong>
+              <span>Catalogo mas inteligente</span>
+            </div>
+            <div class="metric">
+              <strong>02</strong>
+              <span>Operacion mas simple</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="transition-wipe wipe-a" data-layout-ignore></div>
+      <div class="transition-wipe wipe-b" data-layout-ignore></div>
+      <div class="transition-wipe wipe-c" data-layout-ignore></div>
+    </main>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      tl.from(".brand-mark", { y: -30, opacity: 0, duration: 0.55, ease: "power3.out" }, 0.18);
+      tl.from(".mesh", { y: 80, opacity: 0, duration: 1.0, ease: "sine.out" }, 0.1);
+      tl.from(".orbital-a", { scale: 0.82, opacity: 0, duration: 1.1, ease: "power2.out" }, 0.12);
+      tl.from(".orbital-b", { scale: 1.18, opacity: 0, duration: 1.1, ease: "power1.out" }, 0.18);
+
+      tl.from("#scene-1 .eyebrow", { x: -54, opacity: 0, duration: 0.48, ease: "power3.out" }, 0.25);
+      tl.from("#scene-1 .headline", { y: 78, opacity: 0, scale: 0.96, duration: 0.72, ease: "expo.out" }, 0.45);
+      tl.from("#scene-1 .subline", { y: 46, opacity: 0, duration: 0.58, ease: "power2.out" }, 0.78);
+      tl.from("#scene-1 .signal-lines span", { x: -120, scaleX: 0.1, opacity: 0, duration: 0.56, stagger: 0.12, ease: "back.out(1.7)" }, 1.12);
+      tl.from("#scene-1 .core-ring", { scale: 0.68, opacity: 0, rotation: -18, duration: 0.8, stagger: 0.14, ease: "power4.out" }, 0.64);
+      tl.from("#scene-1 .core-dot", { scale: 0.1, opacity: 0, duration: 0.62, ease: "elastic.out(1,0.55)" }, 1.08);
+
+      tl.to(".orbital-a", { rotation: 14, duration: 24, ease: "none" }, 0);
+      tl.to(".orbital-b", { rotation: -18, duration: 24, ease: "none" }, 0);
+      tl.to(".core-ring", { rotation: 28, duration: 5.2, repeat: 4, ease: "sine.inOut" }, 1.0);
+      tl.to(".core-dot", { scale: 1.08, duration: 1.4, repeat: 15, yoyo: true, ease: "sine.inOut" }, 1.0);
+
+      tl.to(".wipe-a", { x: "0%", duration: 0.34, ease: "power3.in" }, 5.55);
+      tl.to(".wipe-a", { x: "110%", duration: 0.42, ease: "power3.out" }, 6.02);
+
+      tl.from("#scene-2 .eyebrow", { y: 42, opacity: 0, duration: 0.46, ease: "power3.out", immediateRender: false }, 6.25);
+      tl.from("#scene-2 .headline", { x: -70, opacity: 0, duration: 0.68, ease: "expo.out", immediateRender: false }, 6.42);
+      tl.from("#scene-2 .panel", { y: 72, opacity: 0, scale: 0.965, duration: 0.56, stagger: 0.17, ease: "back.out(1.35)", immediateRender: false }, 6.92);
+      tl.from("#scene-2 .panel-label", { x: -26, opacity: 0, duration: 0.34, stagger: 0.17, ease: "power2.out", immediateRender: false }, 7.08);
+      tl.from("#scene-2 .panel-copy", { y: 28, opacity: 0, duration: 0.42, stagger: 0.17, ease: "sine.out", immediateRender: false }, 7.18);
+
+      tl.to(".wipe-b", { x: "0%", duration: 0.34, ease: "power3.in" }, 11.55);
+      tl.to(".wipe-b", { x: "110%", duration: 0.42, ease: "power3.out" }, 12.02);
+
+      tl.from("#scene-3 .eyebrow", { x: 54, opacity: 0, duration: 0.46, ease: "power3.out", immediateRender: false }, 12.24);
+      tl.from("#scene-3 .headline", { y: 62, opacity: 0, duration: 0.68, ease: "expo.out", immediateRender: false }, 12.44);
+      tl.from("#scene-3 .connector", { scaleX: 0, opacity: 0, duration: 0.52, stagger: 0.16, ease: "power4.out", immediateRender: false }, 13.0);
+      tl.from("#scene-3 .node-a", { x: -80, y: 28, opacity: 0, duration: 0.58, ease: "back.out(1.35)", immediateRender: false }, 13.15);
+      tl.from("#scene-3 .node-b", { x: 92, opacity: 0, duration: 0.58, ease: "power3.out", immediateRender: false }, 13.42);
+      tl.from("#scene-3 .node-c", { y: 96, opacity: 0, scale: 0.96, duration: 0.62, ease: "elastic.out(1,0.55)", immediateRender: false }, 13.72);
+
+      tl.to(".wipe-c", { x: "0%", duration: 0.34, ease: "power3.in" }, 17.55);
+      tl.to(".wipe-c", { x: "110%", duration: 0.42, ease: "power3.out" }, 18.02);
+
+      tl.from("#scene-4 .final-pill", { y: -44, opacity: 0, duration: 0.48, ease: "power3.out", immediateRender: false }, 18.22);
+      tl.from("#scene-4 .eter-title", { scale: 0.84, opacity: 0, duration: 0.72, ease: "expo.out", immediateRender: false }, 18.42);
+      tl.from("#scene-4 .subline", { y: 42, opacity: 0, duration: 0.52, ease: "power2.out", immediateRender: false }, 18.84);
+      tl.from("#scene-4 .metric", { y: 58, opacity: 0, rotation: 1.5, duration: 0.54, stagger: 0.16, ease: "back.out(1.4)", immediateRender: false }, 19.25);
+      tl.to("#scene-4 .final-lockup", { opacity: 0, scale: 0.985, duration: 0.7, ease: "sine.inOut" }, 23.15);
+
+      window.__timelines["eter-ia-silent"] = tl;
+    </script>
+  </body>
+</html>

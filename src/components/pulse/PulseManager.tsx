@@ -22,14 +22,14 @@ export function PulseManager() {
     useEterPulse(handleNewEvent);
 
     return (
-        <div className="fixed bottom-6 left-6 z-[100] pointer-events-none">
+        <div className="pointer-events-none fixed bottom-6 right-5 z-[95] sm:right-6">
             <AnimatePresence mode="wait">
                 {activeNotification && (
                     <motion.div
                         key={activeNotification.id}
-                        initial={{ x: -100, opacity: 0, scale: 0.9 }}
+                        initial={{ x: 100, opacity: 0, scale: 0.9 }}
                         animate={{ x: 0, opacity: 1, scale: 1 }}
-                        exit={{ x: -20, opacity: 0, scale: 0.95 }}
+                        exit={{ x: 20, opacity: 0, scale: 0.95 }}
                         className="pointer-events-auto"
                     >
                         <PulseToast 

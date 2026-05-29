@@ -300,6 +300,30 @@
     @apply font-black tracking-tighter uppercase italic;
     text-shadow: 4px 4px 0 rgba(0,0,0,0.5);
   }
+
+  /* ── Safe area inset utilities (iOS notch / home indicator) ── */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* ── Floating Nav / Cart — prevent overlap with native OS bars ── */
+  @supports (padding: max(0px)) {
+    .pb-safe {
+      padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
+    }
+  }
+
+  /* ── No scrollbar utility ── */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Custom Scrollbar */

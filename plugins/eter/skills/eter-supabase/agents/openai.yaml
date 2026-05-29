@@ -1,0 +1,4 @@
+interface:
+  display_name: "Éter Supabase"
+  short_description: "Supabase schema, RPC, storage, and safety"
+  default_prompt: "Use $eter-supabase to work safely with Éter database, storage, RPCs, and app-web sync."

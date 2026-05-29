@@ -1,0 +1,4 @@
+﻿interface:
+  display_name: "Eter Skill Forge"
+  short_description: "Crea skills y plugins de Eter"
+  default_prompt: "Usa @eter para crear, reparar o profesionalizar skills y plugins del ecosistema Eter."

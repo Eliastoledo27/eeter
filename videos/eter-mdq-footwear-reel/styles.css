@@ -1,0 +1,448 @@
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+#root {
+  --lime: #39ff14;
+  --violet: #a020f0;
+  --cyan: #00e0ff;
+  position: relative;
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(circle at 20% 18%, rgba(0, 224, 255, 0.18), transparent 28%),
+    radial-gradient(circle at 90% 68%, rgba(160, 32, 240, 0.22), transparent 34%),
+    linear-gradient(180deg, #020206 0%, #050711 48%, #000 100%);
+}
+
+.grain,
+.scan,
+.coast-glow,
+.city-grid,
+.texture,
+.logo-mark,
+.shoe-main,
+.brand-footer {
+  position: absolute;
+}
+
+.grain {
+  inset: 0;
+  opacity: 0.15;
+  background-image:
+    radial-gradient(circle at 12% 11%, rgba(255, 255, 255, 0.22) 0 1px, transparent 1px),
+    radial-gradient(circle at 71% 55%, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px);
+  background-size: 23px 27px, 37px 41px;
+}
+
+.scan {
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0.1;
+  background: repeating-linear-gradient(to bottom, transparent 0 8px, rgba(255, 255, 255, 0.2) 9px);
+}
+
+.coast-glow {
+  left: -260px;
+  top: 110px;
+  width: 880px;
+  height: 880px;
+  border-radius: 50%;
+  background: rgba(0, 224, 255, 0.2);
+  filter: blur(70px);
+}
+
+.city-grid {
+  left: -80px;
+  right: -80px;
+  bottom: -110px;
+  height: 550px;
+  opacity: 0.2;
+  transform: perspective(760px) rotateX(64deg);
+  transform-origin: bottom;
+  background-image:
+    linear-gradient(rgba(57, 255, 20, 0.34) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 224, 255, 0.28) 1px, transparent 1px);
+  background-size: 88px 88px;
+}
+
+.texture {
+  opacity: 0.18;
+  pointer-events: none;
+  filter: drop-shadow(0 0 24px rgba(0, 224, 255, 0.15));
+}
+
+.texture-a {
+  width: 680px;
+  left: -190px;
+  top: 190px;
+  transform: rotate(-12deg);
+}
+
+.texture-b {
+  width: 570px;
+  right: -170px;
+  bottom: 270px;
+  transform: rotate(13deg);
+}
+
+.texture-c {
+  width: 540px;
+  right: -190px;
+  top: 80px;
+  opacity: 0.16;
+}
+
+.texture-lines {
+  width: 820px;
+  left: 120px;
+  bottom: 650px;
+  opacity: 0.09;
+}
+
+.logo-mark {
+  z-index: 9;
+  width: 210px;
+  top: 84px;
+  left: 72px;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 28px rgba(57, 255, 20, 0.2));
+}
+
+.shoe-main {
+  z-index: 16;
+  width: 900px;
+  left: 92px;
+  top: 760px;
+  filter: drop-shadow(0 42px 55px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 44px rgba(57, 255, 20, 0.22));
+  transform: rotate(-2deg);
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s linear;
+}
+
+.scene.is-active {
+  opacity: 1;
+}
+
+.location-chip {
+  position: absolute;
+  top: 252px;
+  left: 72px;
+  padding: 16px 24px;
+  border: 1px solid rgba(0, 224, 255, 0.48);
+  color: var(--cyan);
+  background: rgba(0, 0, 0, 0.62);
+  font-size: 28px;
+  font-weight: 950;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  font-weight: 1000;
+  letter-spacing: 0;
+}
+
+h1 {
+  position: absolute;
+  left: 62px;
+  right: 62px;
+  top: 332px;
+  font-size: 112px;
+  line-height: 0.92;
+  text-wrap: balance;
+  text-shadow: 0 0 36px rgba(0, 224, 255, 0.36), 0 16px 0 rgba(0, 0, 0, 0.56);
+}
+
+.sunrise-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 650px;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--lime), var(--cyan), transparent);
+  box-shadow: 0 0 30px rgba(57, 255, 20, 0.6);
+}
+
+.scene-contexts h2,
+.scene-versatility h2 {
+  position: absolute;
+  left: 66px;
+  right: 66px;
+  top: 280px;
+  font-size: 86px;
+  line-height: 0.96;
+  text-align: center;
+}
+
+.context-row {
+  position: absolute;
+  left: 70px;
+  right: 70px;
+  top: 530px;
+  display: grid;
+  gap: 24px;
+}
+
+.context-row span,
+.commerce-list span {
+  display: block;
+  padding: 28px 34px;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.56);
+  font-size: 58px;
+  line-height: 0.96;
+  font-weight: 1000;
+  box-shadow: 0 0 34px rgba(0, 224, 255, 0.09);
+}
+
+.context-row span:nth-child(2),
+.commerce-list span:nth-child(2) {
+  color: var(--lime);
+  border-color: rgba(57, 255, 20, 0.42);
+}
+
+.context-row span:nth-child(3),
+.commerce-list span:nth-child(3) {
+  color: var(--cyan);
+}
+
+.detail-card {
+  position: absolute;
+  left: 56px;
+  top: 260px;
+  width: 968px;
+  height: 650px;
+  overflow: hidden;
+  border-radius: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 70px rgba(255, 255, 255, 0.04), 0 0 80px rgba(160, 32, 240, 0.14);
+}
+
+.detail-shoe {
+  position: absolute;
+  inset: -40px -190px;
+  background: url("./assets/zapa_cat.png") center / contain no-repeat;
+  filter: saturate(1.18) contrast(1.1);
+}
+
+.benefits {
+  position: absolute;
+  left: 70px;
+  right: 70px;
+  bottom: 310px;
+  display: grid;
+  gap: 18px;
+}
+
+.benefits span {
+  width: fit-content;
+  padding: 15px 24px;
+  border-left: 8px solid var(--lime);
+  background: rgba(0, 0, 0, 0.7);
+  font-size: 55px;
+  font-weight: 1000;
+}
+
+.plans {
+  position: absolute;
+  left: 68px;
+  right: 68px;
+  top: 550px;
+  display: grid;
+  gap: 22px;
+}
+
+.plans div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: 30px 36px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.58);
+}
+
+.plans strong {
+  font-size: 60px;
+  line-height: 1;
+  font-weight: 1000;
+}
+
+.plans span {
+  color: var(--cyan);
+  font-size: 30px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.commerce-list {
+  position: absolute;
+  left: 70px;
+  right: 70px;
+  top: 360px;
+  display: grid;
+  gap: 24px;
+}
+
+.stock-note {
+  position: absolute;
+  left: 120px;
+  right: 120px;
+  bottom: 350px;
+  padding: 22px 28px;
+  border-radius: 999px;
+  border: 1px solid rgba(57, 255, 20, 0.58);
+  color: var(--lime);
+  background: rgba(0, 0, 0, 0.66);
+  font-size: 34px;
+  font-weight: 950;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(57, 255, 20, 0.14);
+}
+
+.poll {
+  position: absolute;
+  left: 86px;
+  right: 86px;
+  top: 420px;
+  display: grid;
+  gap: 22px;
+  padding: 42px;
+  border-radius: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.72);
+  box-shadow: 0 0 70px rgba(0, 224, 255, 0.14);
+}
+
+.poll-title {
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 1000;
+  text-align: center;
+}
+
+.poll-option {
+  padding: 28px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(57, 255, 20, 0.9), rgba(0, 224, 255, 0.86));
+  color: #001005;
+  font-size: 48px;
+  font-weight: 1000;
+  text-align: center;
+}
+
+.poll-option:last-child {
+  background: linear-gradient(90deg, rgba(160, 32, 240, 0.92), rgba(0, 224, 255, 0.78));
+  color: #fff;
+}
+
+.final-copy {
+  position: absolute;
+  left: 60px;
+  right: 60px;
+  top: 250px;
+  display: grid;
+  gap: 24px;
+  text-align: center;
+}
+
+.final-copy h2 {
+  font-size: 160px;
+  text-shadow: 0 0 50px rgba(160, 32, 240, 0.7);
+}
+
+.final-copy p {
+  margin: 0;
+  font-size: 50px;
+  line-height: 1.02;
+  font-weight: 1000;
+}
+
+.final-copy p:nth-child(3) {
+  color: var(--cyan);
+}
+
+.final-copy strong {
+  margin: 18px auto 0;
+  width: fit-content;
+  padding: 22px 30px;
+  border-radius: 24px;
+  border: 1px solid rgba(57, 255, 20, 0.72);
+  color: var(--lime);
+  background: rgba(0, 0, 0, 0.66);
+  font-size: 42px;
+  box-shadow: 0 0 48px rgba(57, 255, 20, 0.18);
+}
+
+.brand-footer {
+  z-index: 80;
+  left: 58px;
+  right: 58px;
+  bottom: 70px;
+  padding: 18px 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.66);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+#root[data-scene="hook"] .shoe-main {
+  top: 710px;
+  transform: rotate(-3deg) scale(1.05);
+}
+
+#root[data-scene="contexts"] .shoe-main {
+  top: 1030px;
+  opacity: 0.62;
+  transform: rotate(-6deg) scale(0.82);
+}
+
+#root[data-scene="product"] .shoe-main {
+  opacity: 0;
+}
+
+#root[data-scene="versatility"] .shoe-main,
+#root[data-scene="commerce"] .shoe-main,
+#root[data-scene="poll"] .shoe-main {
+  top: 980px;
+  opacity: 0.38;
+  transform: translateX(130px) rotate(-7deg) scale(0.78);
+}
+
+#root[data-scene="final"] .shoe-main {
+  top: 900px;
+  transform: rotate(-3deg) scale(0.92);
+}

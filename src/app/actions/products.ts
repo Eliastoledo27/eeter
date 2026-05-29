@@ -15,6 +15,7 @@ export interface ProductType {
     images: string[];
     stock_by_size: Record<string, number>;
     is_active: boolean;
+    brand?: string | null;
     created_at?: string;
     auraScore?: number;
     liquidation_active?: boolean;

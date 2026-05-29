@@ -1,0 +1,130 @@
+{
+  "nota": "Inventario resumido. No copiar archivos pesados al contexto de Gemini; referenciarlos por ruta.",
+  "logos": [
+    {
+      "ruta": "public/logo.png",
+      "descripcion": "Logo principal ETER.",
+      "uso_sugerido": "Splash, header, login, cierre de pantallas.",
+      "incluir_en_app": true
+    },
+    {
+      "ruta": "public/texto.png",
+      "descripcion": "Wordmark/texto ETER usado en hero.",
+      "uso_sugerido": "Hero publico y pantallas de marca.",
+      "incluir_en_app": true
+    },
+    {
+      "ruta": "public/icon.svg",
+      "descripcion": "Icono SVG del proyecto.",
+      "uso_sugerido": "App icon o favicon si se adapta.",
+      "incluir_en_app": true
+    }
+  ],
+  "imagenes_marca": [
+    {
+      "ruta": "public/hero.webp",
+      "descripcion": "Hero visual de zapatilla premium ETER.",
+      "uso_sugerido": "Inicio/catalogo.",
+      "incluir_en_app": true
+    },
+    {
+      "ruta": "public/zapa_cat.png",
+      "descripcion": "Producto grafico para catalogo/campanas.",
+      "uso_sugerido": "Onboarding revendedores y piezas de marca.",
+      "incluir_en_app": true
+    },
+    {
+      "ruta": "public/design/mancha cian.png",
+      "descripcion": "Textura/mancha cian.",
+      "uso_sugerido": "Fondo/acento, con moderacion.",
+      "incluir_en_app": true
+    },
+    {
+      "ruta": "public/design/mancha verde.png",
+      "descripcion": "Textura/mancha verde.",
+      "uso_sugerido": "Acento revendedor/stock.",
+      "incluir_en_app": true
+    },
+    {
+      "ruta": "public/design/mancha violeta.png",
+      "descripcion": "Textura/mancha violeta.",
+      "uso_sugerido": "Acento visual secundario.",
+      "incluir_en_app": true
+    },
+    {
+      "ruta": "public/design/grafiti cian.png",
+      "descripcion": "Trazo graffiti cian.",
+      "uso_sugerido": "Campanas/hero, no saturar UI operativa.",
+      "incluir_en_app": true
+    },
+    {
+      "ruta": "public/design/lineas grafiti tricolor.png",
+      "descripcion": "Lineas graffiti tricolor.",
+      "uso_sugerido": "Decoracion puntual.",
+      "incluir_en_app": true
+    }
+  ],
+  "open_graph": [
+    {
+      "ruta": "public/catalog-og.jpg",
+      "descripcion": "Imagen social de catalogo.",
+      "uso_sugerido": "Preview web/social.",
+      "incluir_en_app": false
+    },
+    {
+      "ruta": "public/dashboard-og.jpg",
+      "descripcion": "Imagen social dashboard.",
+      "uso_sugerido": "Preview web/social.",
+      "incluir_en_app": false
+    }
+  ],
+  "audio": [
+    {
+      "ruta": "public/audio/*.mp3",
+      "descripcion": "Tracks usados en experiencia ETER/FETER.",
+      "uso_sugerido": "No cargar por defecto en app mobile; opcional en seccion musica.",
+      "incluir_en_app": false
+    }
+  ],
+  "videos": [
+    {
+      "ruta": "exports/eter-revendedores-instagram-1080x1920.mp4",
+      "descripcion": "Video vertical de revendedores.",
+      "uso_sugerido": "Material de marketing, no embebido por defecto.",
+      "incluir_en_app": false
+    },
+    {
+      "ruta": "videos/eter-revendedores-ad/",
+      "descripcion": "Proyecto Hyperframes para anuncio revendedores.",
+      "uso_sugerido": "Referencia de copy y estetica.",
+      "incluir_en_app": false
+    }
+  ],
+  "documentos_importantes": [
+    {
+      "ruta": "src/config/branding.ts",
+      "descripcion": "Base oficial de marca, Aura, frases y sistema revendedor.",
+      "uso_sugerido": "Fuente de tono y reglas.",
+      "incluir_en_app": false
+    },
+    {
+      "ruta": "tailwind.config.ts",
+      "descripcion": "Tokens visuales Tailwind.",
+      "uso_sugerido": "Fuente de paleta.",
+      "incluir_en_app": false
+    },
+    {
+      "ruta": "supabase_schema.sql",
+      "descripcion": "Esquema base de perfiles, productos, ordenes y academia.",
+      "uso_sugerido": "Referencia tecnica.",
+      "incluir_en_app": false
+    },
+    {
+      "ruta": "MyApplication/",
+      "descripcion": "App Android experimental FETER Stock. Contiene patrones utiles, pero no copiar claves hardcodeadas.",
+      "uso_sugerido": "Referencia de funcionalidades administrativas.",
+      "incluir_en_app": false
+    }
+  ]
+}
+

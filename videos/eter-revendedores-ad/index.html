@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ÉTER - Revendedores</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="eter-revendedores-ad"
+      data-start="0"
+      data-duration="42"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div class="grain"></div>
+      <div class="neon neon-a"></div>
+      <div class="neon neon-b"></div>
+      <div class="neon neon-c"></div>
+      <div class="scan"></div>
+
+      <img class="graffiti graffiti-a" src="./assets/grafiti-cian.png" alt="" />
+      <img class="graffiti graffiti-b" src="./assets/grafiti-verde.png" alt="" />
+      <img class="graffiti graffiti-c" src="./assets/grafiti-violeta.png" alt="" />
+      <img class="graffiti graffiti-lines" src="./assets/lineas-grafiti-tricolor.png" alt="" />
+
+      <div class="vault-ring ring-one"></div>
+      <div class="vault-ring ring-two"></div>
+      <div class="floor-grid"></div>
+
+      <img class="shoe hero-shoe" src="./assets/zapa_cat.png" alt="Zapatilla ÉTER" />
+      <img class="logo logo-main" src="./assets/logo.png" alt="ÉTER" />
+
+      <section id="hook-vender-zapatillas" class="scene scene-1 clip" data-start="0" data-duration="3" data-track-index="1">
+        <div class="kicker">ACCESO REVENDEDORES</div>
+        <h1>¿Querés vender zapatillas?</h1>
+      </section>
+
+      <section id="problema-sin-local" class="scene scene-2 clip" data-start="3" data-duration="4" data-track-index="2">
+        <div class="phone-frame">
+          <div class="phone-line short"></div>
+          <div class="phone-line"></div>
+          <div class="phone-line glow"></div>
+          <div class="phone-pill"></div>
+        </div>
+        <div class="split-words">
+          <span>Sin local</span>
+          <span>Sin complicarte</span>
+        </div>
+      </section>
+
+      <section id="marca-eter-mdp" class="scene scene-3 clip" data-start="7" data-duration="5" data-track-index="3">
+        <div class="brand-lockup">
+          <div class="brand-title">ÉTER</div>
+          <div class="brand-sub">Calzado urbano premium</div>
+          <div class="brand-city">Mar del Plata</div>
+        </div>
+      </section>
+
+      <section id="producto-premium-g5" class="scene scene-4 clip" data-start="12" data-duration="5" data-track-index="4">
+        <div class="detail-window">
+          <div class="detail-image"></div>
+        </div>
+        <div class="stacked-tags">
+          <span>Línea brasilera premium</span>
+          <span>Calidad G5</span>
+          <span>Alta rotación</span>
+        </div>
+      </section>
+
+      <section id="sistema-revendedor" class="scene scene-5 clip" data-start="17" data-duration="8" data-track-index="5">
+        <div class="flow">
+          <div class="flow-node">Publicás</div>
+          <div class="flow-node">Te consultan</div>
+          <div class="flow-node strong">Confirmás stock</div>
+          <div class="flow-node">Coordinamos</div>
+        </div>
+      </section>
+
+      <section id="margen-propio" class="scene scene-6 clip" data-start="25" data-duration="6" data-track-index="6">
+        <div class="margin-card base-card">
+          <span>Precio base</span>
+          <div class="blank-line"></div>
+        </div>
+        <div class="margin-card own-card">
+          <span>Margen propio</span>
+          <strong>No es comisión</strong>
+        </div>
+      </section>
+
+      <section id="entrega-pago" class="scene scene-7 clip" data-start="31" data-duration="6" data-track-index="7">
+        <div class="delivery-box">
+          <div class="box-top"></div>
+          <div class="box-mark">ÉTER</div>
+        </div>
+        <div class="delivery-copy">
+          <span>Abonan al recibir</span>
+          <span>Según disponibilidad</span>
+        </div>
+      </section>
+
+      <section id="cierre-cta" class="scene scene-8 clip" data-start="37" data-duration="5" data-track-index="8">
+        <div class="cta">
+          <div class="cta-main">Vos vendés. Nosotros nos encargamos del resto.</div>
+          <div class="cta-sub">Pedí info y empezá a publicar.</div>
+          <div class="cta-final">Escribí: QUIERO VENDER</div>
+        </div>
+      </section>
+
+      <div class="legal-note">Confirmá stock antes de cerrar</div>
+
+      <script>
+        (() => {
+          const duration = 42;
+          const root = document.getElementById("root");
+          const setTime = (time) => {
+            const t = Math.max(0, Math.min(duration, Number(time) || 0));
+            root.style.setProperty("--t", String(t));
+            root.dataset.scene =
+              t < 3 ? "1" :
+              t < 7 ? "2" :
+              t < 12 ? "3" :
+              t < 17 ? "4" :
+              t < 25 ? "5" :
+              t < 31 ? "6" :
+              t < 37 ? "7" : "8";
+            root.querySelectorAll(".scene").forEach((scene) => {
+              const start = Number(scene.dataset.start);
+              const end = start + Number(scene.dataset.duration);
+              const active = t >= start && t < end;
+              scene.classList.toggle("is-active", active);
+              scene.style.setProperty("--local", String(Math.max(0, Math.min(1, (t - start) / (end - start)))));
+            });
+          };
+
+          window.__timelines = window.__timelines || {};
+          window.__timelines["eter-revendedores-ad"] = {
+            duration: () => duration,
+            totalDuration: () => duration,
+            seek: setTime,
+            time: setTime,
+            progress: (p) => setTime(p * duration),
+            pause: () => window.__timelines["eter-revendedores-ad"],
+            play: () => window.__timelines["eter-revendedores-ad"],
+            resume: () => window.__timelines["eter-revendedores-ad"],
+            kill: () => undefined,
+            paused: () => true,
+          };
+          setTime(0);
+        })();
+      </script>
+    </div>
+  </body>
+</html>

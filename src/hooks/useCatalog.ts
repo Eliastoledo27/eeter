@@ -6,9 +6,21 @@ import { SupabaseProductRepository } from '@/infrastructure/repositories/Supabas
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase';
 
-export function useCatalog() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+interface UseCatalogOptions {
+  initialProducts?: Product[];
+  fetchOnMount?: boolean;
+  realtime?: boolean;
+}
+
+export function useCatalog(options: UseCatalogOptions = {}) {
+  const {
+    initialProducts = [],
+    fetchOnMount = true,
+    realtime = true,
+  } = options;
+
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [loading, setLoading] = useState(fetchOnMount && initialProducts.length === 0);
   const [isMounted, setIsMounted] = useState(false);
 
   // Dependency Injection (Manual for now)
@@ -30,7 +42,11 @@ export function useCatalog() {
 
   useEffect(() => {
     setIsMounted(true);
-    refresh();
+    if (fetchOnMount) {
+      refresh();
+    }
+
+    if (!realtime) return;
 
     // Real-time subscription
     // Note: This is leaky abstraction (Supabase specific), ideally should be in Repository too
@@ -46,17 +62,15 @@ export function useCatalog() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [refresh, supabase]);
+  }, [fetchOnMount, realtime, refresh, supabase]);
 
   const addProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
-      // console.log('Attempting to create product:', product); // Removed log
       await repository.create(product);
       toast.success('Producto agregado correctamente');
       refresh();
     } catch (error: unknown) {
       console.error('Error adding product:', error);
-
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
       if (errorMessage.includes('row-level security')) {
@@ -76,7 +90,6 @@ export function useCatalog() {
       toast.success('Producto actualizado correctamente');
       refresh();
     } catch (error: unknown) {
-      // console.error('Error updating product:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       toast.error(`Error al actualizar: ${errorMessage}`);
     }
@@ -94,24 +107,21 @@ export function useCatalog() {
   };
 
   const filterProducts = useCallback((filters: CatalogFilter) => {
-    if (!isMounted) return [];
-
     return products.filter(p => {
       const matchesQuery = p.name.toLowerCase().includes(filters.query.toLowerCase());
       const matchesCategory = filters.category === 'Todos' || !filters.category || p.category === filters.category;
       return matchesQuery && matchesCategory;
     });
-  }, [products, isMounted]);
+  }, [products]);
 
   const categories = useMemo(() => {
-    if (!isMounted) return ['Todos'];
     const unique = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
     return ['Todos', ...unique];
-  }, [products, isMounted]);
+  }, [products]);
 
   return {
-    products: isMounted ? products : [],
-    loading: loading || !isMounted,
+    products,
+    loading,
     categories,
     addProduct,
     updateProduct,

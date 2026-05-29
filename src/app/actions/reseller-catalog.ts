@@ -4,6 +4,40 @@ import { createClient } from '@/utils/supabase/server';
 import { getProducts } from './products';
 import { revalidatePath } from 'next/cache';
 
+export type ResellerCatalogLink = {
+    id: string;
+    name: string;
+    slug: string;
+    href: string;
+    isPremium: boolean;
+};
+
+export async function getActiveResellerCatalogLinks(): Promise<ResellerCatalogLink[]> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, reseller_slug, is_premium')
+        .eq('role', 'reseller')
+        .not('reseller_slug', 'is', null)
+        .order('full_name', { ascending: true });
+
+    if (error || !data) {
+        console.error('Error fetching reseller catalog links:', error);
+        return [];
+    }
+
+    return data
+        .filter((profile) => Boolean(profile.reseller_slug))
+        .map((profile) => ({
+            id: profile.id,
+            name: profile.full_name || 'Revendedor ÉTER',
+            slug: profile.reseller_slug,
+            href: `/c/${profile.reseller_slug}`,
+            isPremium: Boolean(profile.is_premium),
+        }));
+}
+
 /**
  * Get reseller data by their unique slug
  */

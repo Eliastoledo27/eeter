@@ -1,0 +1,11 @@
+{
+  "name": "eter-reel-pago-contra-entrega-hyperframes",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate:audio": "node scripts/generate-original-beat.mjs",
+    "dev": "npx --yes hyperframes@0.6.6 preview",
+    "check": "npx --yes hyperframes@0.6.6 lint && npx --yes hyperframes@0.6.6 validate && npx --yes hyperframes@0.6.6 inspect --samples 12",
+    "render": "npx --yes hyperframes@0.6.6 render --output renders/eter-reel-pago-contra-entrega.mp4 --quality standard --fps 30 --workers 1"
+  }
+}

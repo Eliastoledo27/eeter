@@ -1,0 +1,55 @@
+{
+  "name": "eter",
+  "version": "0.2.0+codex.20260527071546",
+  "description": "Operational memory, expert editing, and creator toolkit for the Eter commerce ecosystem, Feter Stock, Supabase, catalog workflows, mobile app, content production, skills, and plugins.",
+  "author": {
+    "name": "Eter",
+    "email": "dev@eter.local",
+    "url": "https://github.com/Eliastoledo27/eeter"
+  },
+  "homepage": "https://github.com/Eliastoledo27/eeter",
+  "repository": "https://github.com/Eliastoledo27/eeter",
+  "license": "UNLICENSED",
+  "keywords": [
+    "eter",
+    "feter-stock",
+    "supabase",
+    "catalog",
+    "android",
+    "remotion",
+    "commerce",
+    "skills",
+    "plugins",
+    "agent-memory"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "@eter",
+    "shortDescription": "Eter operating memory, editing, and creator toolkit",
+    "longDescription": "A repo-local plugin that captures Eter brand rules, Feter Stock Android workflows, Supabase schema and RPC conventions, catalog behavior, content/video pipelines, troubleshooting playbooks, expert editing flow, and skill/plugin creation standards so future work can start from the ecosystem's real operating context.",
+    "developerName": "Eter",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write",
+      "Code",
+      "Research",
+      "Media",
+      "Automation"
+    ],
+    "websiteURL": "https://github.com/Eliastoledo27/eeter",
+    "privacyPolicyURL": "https://github.com/Eliastoledo27/eeter",
+    "termsOfServiceURL": "https://github.com/Eliastoledo27/eeter",
+    "defaultPrompt": [
+      "Use @eter to fix the Feter Stock app with the correct Supabase connection.",
+      "Use @eter to update the Eter catalog without breaking sections or reseller links.",
+      "Use @eter to create a branded Eter video or marketing asset.",
+      "Use @eter to debug a known build, Supabase, Android, or catalog issue.",
+      "Use @eter to edit the repo professionally when I say Eter without naming files.",
+      "Use @eter to create or repair Eter skills and plugins."
+    ],
+    "brandColor": "#00E5FF",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/logo.png"
+  }
+}

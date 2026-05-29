@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { ProductType } from '@/app/actions/products';
 import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
+import { cartNotify } from '@/components/cart/CartNotificationSystem';
 
 interface ProductQuickViewProps {
     product: ProductType;
@@ -84,9 +85,11 @@ export function ProductQuickView({ product, onClose }: ProductQuickViewProps) {
         setTimeout(() => {
             setIsAdding(false);
             if (!buyNow) {
-                toast.success('ARCHIVO ACTUALIZADO', {
-                    description: `${product.name} (Talle ${selectedSize}) añadido.`,
-                    style: { background: '#020202', color: '#FAFAF9', border: '1px solid rgba(0, 229, 255, 0.2)' }
+                cartNotify({
+                    type: 'added',
+                    title: 'Producto agregado',
+                    productName: `${product.name} — Talle ${selectedSize}`,
+                    productImage: displayImages[0],
                 });
                 setIsCartOpen(true);
                 onClose();

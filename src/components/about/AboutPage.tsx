@@ -102,7 +102,7 @@ export default function AboutPage() {
                                 DIRECTO DE FÁBRICA <br/>AL <span className="text-[#00E5FF]">ASFALTO.</span>
                             </h2>
                             <p className="text-xl text-white/50 leading-relaxed mb-10">
-                                En ÉTER eliminamos las vueltas. Importamos directamente desde Brasil, auditamos cada par en Mar del Plata y lo ponemos en tus manos (o en las de tu cliente) en tiempo récord. Calidad G5/OG: lo que ves es lo que entregás.
+                                En ÉTER eliminamos las vueltas. Importamos directamente desde Brasil, auditamos cada par en Mar del Plata y lo ponemos en tus manos (o en las de tu cliente) en tiempo récord. Selección premium: lo que ves es lo que entregás.
                             </p>
                             
                             <div className="grid gap-6">
