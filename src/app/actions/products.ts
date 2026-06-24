@@ -22,6 +22,7 @@ export interface ProductType {
     liquidation_discount_percent?: number;
     liquidation_price?: number;
     liquidation_at?: string;
+    product_sections?: Array<'home' | 'catalog' | 'liquidation' | 'flash'> | null;
 }
 
 interface SupabaseProduct {
@@ -119,7 +120,7 @@ export async function bulkImportProducts(products: Record<string, unknown>[]) {
 export async function bulkUpdateProducts(updates: { id: string, data: Partial<ProductType> }[]) {
     try {
         let permResult = await checkUserPermissions();
-        
+
         // Retry once if occasionally failing due to network glitch
         if (!permResult.user) {
             await new Promise(res => setTimeout(res, 500));
@@ -129,9 +130,9 @@ export async function bulkUpdateProducts(updates: { id: string, data: Partial<Pr
         const { user, isAdmin, isStaff, error: permError } = permResult;
 
         if (!user || (!isAdmin && !isStaff)) {
-            return { 
-                success: false, 
-                error: `Autorización denegada: ${permError || 'Permisos insuficientes'}` 
+            return {
+                success: false,
+                error: `Autorización denegada: ${permError || 'Permisos insuficientes'}`
             };
         }
 
@@ -142,7 +143,7 @@ export async function bulkUpdateProducts(updates: { id: string, data: Partial<Pr
             process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnon!,
             { auth: { autoRefreshToken: false, persistSession: false } }
         );
-        
+
         console.log(`[bulkUpdateProducts] Processing ${updates.length} updates...`);
         let successCount = 0;
         const errors: { id?: string; error: string }[] = [];
@@ -153,23 +154,23 @@ export async function bulkUpdateProducts(updates: { id: string, data: Partial<Pr
             if (!id) continue;
 
             const dbUpdate: Record<string, unknown> = {};
-            
+
             if (data.name) dbUpdate.name = data.name.trim();
             if (data.category) dbUpdate.category = data.category.trim();
             if (data.description !== undefined) dbUpdate.description = data.description;
             if (data.base_price !== undefined) dbUpdate.price = Number(data.base_price);
-            
+
             if (data.stock_by_size) {
                 const cleanStock = typeof data.stock_by_size === 'object' ? data.stock_by_size : {};
                 dbUpdate.stock_by_size = cleanStock;
-                
+
                 // Precise stock total calculation
                 dbUpdate.stock = Object.values(cleanStock).reduce((acc: number, val: unknown) => {
                     const n = Number(val);
                     return acc + (isNaN(n) ? 0 : n);
                 }, 0);
             }
-            
+
             if (data.is_active !== undefined) {
                 dbUpdate.status = data.is_active ? 'activo' : 'inactivo';
             }
@@ -204,16 +205,16 @@ export async function bulkUpdateProducts(updates: { id: string, data: Partial<Pr
             }
         });
 
-        return { 
-            success: errors.length === 0, 
-            successCount, 
+        return {
+            success: errors.length === 0,
+            successCount,
             errors,
             message: errors.length > 0 ? `Error en ${errors.length} ítems.` : 'Sincronización completa.'
         };
     } catch (error: any) {
         console.error('CRITICAL ERROR in bulkUpdateProducts:', error);
-        return { 
-            success: false, 
+        return {
+            success: false,
             error: error?.message || 'Error de conexión',
             details: 'No se pudo completar la sincronización con la base de datos.'
         };

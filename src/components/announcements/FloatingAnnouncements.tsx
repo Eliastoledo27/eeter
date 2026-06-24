@@ -47,6 +47,10 @@ function getPageKey(pathname: string) {
 
 export function FloatingAnnouncements() {
   const pathname = usePathname();
+
+  // No mostrar en el portal del revendedor
+  if (pathname?.startsWith('/reseller')) return null;
+
   const routeKey = pathname || '/';
   const pageKey = getPageKey(routeKey);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);

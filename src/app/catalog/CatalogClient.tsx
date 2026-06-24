@@ -51,9 +51,10 @@ const easeOut = [0.16, 1, 0.3, 1] as const;
 
 interface CatalogClientProps {
     initialProducts?: ProductType[];
+    resellerCatalogLinks?: any[];
 }
 
-export default function CatalogPage({ initialProducts }: CatalogClientProps) {
+export default function CatalogPage({ initialProducts, resellerCatalogLinks }: CatalogClientProps) {
     const { loading: catalogLoading, categories: dbCategories, products: dbProducts } = useCatalog();
     const viewedIds = useAuraStore((s) => s.viewedIds);
     const purchasedIds = useAuraStore((s) => s.purchasedIds);
@@ -79,11 +80,11 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
 
     // Hydration management
     const mappedInitial = useMemo(() => initialProducts?.map(mapProductTypeToProduct) || [], [initialProducts]);
-    const products = useMemo(() => 
-        dbProducts?.length ? dbProducts : mappedInitial, 
+    const products = useMemo(() =>
+        dbProducts?.length ? dbProducts : mappedInitial,
     [dbProducts, mappedInitial]);
 
-    const categories = useMemo(() => 
+    const categories = useMemo(() =>
         dbCategories?.length > 1 ? dbCategories : (products.length ? ['Todos', ...Array.from(new Set(products.map(p => p.category)))] : ['Todos']),
     [dbCategories, products]);
 
@@ -93,7 +94,7 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
     }, [categories]);
 
     const loading = catalogLoading && products.length === 0;
-    
+
     // Client-only state initialized after mount to prevent hydration mismatch
     const [mounted, setMounted] = useState(false);
     const [recoVariant, setRecoVariant] = useState<RecoVariant | null>(null);
@@ -109,7 +110,7 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
         setRecoVariant(getRecoVariant());
         setVisitorSeed(getRecoVisitorId());
         setExperimentMetrics(getRecoExperimentMetrics());
-        
+
         if (hasCompletedQuiz) {
             setSortBy('aura');
         }
@@ -198,7 +199,7 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
         mounted
     ]);
 
-    const displayProducts = useMemo(() => 
+    const displayProducts = useMemo(() =>
         filteredAndSortedProducts.slice(0, visibleCount),
     [filteredAndSortedProducts, visibleCount]);
     const hasMore = visibleCount < filteredAndSortedProducts.length;
@@ -633,7 +634,7 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
 
                             <aside className="hidden lg:block lg:order-2 lg:pl-10 lg:border-l lg:border-white/5 relative h-full space-y-12">
                                 <div className="absolute -left-[1px] top-0 bottom-0 w-[1px] bg-gradient-to-b from-[#00E5FF]/20 via-[#00E5FF]/5 to-transparent hidden lg:block" />
-                                
+
                                 <FilterSidebar
                                     categories={categories}
                                     activeCategory={activeCategory}
@@ -712,7 +713,7 @@ export default function CatalogPage({ initialProducts }: CatalogClientProps) {
                                     <X size={20} />
                                 </button>
                             </div>
-                            
+
                             <div className="flex-1 space-y-6">
                                 <FilterSidebar
                                     categories={categories}

@@ -63,8 +63,9 @@ export async function getResellerBySlug(slug: string) {
 export async function getResellerProducts(resellerId: string, defaultMarkup: number) {
     const supabase = createClient();
 
-    // 1. Get all base products
-    const products = await getProducts();
+    // 1. Get all base products, filtering out "Aura" (exclusive to Éter)
+    const allProducts = await getProducts();
+    const products = allProducts.filter(product => !product.name.toLowerCase().includes('aura'));
 
     // 2. Get price overrides for this reseller
     const { data: overrides } = await supabase
@@ -166,7 +167,7 @@ export async function updateProductOverride(productId: string, customPrice: numb
 
     if (!product) return { success: false, error: 'Producto no encontrado' };
 
-    if (customPrice < product.price) {
+    if (customPrice < product.price && customPrice !== 0) {
         return { success: false, error: `El precio no puede ser menor al precio base ($${product.price.toLocaleString()})` };
     }
 
@@ -198,4 +199,38 @@ export async function updateProductOverride(productId: string, customPrice: numb
     revalidatePath('/dashboard/myshop');
 
     return { success: true };
+}
+
+/**
+ * Get all reseller profiles for administrative management
+ */
+export async function getAllResellers() {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return { data: null, error: 'No autorizado' };
+
+    // Validate if the requester is an admin or support
+    const { data: adminProfile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+    if (!adminProfile || !['admin', 'support'].includes(adminProfile.role)) {
+        return { data: null, error: 'Permisos insuficientes' };
+    }
+
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .or('role.eq.reseller,reseller_slug.not.is.null')
+        .order('full_name', { ascending: true });
+
+    if (error) {
+        console.error('Error fetching all resellers:', error);
+        return { data: null, error: error.message };
+    }
+
+    return { data, error: null };
 }

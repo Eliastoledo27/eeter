@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useCallback } from 'react';
@@ -7,8 +6,10 @@ import { ShoppingCart, Bike, Box, X } from 'lucide-react';
 import { useEterPulse } from '@/hooks/useEterPulse';
 import { PulseEvent } from '@/types/pulse';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function PulseManager() {
+    const pathname = usePathname();
     const [activeNotification, setActiveNotification] = useState<PulseEvent | null>(null);
 
     const handleNewEvent = useCallback((event: PulseEvent) => {
@@ -21,6 +22,9 @@ export function PulseManager() {
 
     useEterPulse(handleNewEvent);
 
+    // No mostrar en el portal del revendedor
+    if (pathname?.startsWith('/reseller')) return null;
+
     return (
         <div className="pointer-events-none fixed bottom-6 right-5 z-[95] sm:right-6">
             <AnimatePresence mode="wait">
@@ -32,9 +36,9 @@ export function PulseManager() {
                         exit={{ x: 20, opacity: 0, scale: 0.95 }}
                         className="pointer-events-auto"
                     >
-                        <PulseToast 
-                            event={activeNotification} 
-                            onClose={() => setActiveNotification(null)} 
+                        <PulseToast
+                            event={activeNotification}
+                            onClose={() => setActiveNotification(null)}
                         />
                     </motion.div>
                 )}
@@ -54,7 +58,7 @@ function PulseToast({ event, onClose }: { event: PulseEvent, onClose: () => void
 
     const getMessage = () => {
         switch (event.channel) {
-            case 'SALES': 
+            case 'SALES':
                 return (
                     <>
                         <span className="text-white/60">🔥 ¡Venta confirmada! Alguien en </span>
@@ -64,7 +68,7 @@ function PulseToast({ event, onClose }: { event: PulseEvent, onClose: () => void
                         <span className="text-white/60">.</span>
                     </>
                 );
-            case 'LOCAL_DELIVERY': 
+            case 'LOCAL_DELIVERY':
                 return (
                     <>
                         <span className="text-white/60">🛵 ¡Reparto en camino! Uno de nuestros 8 repartidores está entregando unas </span>
@@ -74,7 +78,7 @@ function PulseToast({ event, onClose }: { event: PulseEvent, onClose: () => void
                         <span className="text-white/60">.</span>
                     </>
                 );
-            case 'NATIONAL_SHIPMENT': 
+            case 'NATIONAL_SHIPMENT':
                 return (
                     <>
                         <span className="text-white/60">📦 ¡Envío despachado! Un par de </span>
@@ -87,24 +91,29 @@ function PulseToast({ event, onClose }: { event: PulseEvent, onClose: () => void
         }
     };
 
+    // Para ventas → lleva al catálogo filtrado por el modelo; para otros → /pulse
+    const linkHref = event.channel === 'SALES' && event.model
+        ? `/catalog?q=${encodeURIComponent(event.model)}`
+        : '/pulse';
+
     return (
         <div className="relative group pointer-events-auto">
             {/* Glow Effect */}
             <div className="absolute -inset-0.5 bg-gradient-to-r from-[#8B5CF6] to-[#00E5FF] rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-            
-            <Link 
-                href="/pulse"
+
+            <Link
+                href={linkHref}
                 className="flex items-center gap-4 bg-[#0A0A0A]/80 backdrop-blur-2xl border border-white/10 p-4 rounded-2xl shadow-2xl max-w-sm hover:bg-[#0A0A0A]/90 transition-all cursor-pointer"
             >
                 <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner">
                     {getIcon()}
                 </div>
-                
+
                 <div className="flex-grow text-xs leading-relaxed">
                     {getMessage()}
                 </div>
 
-                <div 
+                <div
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();

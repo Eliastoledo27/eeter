@@ -19,5 +19,5 @@ export const mapProductTypeToProduct = (p: ProductType): Product => ({
     liquidationActive: p.liquidation_active,
     liquidationPrice: p.liquidation_price,
     liquidationDiscountPercent: p.liquidation_discount_percent,
-    productSections: p.product_sections || ['catalog'],
+    productSections: (p.product_sections || ['catalog']) as Array<'home' | 'catalog' | 'liquidation' | 'flash'>,
 });

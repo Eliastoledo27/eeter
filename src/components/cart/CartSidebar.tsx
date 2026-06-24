@@ -11,13 +11,15 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { createOrderFromCart } from '@/app/actions/orders';
 import { validateCoupon } from '@/app/actions/coupons';
 import { toast } from 'sonner';
 import { cartNotify } from '@/components/cart/CartNotificationSystem';
+import { usePathname } from 'next/navigation';
+import { getResellerBySlug } from '@/app/actions/reseller-catalog';
 
 // Datos bancarios de Éter
 const BANK_DATA = {
@@ -61,7 +63,7 @@ export function CartSidebar() {
     clearCart, cartStep, setCartStep,
     getSubtotal, getDiscountAmount, getTotal: getFinalTotal,
     appliedCoupon, applyCoupon, removeCoupon,
-    setLastOrder
+    setLastOrder, resellerWhatsApp
   } = useCartStore();
 
   const { user } = useAuth();
@@ -72,6 +74,176 @@ export function CartSidebar() {
   const [orderedTotal, setOrderedTotal] = useState(0);
   // Per-item loading state (key: `${id}-${size}`)
   const [itemLoading, setItemLoading] = useState<Record<string, 'remove' | 'qty-up' | 'qty-down'>>({});
+
+  // Reseller-specific path detection and state
+  const pathname = usePathname();
+  const isResellerCatalog = pathname ? pathname.startsWith('/c/') : false;
+  const resellerSlug = isResellerCatalog && pathname ? pathname.split('/')[2] : null;
+
+  const [resellerProfile, setResellerProfile] = useState<any>(null);
+  const [loadingReseller, setLoadingReseller] = useState(false);
+
+  useEffect(() => {
+    if (!resellerSlug) {
+      setResellerProfile(null);
+      return;
+    }
+
+    const fetchReseller = async () => {
+      setLoadingReseller(true);
+      try {
+        const { data, error } = await getResellerBySlug(resellerSlug);
+        if (data) {
+          setResellerProfile(data);
+        } else {
+          console.error(error);
+        }
+      } catch (err) {
+        console.error('Error fetching reseller for cart:', err);
+      } finally {
+        setLoadingReseller(false);
+      }
+    };
+
+    fetchReseller();
+  }, [resellerSlug]);
+
+  const activeTheme = isResellerCatalog ? (resellerProfile?.reseller_theme || 'original') : 'original';
+
+  // Dynamic visual styling configurations for the 6 reseller themes
+  const themeStyles: Record<string, {
+    font: string;
+    container: string;
+    progressBar: string;
+    header: string;
+    card: string;
+    buttonPrimary: string;
+    buttonSecondary: string;
+    input: string;
+    accentText: string;
+    textMuted: string;
+    transferBg: string;
+    transferItem: string;
+    whatsappBtn: string;
+    bgEffects: React.ReactNode;
+  }> = {
+    original: {
+      font: 'font-sans',
+      container: 'bg-[#070707] border-l border-white/5 text-white',
+      progressBar: 'bg-[#00E5FF] shadow-[0_0_8px_rgba(0,229,255,0.8)]',
+      header: 'bg-black/40 border-b border-white/5 backdrop-blur-2xl',
+      card: 'bg-white/[0.01] hover:bg-white/[0.02] border border-white/5 hover:border-white/10 rounded-2xl',
+      buttonPrimary: 'bg-white hover:bg-[#00E5FF] text-black rounded-xl font-semibold',
+      buttonSecondary: 'bg-white/5 text-white/40 hover:text-white border border-white/5 rounded-lg',
+      input: 'bg-[#0c0c0c] border border-white/5 focus:border-[#00E5FF]/30 text-white rounded-xl focus:bg-[#0c0c0c]',
+      accentText: 'text-[#00E5FF]',
+      textMuted: 'text-white/40',
+      transferBg: 'bg-[#0b0b0b] border border-emerald-500/10 rounded-2xl',
+      transferItem: 'bg-white/[0.02] border border-white/5 hover:border-emerald-500/20 rounded-xl',
+      whatsappBtn: 'bg-[#25D366] hover:bg-[#20ba5a] text-white shadow-md rounded-xl',
+      bgEffects: (
+        <div className="absolute inset-0 z-0 opacity-15 pointer-events-none">
+          <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[#00E5FF]/10 blur-[90px] rounded-full" />
+          <div className="absolute bottom-0 left-0 w-[250px] h-[250px] bg-[#7A00FF]/5 blur-[80px] rounded-full" />
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-[0.2] contrast-100 mix-blend-overlay opacity-30" />
+        </div>
+      )
+    },
+    minimal: {
+      font: 'font-sans tracking-tight',
+      container: 'bg-black border-l border-zinc-800 text-zinc-100',
+      progressBar: 'bg-zinc-300',
+      header: 'bg-black border-b border-zinc-900',
+      card: 'bg-transparent border border-zinc-900 hover:border-zinc-700 rounded-none',
+      buttonPrimary: 'bg-white hover:bg-zinc-200 text-black rounded-none font-bold tracking-widest uppercase',
+      buttonSecondary: 'bg-transparent text-zinc-400 hover:text-white border border-zinc-800 rounded-none',
+      input: 'bg-black border border-zinc-800 focus:border-zinc-400 text-white rounded-none placeholder:text-zinc-600 focus:bg-black',
+      accentText: 'text-white font-bold',
+      textMuted: 'text-zinc-500',
+      transferBg: 'bg-black border border-zinc-800 rounded-none',
+      transferItem: 'bg-transparent border border-zinc-900 hover:border-zinc-700 rounded-none',
+      whatsappBtn: 'bg-white hover:bg-zinc-200 text-black border border-zinc-800 rounded-none font-bold uppercase tracking-widest',
+      bgEffects: null
+    },
+    cyber: {
+      font: 'font-mono',
+      container: 'bg-[#020408] border-l-2 border-emerald-500/80 text-emerald-400',
+      progressBar: 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]',
+      header: 'bg-black border-b border-emerald-950/50',
+      card: 'bg-black border border-emerald-950 hover:border-emerald-500/40 rounded-none',
+      buttonPrimary: 'bg-emerald-500 hover:bg-emerald-400 text-black rounded-none font-bold uppercase border border-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]',
+      buttonSecondary: 'bg-transparent text-emerald-600 hover:text-emerald-400 border border-emerald-950 rounded-none',
+      input: 'bg-black border border-emerald-950 focus:border-emerald-500 text-emerald-400 rounded-none placeholder:text-emerald-900 focus:bg-black',
+      accentText: 'text-emerald-400',
+      textMuted: 'text-emerald-700',
+      transferBg: 'bg-[#020408] border border-emerald-500/30 rounded-none',
+      transferItem: 'bg-black border border-emerald-950/80 hover:border-emerald-500/50 rounded-none',
+      whatsappBtn: 'bg-transparent hover:bg-emerald-500/10 text-emerald-400 border border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.2)] rounded-none font-bold uppercase tracking-wider',
+      bgEffects: (
+        <div className="absolute inset-0 z-0 opacity-5 pointer-events-none">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b981_1px,transparent_1px),linear-gradient(to_bottom,#10b981_1px,transparent_1px)] bg-[size:24px_24px]" />
+        </div>
+      )
+    },
+    warm: {
+      font: 'font-serif',
+      container: 'bg-[#1a1816] border-l border-[#2c2824] text-[#F5F2EB]',
+      progressBar: 'bg-[#D39E82]',
+      header: 'bg-[#121110] border-b border-[#2c2824]',
+      card: 'bg-[#22201d] border border-[#2c2824] hover:border-[#D39E82]/30 rounded-xl',
+      buttonPrimary: 'bg-[#D39E82] hover:bg-[#c58d70] text-[#1a1816] rounded-xl font-serif font-medium',
+      buttonSecondary: 'bg-[#22201d] text-[#8F9E8B] hover:text-[#F5F2EB] border border-[#2c2824] rounded-xl',
+      input: 'bg-[#121110] border border-[#2c2824] focus:border-[#D39E82]/40 text-[#F5F2EB] rounded-xl placeholder:text-[#8F9E8B]/40 focus:bg-[#121110]',
+      accentText: 'text-[#D39E82]',
+      textMuted: 'text-[#8F9E8B]',
+      transferBg: 'bg-[#121110] border border-[#2c2824] rounded-xl',
+      transferItem: 'bg-[#22201d] border border-[#2c2824] hover:border-[#D39E82]/20 rounded-xl',
+      whatsappBtn: 'bg-[#8F9E8B] hover:bg-[#7a8b76] text-[#1a1816] rounded-xl font-medium',
+      bgEffects: (
+        <div className="absolute inset-0 z-0 opacity-[0.08] pointer-events-none">
+          <div className="absolute top-10 left-10 w-[250px] h-[250px] bg-[#D39E82] rounded-full blur-[100px]" />
+        </div>
+      )
+    },
+    swiss: {
+      font: 'font-sans font-medium',
+      container: 'bg-neutral-950 border-l-4 border-white text-white',
+      progressBar: 'bg-[#FF3B30]',
+      header: 'bg-black border-b-2 border-neutral-800',
+      card: 'bg-black border-2 border-neutral-900 hover:border-white rounded-none',
+      buttonPrimary: 'bg-white hover:bg-[#FF3B30] hover:text-white text-black rounded-none font-black uppercase border-2 border-white',
+      buttonSecondary: 'bg-neutral-900 border border-neutral-800 text-white hover:bg-neutral-800 rounded-none',
+      input: 'bg-black border-2 border-neutral-800 focus:border-white text-white rounded-none placeholder:text-neutral-700 focus:bg-black',
+      accentText: 'text-[#FF3B30] font-black',
+      textMuted: 'text-neutral-400',
+      transferBg: 'bg-black border-2 border-white rounded-none',
+      transferItem: 'bg-neutral-950 border border-neutral-900 hover:border-white rounded-none',
+      whatsappBtn: 'bg-[#FF3B30] hover:bg-[#d92e24] text-white rounded-none font-black uppercase border-2 border-[#FF3B30]',
+      bgEffects: null
+    },
+    kinetic: {
+      font: 'font-sans tracking-wide',
+      container: 'bg-[#030303] border-l border-yellow-500/20 text-white',
+      progressBar: 'bg-[#FFFF00] shadow-[0_0_10px_rgba(255,255,0,0.6)]',
+      header: 'bg-[#090909] border-b border-zinc-900',
+      card: 'bg-zinc-950 border border-zinc-900 hover:border-zinc-800 rounded-xl',
+      buttonPrimary: 'bg-[#FFFF00] hover:bg-yellow-400 text-black rounded-lg font-black uppercase italic tracking-wider shadow-[0_4px_12px_rgba(255,255,0,0.15)]',
+      buttonSecondary: 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 rounded-lg',
+      input: 'bg-[#0d0d0d] border border-zinc-800 focus:border-[#FFFF00] text-white rounded-lg placeholder:text-zinc-700 focus:bg-[#0d0d0d]',
+      accentText: 'text-[#FFFF00] font-bold italic',
+      textMuted: 'text-zinc-500',
+      transferBg: 'bg-[#050505] border border-zinc-800 rounded-lg',
+      transferItem: 'bg-zinc-950 border border-zinc-900 hover:border-zinc-800 rounded-lg',
+      whatsappBtn: 'bg-[#FFFF00] hover:bg-yellow-400 text-black rounded-lg shadow-lg font-black uppercase tracking-wider',
+      bgEffects: (
+        <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
+          <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-yellow-500/20 blur-[80px] rounded-full" />
+        </div>
+      )
+    }
+  };
+
+  const currentStyles = themeStyles[activeTheme] || themeStyles.original;
 
   const setItemOp = (key: string, op: 'remove' | 'qty-up' | 'qty-down' | null) => {
     setItemLoading(prev => {
@@ -111,6 +283,13 @@ export function CartSidebar() {
     notes: ''
   });
 
+  // Force direct bank transfer payment option for resellers
+  useEffect(() => {
+    if (isResellerCatalog) {
+      setFormData(prev => ({ ...prev, paymentMethod: 'transferencia' }));
+    }
+  }, [isResellerCatalog]);
+
   // Coupon State
   const [couponCode, setCouponCode] = useState('');
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
@@ -123,8 +302,8 @@ export function CartSidebar() {
     nombre: '',
     apellido: '',
     whatsapp: '',
-    provincia: '',
-    localidad: '',
+    provincia: 'Buenos Aires',
+    localidad: 'Mar del Plata',
     codigoPostal: '',
     direccion: '',
     altura: '',
@@ -147,7 +326,7 @@ export function CartSidebar() {
       customerPhone: shippingForm.whatsapp.trim(),
       deliveryAddress: `${shippingForm.direccion.trim()} ${shippingForm.altura.trim()}${shippingForm.depto ? `, Depto/Piso: ${shippingForm.depto.trim()}` : ''}, ${shippingForm.localidad.trim()}, ${shippingForm.provincia.trim()} (CP ${shippingForm.codigoPostal.trim()})`,
       notes: shippingForm.notas.trim(),
-      resellerName: user?.name || 'Éter Oficial'
+      resellerName: isResellerCatalog && resellerProfile ? (resellerProfile.full_name || 'Mi Showroom') : (user?.name || 'Éter Oficial')
     });
 
     setCheckoutSubStep('payment');
@@ -177,7 +356,11 @@ export function CartSidebar() {
       `▪️ ${item.quantity}x ${item.name} (${item.selectedSize}) — $${(item.basePrice * item.quantity).toLocaleString('es-AR')}`
     ).join('\n');
 
-    const ticket = `🧾 *TICKET DE COMPRA — ÉTER STORE*
+    // Customize ticket title and thanks message if reseller catalog
+    const headerTitle = isResellerCatalog ? formData.resellerName.toUpperCase() : 'ÉTER STORE';
+    const footerThanks = isResellerCatalog ? `Gracias por elegir ${formData.resellerName}` : 'Gracias por elegir ÉTER';
+
+    const ticket = `🧾 *TICKET DE COMPRA — ${headerTitle}*
 ━━━━━━━━━━━━━━━━━━━━
 
 📋 *Ref:* ${refCode}
@@ -187,7 +370,7 @@ export function CartSidebar() {
 👤 *Cliente:* ${formData.customerName}
 📱 *Tel:* +54 9 ${formData.customerPhone}
 📍 *Envío:* ${formData.deliveryAddress}
-🏷️ *Reseller:* ${formData.resellerName}
+${isResellerCatalog ? `🏷️ *Showroom:* ${formData.resellerName}` : `🏷️ *Reseller:* ${formData.resellerName}`}
 
 ━━━━━━━━━━━━━━━━━━━━
 📦 *PRODUCTOS:*
@@ -202,14 +385,16 @@ ${itemsList}
 ✅ *Pedido registrado exitosamente*
 🚚 Te contactaremos para coordinar el envío.
 
-_Gracias por elegir ÉTER_ 🖤`;
+_${footerThanks}_ 🖤`;
 
     return encodeURIComponent(ticket);
   };
 
   const openWhatsApp = (refCode: string, orderItems: any[], orderTotal: number) => {
     const ticket = generateWhatsAppTicket(refCode, orderItems, orderTotal);
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${ticket}`, '_blank');
+    // Dynamic WhatsApp destination number (with backup to fetched profile and fallback to Éter)
+    const number = (isResellerCatalog && (resellerWhatsApp || resellerProfile?.whatsapp_number)) || WHATSAPP_NUMBER;
+    window.open(`https://wa.me/${number}?text=${ticket}`, '_blank');
   };
 
   const handleCheckout = async (e: React.FormEvent) => {
@@ -362,7 +547,11 @@ _Gracias por elegir ÉTER_ 🖤`;
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 32, stiffness: 300 }}
-            className="fixed right-0 top-0 bottom-0 w-full sm:w-[460px] bg-[#070707] border-l border-white/5 z-[210] shadow-[0_0_80px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden text-white"
+            className={cn(
+              "fixed right-0 top-0 bottom-0 w-full sm:w-[460px] z-[210] shadow-[0_0_80px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden",
+              currentStyles.container,
+              currentStyles.font
+            )}
           >
             {/* Minimal Horizontal Progress Bar at the top of the cart */}
             {cartStep !== 'success' && (
@@ -375,20 +564,16 @@ _Gracias por elegir ÉTER_ 🖤`;
                            cartStep === 'transferencia' ? '90%' : '100%'
                   }}
                   transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                  className="h-full bg-[#00E5FF] shadow-[0_0_8px_rgba(0,229,255,0.8)]"
+                  className={cn("h-full transition-all duration-300", currentStyles.progressBar)}
                 />
               </div>
             )}
 
             {/* Background Effects */}
-            <div className="absolute inset-0 z-0 opacity-15 pointer-events-none">
-              <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[#00E5FF]/10 blur-[90px] rounded-full" />
-              <div className="absolute bottom-0 left-0 w-[250px] h-[250px] bg-[#7A00FF]/5 blur-[80px] rounded-full" />
-              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-[0.2] contrast-100 mix-blend-overlay opacity-30" />
-            </div>
+            {currentStyles.bgEffects}
 
             {/* ── Header ── */}
-            <header className="relative flex items-center justify-between px-6 py-5 border-b border-white/5 bg-black/40 backdrop-blur-2xl z-50 shrink-0">
+            <header className={cn("relative flex items-center justify-between px-6 py-5 z-50 shrink-0 border-b", currentStyles.header)}>
               <div className="flex items-center gap-3">
                 {(cartStep === 'checkout' || cartStep === 'transferencia') && (
                   <button
@@ -400,7 +585,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                         if (cartStep === 'transferencia') setCheckoutSubStep('payment');
                       }
                     }}
-                    className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center hover:bg-white/10 hover:border-white/15 transition-all group"
+                    className={cn("w-8 h-8 flex items-center justify-center transition-all group", currentStyles.buttonSecondary)}
                   >
                     <ArrowLeft size={14} className="text-white/60 group-hover:text-white" />
                   </button>
@@ -428,7 +613,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                 )}
                 <button
                   onClick={() => { toggleCart(); if (cartStep === 'success' || cartStep === 'transferencia') setCartStep('items'); }}
-                  className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center hover:bg-[#FF0055]/10 hover:border-[#FF0055]/20 group transition-all"
+                  className={cn("w-8 h-8 flex items-center justify-center group transition-all", currentStyles.buttonSecondary)}
                 >
                   <X className="text-white/60 group-hover:text-[#FF0055]" size={15} />
                 </button>
@@ -437,10 +622,10 @@ _Gracias por elegir ÉTER_ 🖤`;
 
             {/* Alert Banner for free shipping (shown on items and checkout steps) */}
             {(cartStep === 'items' || cartStep === 'checkout') && (
-              <div className="flex items-center gap-2 bg-[#0c0c0c] border-b border-white/5 px-6 py-3 shrink-0 z-40">
-                <Truck size={14} className="text-white/40" />
-                <span className="text-[11px] text-white/50 font-medium">
-                  Tenés envío gratis en compras superiores a <span className="text-[#00E5FF] font-semibold">$250.000</span>
+              <div className={cn("flex items-center gap-2 px-6 py-3 shrink-0 z-40 border-b", currentStyles.header)}>
+                <Truck size={14} className="opacity-50" />
+                <span className={cn("text-[11px] font-medium", currentStyles.textMuted)}>
+                  Tenés envío gratis en compras superiores a <span className={cn("font-semibold", currentStyles.accentText)}>$250.000</span>
                 </span>
               </div>
             )}
@@ -459,7 +644,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                       <p className="text-white/40 text-xs max-w-[240px] leading-relaxed mb-8">Agrega productos del catálogo para comenzar tu pedido.</p>
                       <Button
                         onClick={toggleCart}
-                        className="bg-white hover:bg-neutral-200 text-black font-semibold text-xs tracking-wider uppercase py-5 px-8 rounded-xl transition-all"
+                        className={cn("font-semibold text-xs tracking-wider uppercase py-5 px-8 transition-all", currentStyles.buttonPrimary)}
                       >
                         Explorar Catálogo
                       </Button>
@@ -478,7 +663,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                               animate={{ opacity: isRemoving ? 0.3 : 1, y: 0 }}
                               exit={{ opacity: 0, x: -20 }}
                               key={key}
-                              className="group flex gap-4 bg-white/[0.01] hover:bg-white/[0.02] border border-white/5 hover:border-white/10 rounded-2xl p-4 transition-all relative overflow-hidden"
+                              className={cn("group flex gap-4 p-4 transition-all relative overflow-hidden", currentStyles.card)}
                             >
                               {/* Remove loading overlay */}
                               {isRemoving && (
@@ -507,12 +692,12 @@ _Gracias por elegir ÉTER_ 🖤`;
                                       {isRemoving ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={13} />}
                                     </button>
                                   </div>
-                                  <p className="text-[10px] font-medium text-white/40 mt-1">Talle: {item.selectedSize}</p>
+                                  <p className={cn("text-[10px] font-medium mt-1", currentStyles.textMuted)}>Talle: {item.selectedSize}</p>
                                 </div>
-                                
+
                                 <div className="flex justify-between items-center mt-2">
                                   {/* Quantity Selector */}
-                                  <div className="flex items-center bg-white/5 border border-white/5 rounded-lg p-0.5">
+                                  <div className={cn("flex items-center p-0.5", currentStyles.buttonSecondary)}>
                                     <button
                                       onClick={() => handleUpdateQuantity(item.id, item.selectedSize, item.quantity - 1, 'down', item.name, item.images?.[0])}
                                       disabled={!!op || item.quantity <= 1}
@@ -533,9 +718,9 @@ _Gracias por elegir ÉTER_ 🖤`;
                                       {op === 'qty-up' ? <Loader2 size={10} className="animate-spin" /> : <Plus size={10} />}
                                     </button>
                                   </div>
-                                  
+
                                   <span className="font-semibold text-sm text-white">
-                                    ${(item.basePrice * item.quantity).toLocaleString('es-AR')}
+                                    $${(item.basePrice * item.quantity).toLocaleString('es-AR')}
                                   </span>
                                 </div>
                               </div>
@@ -547,10 +732,10 @@ _Gracias por elegir ÉTER_ 🖤`;
                       {/* Collapsible Coupon Input */}
                       <div className="border-t border-white/5 pt-5 mt-6">
                         {appliedCoupon ? (
-                          <div className="flex justify-between items-center bg-[#00E5FF]/5 p-3 rounded-xl border border-[#00E5FF]/10">
+                          <div className={cn("flex justify-between items-center p-3 rounded-xl border", currentStyles.card)}>
                             <div className="flex items-center gap-2">
-                              <Percent size={12} className="text-[#00E5FF]" />
-                              <span className="text-xs font-bold text-[#00E5FF] tracking-wider">{appliedCoupon.code}</span>
+                              <Percent size={12} className={cn(currentStyles.accentText)} />
+                              <span className={cn("text-xs font-bold tracking-wider", currentStyles.accentText)}>{appliedCoupon.code}</span>
                             </div>
                             <button onClick={removeCoupon} className="text-[10px] font-semibold text-[#FF3A5C] hover:underline uppercase tracking-wider">
                               Eliminar
@@ -561,12 +746,12 @@ _Gracias por elegir ÉTER_ 🖤`;
                             <button
                               type="button"
                               onClick={() => setShowCouponInput(!showCouponInput)}
-                              className="text-xs font-medium text-white/50 hover:text-white flex items-center gap-1.5 transition-colors"
+                              className={cn("text-xs font-medium flex items-center gap-1.5 transition-colors", currentStyles.textMuted, "hover:text-white")}
                             >
                               <Tag size={12} />
                               ¿Tenés un código alpha?
                             </button>
-                            
+
                             {showCouponInput && (
                               <div className="flex gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
                                 <input
@@ -574,12 +759,12 @@ _Gracias por elegir ÉTER_ 🖤`;
                                   placeholder="Escribe el código aquí"
                                   value={couponCode}
                                   onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                                  className="flex-1 bg-white/5 border border-white/5 rounded-xl px-4 py-2 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-[#00E5FF]/30 transition-all uppercase"
+                                  className={cn("flex-1 px-4 py-2 text-xs border focus:outline-none transition-all uppercase", currentStyles.input)}
                                 />
                                 <button
                                   onClick={handleApplyCoupon}
                                   disabled={isValidatingCoupon || !couponCode.trim()}
-                                  className="px-4 bg-[#00E5FF]/10 hover:bg-[#00E5FF]/20 text-[#00E5FF] disabled:bg-white/5 disabled:text-white/20 text-xs font-bold rounded-xl transition-all border border-[#00E5FF]/20 disabled:border-transparent flex items-center justify-center min-w-[70px]"
+                                  className={cn("px-4 text-xs font-bold transition-all flex items-center justify-center min-w-[70px]", currentStyles.buttonPrimary)}
                                 >
                                   {isValidatingCoupon ? <Loader2 className="animate-spin" size={14} /> : 'Aplicar'}
                                 </button>
@@ -601,7 +786,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                     <div className="space-y-5">
                       <div>
                         <h3 className="text-xs font-bold text-white uppercase tracking-wider">DATOS DE ENTREGA</h3>
-                        <p className="text-[11px] text-white/40 mt-1">Completá los datos del cliente final para coordinar la entrega.</p>
+                        <p className={cn("text-[11px] mt-1", currentStyles.textMuted)}>Completá los datos del cliente final para coordinar la entrega.</p>
                       </div>
 
                       <div className="space-y-3.5">
@@ -613,7 +798,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                             placeholder="Nombre"
                             value={shippingForm.nombre}
                             onChange={e => setShippingForm({ ...shippingForm, nombre: e.target.value })}
-                            className="w-full bg-[#0c0c0c] border border-white/5 rounded-xl py-3 px-3.5 text-xs text-white focus:outline-none focus:border-[#00E5FF]/30 focus:bg-[#0c0c0c] transition-all placeholder:text-white/20"
+                            className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all", currentStyles.input)}
                           />
                           <input
                             required
@@ -621,7 +806,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                             placeholder="Apellido"
                             value={shippingForm.apellido}
                             onChange={e => setShippingForm({ ...shippingForm, apellido: e.target.value })}
-                            className="w-full bg-[#0c0c0c] border border-white/5 rounded-xl py-3 px-3.5 text-xs text-white focus:outline-none focus:border-[#00E5FF]/30 focus:bg-[#0c0c0c] transition-all placeholder:text-white/20"
+                            className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all", currentStyles.input)}
                           />
                         </div>
 
@@ -633,7 +818,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                             placeholder="WhatsApp"
                             value={shippingForm.whatsapp}
                             onChange={e => setShippingForm({ ...shippingForm, whatsapp: e.target.value.replace(/[^0-9]/g, '') })}
-                            className="w-full bg-[#0c0c0c] border border-white/5 rounded-xl py-3 pl-3.5 pr-10 text-xs text-white focus:outline-none focus:border-[#00E5FF]/30 focus:bg-[#0c0c0c] transition-all placeholder:text-white/20"
+                            className={cn("w-full py-3 pl-3.5 pr-10 text-xs focus:outline-none transition-all", currentStyles.input)}
                           />
                           {/* WhatsApp SVG Logo Icon */}
                           <svg className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -641,31 +826,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                           </svg>
                         </div>
 
-                        {/* Provincia & Localidad */}
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="relative">
-                            <select
-                              required
-                              value={shippingForm.provincia}
-                              onChange={e => setShippingForm({ ...shippingForm, provincia: e.target.value })}
-                              className="w-full bg-[#0c0c0c] border border-white/5 rounded-xl py-3 pl-3.5 pr-8 text-xs text-white focus:outline-none focus:border-[#00E5FF]/30 transition-all appearance-none cursor-pointer"
-                            >
-                              <option value="" disabled className="text-white/20">Provincia</option>
-                              {PROVINCIAS.map(p => (
-                                <option key={p} value={p} className="bg-[#0c0c0c] text-white">{p}</option>
-                              ))}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" size={14} />
-                          </div>
-                          <input
-                            required
-                            type="text"
-                            placeholder="Localidad"
-                            value={shippingForm.localidad}
-                            onChange={e => setShippingForm({ ...shippingForm, localidad: e.target.value })}
-                            className="w-full bg-[#0c0c0c] border border-white/5 rounded-xl py-3 px-3.5 text-xs text-white focus:outline-none focus:border-[#00E5FF]/30 focus:bg-[#0c0c0c] transition-all placeholder:text-white/20"
-                          />
-                        </div>
+
 
                         {/* Código postal */}
                         <input
@@ -674,7 +835,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                           placeholder="Código postal"
                           value={shippingForm.codigoPostal}
                           onChange={e => setShippingForm({ ...shippingForm, codigoPostal: e.target.value })}
-                          className="w-full bg-[#0c0c0c] border border-white/5 rounded-xl py-3 px-3.5 text-xs text-white focus:outline-none focus:border-[#00E5FF]/30 focus:bg-[#0c0c0c] transition-all placeholder:text-white/20"
+                          className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all", currentStyles.input)}
                         />
 
                         {/* Dirección */}
@@ -684,7 +845,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                           placeholder="Dirección"
                           value={shippingForm.direccion}
                           onChange={e => setShippingForm({ ...shippingForm, direccion: e.target.value })}
-                          className="w-full bg-[#0c0c0c] border border-white/5 rounded-xl py-3 px-3.5 text-xs text-white focus:outline-none focus:border-[#00E5FF]/30 focus:bg-[#0c0c0c] transition-all placeholder:text-white/20"
+                          className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all", currentStyles.input)}
                         />
 
                         {/* Altura / Calle y número */}
@@ -694,7 +855,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                           placeholder="Altura / Calle y número"
                           value={shippingForm.altura}
                           onChange={e => setShippingForm({ ...shippingForm, altura: e.target.value })}
-                          className="w-full bg-[#0c0c0c] border border-white/5 rounded-xl py-3 px-3.5 text-xs text-white focus:outline-none focus:border-[#00E5FF]/30 focus:bg-[#0c0c0c] transition-all placeholder:text-white/20"
+                          className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all", currentStyles.input)}
                         />
 
                         {/* Departamento / Piso (opcional) */}
@@ -703,7 +864,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                           placeholder="Departamento / Piso (opcional)"
                           value={shippingForm.depto}
                           onChange={e => setShippingForm({ ...shippingForm, depto: e.target.value })}
-                          className="w-full bg-[#0c0c0c] border border-white/5 rounded-xl py-3 px-3.5 text-xs text-white focus:outline-none focus:border-[#00E5FF]/30 focus:bg-[#0c0c0c] transition-all placeholder:text-white/20"
+                          className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all", currentStyles.input)}
                         />
 
                         {/* Referencias o notas (opcional) */}
@@ -711,7 +872,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                           placeholder="Referencias o notas (opcional)"
                           value={shippingForm.notas}
                           onChange={e => setShippingForm({ ...shippingForm, notas: e.target.value })}
-                          className="w-full bg-[#0c0c0c] border border-white/5 rounded-xl py-3 px-3.5 text-xs text-white focus:outline-none focus:border-[#00E5FF]/30 focus:bg-[#0c0c0c] transition-all min-h-[80px] resize-none placeholder:text-white/20"
+                          className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all min-h-[80px] resize-none", currentStyles.input)}
                         />
                       </div>
 
@@ -719,7 +880,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                       <button
                         type="button"
                         onClick={handleGoToPayment}
-                        className="w-full h-11 bg-[#00E5FF] hover:bg-[#00d4ec] text-black font-semibold text-xs tracking-wider uppercase rounded-xl flex items-center justify-between px-4 transition-all mt-6 shadow-[0_5px_15px_rgba(0,229,255,0.1)] group"
+                        className={cn("w-full h-11 font-semibold text-xs tracking-wider uppercase flex items-center justify-between px-4 transition-all mt-6 group", currentStyles.buttonPrimary)}
                       >
                         <span className="mx-auto">CONTINUAR</span>
                         <ArrowRight size={14} className="shrink-0 group-hover:translate-x-0.5 transition-transform" />
@@ -731,53 +892,65 @@ _Gracias por elegir ÉTER_ 🖤`;
                       {/* Payment Methods */}
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                          <CreditCard size={14} className="text-[#00E5FF]" />
+                          <CreditCard size={14} className={cn(currentStyles.accentText)} />
                           <h3 className="text-xs font-semibold text-white uppercase tracking-wider">Método de Pago</h3>
                         </div>
-                        
-                        <div className="grid grid-cols-3 gap-3">
-                          {[
-                            { id: 'mercadopago', icon: CreditCard, label: 'MP' },
-                            { id: 'transferencia', icon: Banknote, label: 'Transfer' },
-                            { id: 'stripe', icon: Wallet, label: 'Global' }
-                          ].map((method) => {
-                            const isSelected = formData.paymentMethod === method.id;
-                            return (
-                              <div
-                                key={method.id}
-                                onClick={() => setFormData({ ...formData, paymentMethod: method.id as any })}
-                                className={cn(
-                                  "p-3 rounded-xl border cursor-pointer transition-all flex flex-col items-center justify-center gap-1.5 min-h-[70px]",
-                                  isSelected
-                                    ? "bg-white/[0.04] border-[#00E5FF] shadow-[0_0_15px_rgba(0,229,255,0.15)]"
-                                    : "bg-white/[0.01] border-white/5 text-white/40 hover:border-white/10 hover:text-white/60"
-                                )}
-                              >
-                                <method.icon size={18} className={cn(isSelected ? "text-[#00E5FF]" : "text-white/30")} />
-                                <span className="text-[10px] font-semibold tracking-wider uppercase">{method.label}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
+
+                        {isResellerCatalog ? (
+                          <div className={cn("p-5 border space-y-3", currentStyles.transferBg)}>
+                            <div className="flex items-center gap-2">
+                              <Banknote size={16} className={currentStyles.accentText} />
+                              <h3 className={cn("text-xs font-bold uppercase tracking-wider", currentStyles.accentText)}>Transferencia Directa</h3>
+                            </div>
+                            <p className={cn("text-[11px] leading-relaxed", currentStyles.textMuted)}>
+                              Esta tienda procesa los pagos exclusivamente por transferencia bancaria directa al revendedor. Al presionar "Solicitar Transferencia", obtendrás los datos bancarios del showroom para completar tu pago de inmediato.
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-3 gap-3">
+                            {[
+                              { id: 'mercadopago', icon: CreditCard, label: 'MP' },
+                              { id: 'transferencia', icon: Banknote, label: 'Transfer' },
+                              { id: 'stripe', icon: Wallet, label: 'Global' }
+                            ].map((method) => {
+                              const isSelected = formData.paymentMethod === method.id;
+                              return (
+                                <div
+                                  key={method.id}
+                                  onClick={() => setFormData({ ...formData, paymentMethod: method.id as any })}
+                                  className={cn(
+                                    "p-3 rounded-xl border cursor-pointer transition-all flex flex-col items-center justify-center gap-1.5 min-h-[70px]",
+                                    isSelected
+                                      ? "bg-white/[0.04] border-[#00E5FF] shadow-[0_0_15px_rgba(0,229,255,0.15)]"
+                                      : "bg-white/[0.01] border-white/5 text-white/40 hover:border-white/10 hover:text-white/60"
+                                  )}
+                                >
+                                  <method.icon size={18} className={cn(isSelected ? "text-[#00E5FF]" : "text-white/30")} />
+                                  <span className="text-[10px] font-semibold tracking-wider uppercase">{method.label}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
 
                       {/* Totals Box */}
-                      <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 space-y-2 mt-4">
-                        <div className="flex justify-between text-xs text-white/40">
+                      <div className={cn("border p-4 space-y-2 mt-4", currentStyles.card)}>
+                        <div className={cn("flex justify-between text-xs", currentStyles.textMuted)}>
                           <span>Carga Parcial</span>
-                          <span className="text-white">${subtotal.toLocaleString('es-AR')}</span>
+                          <span className="text-white">$${subtotal.toLocaleString('es-AR')}</span>
                         </div>
                         {appliedCoupon && (
-                          <div className="flex justify-between text-xs text-[#00E5FF]">
+                          <div className={cn("flex justify-between text-xs", currentStyles.accentText)}>
                             <span>Descuento ({appliedCoupon.code})</span>
-                            <span>-${discount.toLocaleString('es-AR')}</span>
+                            <span>-$${discount.toLocaleString('es-AR')}</span>
                           </div>
                         )}
                         <div className="h-px bg-white/5 my-2" />
                         <div className="flex justify-between items-center">
                           <span className="text-xs font-semibold text-white">Total a Liquidar</span>
-                          <span className="text-base font-bold text-[#00E5FF]">
-                            ${total.toLocaleString('es-AR')}
+                          <span className={cn("text-base font-bold", currentStyles.accentText)}>
+                            $${total.toLocaleString('es-AR')}
                           </span>
                         </div>
                       </div>
@@ -788,19 +961,23 @@ _Gracias por elegir ÉTER_ 🖤`;
                           type="submit"
                           disabled={isProcessing}
                           className={cn(
-                            "w-full h-11 rounded-xl flex items-center justify-center gap-2 font-semibold text-xs tracking-wider uppercase transition-all duration-300 relative overflow-hidden group text-black",
-                            formData.paymentMethod === 'mercadopago' ? "bg-[#00E5FF] hover:bg-[#00B3FF]" :
-                            formData.paymentMethod === 'transferencia' ? "bg-[#10B981] text-white hover:bg-[#0E9F6E]" :
-                            "bg-white hover:bg-neutral-200"
+                            "w-full h-11 rounded-xl flex items-center justify-center gap-2 font-semibold text-xs tracking-wider uppercase transition-all duration-300 relative overflow-hidden group",
+                            isResellerCatalog ? currentStyles.buttonPrimary : (
+                              formData.paymentMethod === 'mercadopago' ? "bg-[#00E5FF] hover:bg-[#00B3FF] text-black" :
+                              formData.paymentMethod === 'transferencia' ? "bg-[#10B981] text-white hover:bg-[#0E9F6E]" :
+                              "bg-white hover:bg-neutral-200 text-black"
+                            )
                           )}
                         >
                           {isProcessing ? (
                             <><Loader2 className="animate-spin" size={16} /> <span>Procesando...</span></>
                           ) : (
                             <span className="flex items-center gap-2">
-                              {formData.paymentMethod === 'mercadopago' ? 'Pagar con Mercado Pago' :
-                               formData.paymentMethod === 'transferencia' ? 'Solicitar Transferencia' :
-                               'Pagar con Stripe'}
+                              {isResellerCatalog ? 'Solicitar Transferencia' : (
+                                formData.paymentMethod === 'mercadopago' ? 'Pagar con Mercado Pago' :
+                                formData.paymentMethod === 'transferencia' ? 'Solicitar Transferencia' :
+                                'Pagar con Stripe'
+                              )}
                               <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                             </span>
                           )}
@@ -809,7 +986,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                         <button
                           type="button"
                           onClick={() => setCheckoutSubStep('shipping')}
-                          className="w-full text-center text-[10px] font-semibold text-white/30 hover:text-white uppercase tracking-wider py-1.5 transition-colors"
+                          className={cn("w-full text-center text-[10px] font-semibold uppercase tracking-wider py-1.5 transition-colors", currentStyles.textMuted, "hover:text-white")}
                         >
                           Volver a los datos de envío
                         </button>
@@ -822,48 +999,72 @@ _Gracias por elegir ÉTER_ 🖤`;
               {/* ════════════════════ STEP: TRANSFERENCIA ════════════════════ */}
               {cartStep === 'transferencia' && (
                 <div className="px-1 py-1 animate-in slide-in-from-right-5 duration-300 space-y-6">
-                  <div className="bg-[#0b0b0b] border border-emerald-500/10 rounded-2xl p-5 relative overflow-hidden shadow-lg">
+                  <div className={cn("border p-5 relative overflow-hidden shadow-lg", currentStyles.transferBg)}>
                     <div className="text-center mb-6">
                       <div className="w-14 h-14 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Banknote className="text-emerald-400" size={24} />
                       </div>
                       <h3 className="text-base font-semibold text-white">Orden de Transferencia</h3>
-                      <p className="text-white/40 text-[10px] uppercase tracking-wider mt-1">Sincronización VIP Activada</p>
+                      <p className={cn("text-[10px] uppercase tracking-wider mt-1 font-mono", currentStyles.accentText)}>Sincronización Showroom Activada</p>
                     </div>
 
                     <div className="space-y-3">
-                      {[
-                        { label: 'Alias de cuenta', value: BANK_DATA.alias, key: 'alias', icon: Target },
-                        { label: 'Titular de la cuenta', value: BANK_DATA.titular, key: 'titular', icon: Shield },
-                        { label: 'Banco', value: BANK_DATA.banco, key: 'banco', icon: Zap },
-                      ].map(({ label, value, key, icon: Icon }) => (
-                        <div key={key} className="flex items-center justify-between bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 hover:border-emerald-500/20 transition-all">
-                          <div>
-                            <span className="text-[9px] font-semibold text-white/30 uppercase tracking-wider block mb-0.5">{label}</span>
-                            <span className="text-xs font-medium text-white">{value}</span>
+                      {(() => {
+                        const getBankDetails = () => {
+                          if (isResellerCatalog && resellerProfile) {
+                            return {
+                              alias: resellerProfile.bank_alias,
+                              cbu: resellerProfile.bank_cbu,
+                              titular: resellerProfile.bank_owner_name || resellerProfile.full_name || 'Titular no especificado',
+                              banco: resellerProfile.bank_cbu ? 'CBU / CVU' : 'Transferencia Directa'
+                            };
+                          }
+                          return {
+                            alias: BANK_DATA.alias,
+                            cbu: null,
+                            titular: BANK_DATA.titular,
+                            banco: BANK_DATA.banco
+                          };
+                        };
+
+                        const bankDetails = getBankDetails();
+
+                        const transferItems = [
+                          { label: 'Titular de la cuenta', value: bankDetails.titular, key: 'titular', icon: Shield },
+                          ...(bankDetails.alias ? [{ label: 'Alias de cuenta', value: bankDetails.alias, key: 'alias', icon: Target }] : []),
+                          ...(bankDetails.cbu ? [{ label: 'CBU / CVU', value: bankDetails.cbu, key: 'cbu', icon: CreditCard }] : []),
+                          ...(!isResellerCatalog ? [{ label: 'Banco', value: BANK_DATA.banco, key: 'banco', icon: Zap }] : [])
+                        ];
+
+                        return transferItems.map(({ label, value, key, icon: Icon }) => (
+                          <div key={key} className={cn("flex items-center justify-between px-4 py-3 transition-all", currentStyles.transferItem)}>
+                            <div>
+                              <span className={cn("text-[9px] font-semibold uppercase tracking-wider block mb-0.5", currentStyles.textMuted)}>{label}</span>
+                              <span className="text-xs font-medium text-white">{value}</span>
+                            </div>
+                            <button
+                              onClick={() => copyToClipboard(value, key)}
+                              className={cn(
+                                "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+                                copiedField === key
+                                  ? "bg-emerald-500 text-black shadow-md"
+                                  : "bg-white/5 text-white/40 hover:text-white"
+                              )}
+                            >
+                              {copiedField === key ? <CheckCircle2 size={12} /> : <Copy size={12} />}
+                            </button>
                           </div>
-                          <button
-                            onClick={() => copyToClipboard(value, key)}
-                            className={cn(
-                              "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
-                              copiedField === key 
-                                ? "bg-emerald-500 text-black shadow-md" 
-                                : "bg-white/5 text-white/40 hover:text-white"
-                            )}
-                          >
-                            {copiedField === key ? <CheckCircle2 size={12} /> : <Copy size={12} />}
-                          </button>
-                        </div>
-                      ))}
+                        ));
+                      })()}
                     </div>
 
-                    <div className="mt-5 bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-4 flex justify-between items-center">
+                    <div className={cn("mt-5 border p-4 flex justify-between items-center bg-white/[0.01]", currentStyles.card)}>
                       <div>
-                        <span className="text-[9px] font-semibold text-emerald-400/60 uppercase tracking-wider block">Monto Total</span>
-                        <span className="text-xl font-bold text-emerald-400">${orderedTotal.toLocaleString('es-AR')}</span>
+                        <span className={cn("text-[9px] font-semibold uppercase tracking-wider block", currentStyles.textMuted)}>Monto Total</span>
+                        <span className={cn("text-xl font-bold", currentStyles.accentText)}>$${orderedTotal.toLocaleString('es-AR')}</span>
                       </div>
                       <div className="text-right">
-                        <span className="text-[9px] font-semibold text-white/30 uppercase block">Referencia</span>
+                        <span className={cn("text-[9px] font-semibold uppercase block", currentStyles.textMuted)}>Referencia</span>
                         <span className="text-xs font-mono font-bold text-white">{referenceCode}</span>
                       </div>
                     </div>
@@ -875,7 +1076,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                         clearCart();
                         openWhatsApp(referenceCode!, orderedItems, orderedTotal);
                       }}
-                      className="w-full h-12 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-xl flex items-center justify-center gap-2 font-semibold text-xs tracking-wider uppercase transition-all shadow-md"
+                      className={cn("w-full h-12 flex items-center justify-center gap-2 font-semibold text-xs tracking-wider uppercase transition-all shadow-md", currentStyles.whatsappBtn)}
                     >
                       <MessageCircle size={16} />
                       Enviar comprobante por WhatsApp
@@ -887,7 +1088,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                         setCartStep('items');
                         toggleCart();
                       }}
-                      className="w-full text-center text-[10px] font-semibold text-white/30 hover:text-white uppercase tracking-wider py-1.5 transition-colors"
+                      className={cn("w-full text-center text-[10px] font-semibold uppercase tracking-wider py-1.5 transition-colors", currentStyles.textMuted, "hover:text-white")}
                     >
                       Finalizar Proceso
                     </button>
@@ -921,24 +1122,24 @@ _Gracias por elegir ÉTER_ 🖤`;
 
             {/* ── Footer (Items Step Only) ── */}
             {cartStep === 'items' && items.length > 0 && (
-              <div className="bg-[#050505]/95 border-t border-white/5 px-6 py-5 shadow-[0_-15px_40px_rgba(0,0,0,0.8)] backdrop-blur-md relative z-50 shrink-0">
+              <div className={cn("border-t px-6 py-5 shadow-[0_-15px_40px_rgba(0,0,0,0.8)] backdrop-blur-md relative z-50 shrink-0 bg-black/95", currentStyles.header)}>
                 {/* Totals */}
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-white/40">Subtotal</span>
-                    <span className="font-medium text-white">${subtotal.toLocaleString('es-AR')}</span>
+                    <span className={currentStyles.textMuted}>Subtotal</span>
+                    <span className="font-medium text-white">$${subtotal.toLocaleString('es-AR')}</span>
                   </div>
                   {appliedCoupon && (
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-[#00E5FF]">Descuento ({appliedCoupon.code})</span>
-                      <span className="font-medium text-[#00E5FF]">-${discount.toLocaleString('es-AR')}</span>
+                      <span className={currentStyles.accentText}>Descuento ({appliedCoupon.code})</span>
+                      <span className={cn("font-medium", currentStyles.accentText)}>-$${discount.toLocaleString('es-AR')}</span>
                     </div>
                   )}
                   <div className="h-px bg-white/5 my-2" />
                   <div className="flex justify-between items-center">
                     <span className="text-xs font-semibold text-white">Total</span>
-                    <span className="text-base font-bold text-[#00E5FF] tracking-tight">
-                      ${total.toLocaleString('es-AR')}
+                    <span className={cn("text-base font-bold tracking-tight", currentStyles.accentText)}>
+                      $${total.toLocaleString('es-AR')}
                     </span>
                   </div>
                 </div>
@@ -946,7 +1147,7 @@ _Gracias por elegir ÉTER_ 🖤`;
                 {/* CTA */}
                 <button
                   onClick={handleNextStep}
-                  className="w-full bg-white h-11 rounded-xl flex items-center justify-center gap-2 text-black font-semibold text-xs tracking-wider uppercase hover:bg-[#00E5FF] transition-all duration-300 shadow-[0_5px_15px_rgba(255,255,255,0.02)] active:scale-98 group"
+                  className={cn("w-full h-11 rounded-xl flex items-center justify-center gap-2 font-semibold text-xs tracking-wider uppercase transition-all duration-300 shadow-[0_5px_15px_rgba(255,255,255,0.02)] active:scale-98 group", currentStyles.buttonPrimary)}
                 >
                   <span>Continuar al Pago</span>
                   <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />

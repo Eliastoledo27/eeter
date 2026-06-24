@@ -1,8 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, AlertTriangle, Minus } from 'lucide-react';
+import { useCartStore } from '@/store/cart-store';
+import { cn } from '@/lib/utils';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 export type CartNotificationType = 'added' | 'removed' | 'updated' | 'error' | 'stock_warning';
@@ -74,9 +77,11 @@ const CONFIG: Record<
 function NotificationCard({
   notification,
   onDismiss,
+  resellerTheme,
 }: {
   notification: CartNotification;
   onDismiss: (id: string) => void;
+  resellerTheme: string | null;
 }) {
   const cfg = CONFIG[notification.type];
   const Icon = cfg.icon;
@@ -95,6 +100,101 @@ function NotificationCard({
     el.style.width = '0%';
   }, [duration]);
 
+  const activeTheme = resellerTheme || 'original';
+
+  // Theme card styling configuration
+  const cardThemeStyles: Record<string, {
+    className: string;
+    style: React.CSSProperties;
+    progressBarColor: string;
+    iconBgStyle: React.CSSProperties;
+    titleStyle: React.CSSProperties;
+    productNameClassName: string;
+    messageClassName: string;
+    fontClass: string;
+  }> = {
+    original: {
+      className: "relative w-[320px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[1.25rem]",
+      style: {
+        background: `linear-gradient(135deg, ${cfg.bg}, rgba(5,5,5,0.95))`,
+        border: `1px solid ${cfg.border}`,
+        boxShadow: `0 20px 60px rgba(0,0,0,0.7), 0 0 30px ${cfg.glow}`,
+      },
+      progressBarColor: cfg.color,
+      iconBgStyle: { background: `${cfg.color}20`, border: `1px solid ${cfg.color}40` },
+      titleStyle: { color: cfg.color },
+      productNameClassName: "text-sm font-bold text-white truncate leading-tight",
+      messageClassName: "text-[11px] text-white/50 mt-0.5 leading-relaxed",
+      fontClass: "font-sans",
+    },
+    minimal: {
+      className: "relative w-[320px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-none border border-zinc-800 shadow-md",
+      style: {
+        background: '#09090b',
+      },
+      progressBarColor: '#e4e4e7',
+      iconBgStyle: { background: '#18181b', border: '1px solid #27272a' },
+      titleStyle: { color: '#a1a1aa' },
+      productNameClassName: "text-sm font-medium text-zinc-100 truncate leading-tight",
+      messageClassName: "text-[11px] text-zinc-500 mt-0.5 leading-relaxed",
+      fontClass: "font-sans tracking-tight",
+    },
+    cyber: {
+      className: "relative w-[320px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[0.5rem] border border-dashed border-emerald-500/40",
+      style: {
+        background: '#020408',
+        boxShadow: '0 0 20px rgba(16,185,129,0.15)',
+      },
+      progressBarColor: '#10b981',
+      iconBgStyle: { background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)' },
+      titleStyle: { color: '#10b981' },
+      productNameClassName: "text-sm font-bold text-emerald-300 truncate leading-tight",
+      messageClassName: "text-[11px] text-emerald-600 mt-0.5 leading-relaxed",
+      fontClass: "font-mono",
+    },
+    warm: {
+      className: "relative w-[320px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[1.5rem] border border-[#3a3530]",
+      style: {
+        background: '#1a1816',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.6)',
+      },
+      progressBarColor: '#c2b29f',
+      iconBgStyle: { background: 'rgba(194,178,159,0.08)', border: '1px solid rgba(194,178,159,0.2)' },
+      titleStyle: { color: '#c2b29f' },
+      productNameClassName: "text-sm font-normal text-[#f5f2eb] truncate leading-tight",
+      messageClassName: "text-[11px] text-[#c2b29f]/50 mt-0.5 leading-relaxed",
+      fontClass: "font-serif",
+    },
+    swiss: {
+      className: "relative w-[320px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-none border-2 border-white",
+      style: {
+        background: '#000000',
+        boxShadow: '8px 8px 0px rgba(255,255,255,0.2)',
+      },
+      progressBarColor: '#ef4444',
+      iconBgStyle: { background: '#000000', border: '2px solid #ffffff' },
+      titleStyle: { color: '#ef4444', fontWeight: 900 },
+      productNameClassName: "text-sm font-black text-white uppercase truncate leading-tight",
+      messageClassName: "text-[11px] text-zinc-400 font-medium uppercase mt-0.5 leading-relaxed",
+      fontClass: "font-sans uppercase",
+    },
+    kinetic: {
+      className: "relative w-[320px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-br-[1.5rem] rounded-tl-[1.5rem] rounded-bl-none rounded-tr-none border border-zinc-800",
+      style: {
+        background: '#050506',
+        boxShadow: '0 15px 40px rgba(0,0,0,0.8)',
+      },
+      progressBarColor: '#eab308',
+      iconBgStyle: { background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.2)' },
+      titleStyle: { color: '#eab308' },
+      productNameClassName: "text-sm font-black text-white italic truncate leading-tight skew-x-3",
+      messageClassName: "text-[11px] text-zinc-500 font-bold italic mt-0.5 leading-relaxed skew-x-3",
+      fontClass: "font-sans font-black italic",
+    },
+  };
+
+  const ts = cardThemeStyles[activeTheme];
+
   return (
     <motion.div
       layout
@@ -105,19 +205,15 @@ function NotificationCard({
       role="alert"
       aria-live="polite"
       aria-label={`${notification.title}: ${notification.message ?? ''}`}
-      className="relative w-[320px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[1.25rem] shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
-      style={{
-        background: `linear-gradient(135deg, ${cfg.bg}, rgba(5,5,5,0.95))`,
-        border: `1px solid ${cfg.border}`,
-        boxShadow: `0 20px 60px rgba(0,0,0,0.7), 0 0 30px ${cfg.glow}`,
-      }}
+      className={cn(ts.className, ts.fontClass)}
+      style={ts.style}
     >
       {/* Progress bar */}
       <div className="absolute bottom-0 left-0 h-[2px] w-full bg-white/5">
         <div
           ref={progressRef}
           className="h-full"
-          style={{ background: cfg.color }}
+          style={{ background: ts.progressBarColor }}
         />
       </div>
 
@@ -125,7 +221,7 @@ function NotificationCard({
         {/* Icon / product image */}
         <div
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-          style={{ background: `${cfg.color}20`, border: `1px solid ${cfg.color}40` }}
+          style={ts.iconBgStyle}
         >
           {notification.productImage ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -135,7 +231,7 @@ function NotificationCard({
               className="h-full w-full rounded-xl object-cover"
             />
           ) : (
-            <Icon size={18} style={{ color: cfg.color }} aria-hidden="true" />
+            <Icon size={18} style={ts.titleStyle} aria-hidden="true" />
           )}
         </div>
 
@@ -143,17 +239,17 @@ function NotificationCard({
         <div className="flex-1 min-w-0 pt-0.5">
           <p
             className="text-[11px] font-black uppercase tracking-[0.18em] leading-none mb-1"
-            style={{ color: cfg.color }}
+            style={ts.titleStyle}
           >
             {notification.title}
           </p>
           {notification.productName && (
-            <p className="text-sm font-bold text-white truncate leading-tight">
+            <p className={ts.productNameClassName}>
               {notification.productName}
             </p>
           )}
           {notification.message && (
-            <p className="text-[11px] text-white/50 mt-0.5 leading-relaxed">
+            <p className={ts.messageClassName}>
               {notification.message}
             </p>
           )}
@@ -174,7 +270,12 @@ function NotificationCard({
 
 // ─── Container (rendered once in layout) ─────────────────────────────────────
 export function CartNotificationContainer() {
+  const pathname = usePathname();
   const [notifications, setNotifications] = useState<CartNotification[]>([]);
+  const { resellerTheme } = useCartStore();
+
+  // No mostrar en el portal del revendedor
+  if (pathname?.startsWith('/reseller')) return null;
 
   const dismiss = useCallback((id: string) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
@@ -202,7 +303,12 @@ export function CartNotificationContainer() {
     >
       <AnimatePresence mode="sync">
         {notifications.map((n) => (
-          <NotificationCard key={n.id} notification={n} onDismiss={dismiss} />
+          <NotificationCard
+            key={n.id}
+            notification={n}
+            onDismiss={dismiss}
+            resellerTheme={resellerTheme}
+          />
         ))}
       </AnimatePresence>
     </div>

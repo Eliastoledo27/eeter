@@ -67,6 +67,17 @@ function useScrollDirection(threshold = 12) {
  */
 export function FloatingNavMenu() {
   const pathname = usePathname();
+
+  // Hide the menu on dashboard and reseller pages to prevent visual clutter
+  if (
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/c/') ||
+    pathname.startsWith('/resellers') ||
+    pathname.startsWith('/reseller')
+  ) {
+    return null;
+  }
+
   const scrollDir = useScrollDirection(12);
   const shouldReduceMotion = useReducedMotion();
 

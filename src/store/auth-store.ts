@@ -169,6 +169,28 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user.app_metadata
       )
 
+      // Enforce temporary session for resellers (expire if browser closed)
+      if (role === 'reseller' && typeof window !== 'undefined') {
+        const isPermanent = window.localStorage.getItem('eter-reseller-logged-in') === 'true'
+        const isTempSessionActive = window.sessionStorage.getItem('eter-reseller-session-temp') === 'true'
+
+        if (!isPermanent && !isTempSessionActive) {
+          set({ isLoading: true })
+          await supabase.auth.signOut()
+          set({
+            user: null,
+            session: null,
+            profile: null,
+            role: 'user',
+            permissions: ROLE_PERMISSIONS['user'],
+            isLoading: false,
+            isInitialized: true,
+            isAuthenticated: false,
+          })
+          return
+        }
+      }
+
       const permissions = ROLE_PERMISSIONS[role] || ROLE_PERMISSIONS['user']
 
       if (profileError || !profile) {

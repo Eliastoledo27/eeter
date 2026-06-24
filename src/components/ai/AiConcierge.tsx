@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Sparkles, ChevronRight, ArrowUpRight, MessageCircle, RotateCcw } from 'lucide-react';
 import Image from 'next/image';
 import { useAudio } from '@/providers/AudioProvider';
+import { usePathname } from 'next/navigation';
 
 type ProductSummary = { id: string; name: string; price: number; image: string; sizes?: string[] };
 
@@ -196,6 +197,12 @@ export function AiConcierge() {
         "¿Cómo elijo mi talle? 📏",
         "¿Son originales? ✅",
     ];
+
+    const pathname = usePathname();
+
+    if (pathname && (pathname.startsWith('/c/') || pathname.startsWith('/reseller'))) {
+        return null;
+    }
 
     return (
         <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[200] flex flex-col items-end gap-3">
@@ -399,7 +406,7 @@ export function AiConcierge() {
                                                             {/* Info */}
                                                             <div className="p-2.5">
                                                                 <h4 className="text-white/80 text-[11px] font-semibold line-clamp-1 mb-1 group-hover:text-white transition-colors uppercase tracking-tight">{p.name}</h4>
-                                                                
+
                                                                 {/* Mini Sizes Indicator */}
                                                                 <div className="flex flex-wrap gap-1 mb-2.5 opacity-60">
                                                                     {p.sizes?.slice(0, 3).map(s => (
@@ -557,7 +564,7 @@ export function AiConcierge() {
                                                 <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mb-3">Talles Disponibles</p>
                                                 <div className="flex flex-wrap gap-2">
                                                     {selectedProduct.sizes?.map(size => (
-                                                        <div 
+                                                        <div
                                                             key={size}
                                                             className="w-10 h-10 rounded-lg border border-white/10 bg-[#0C0C0C] flex items-center justify-center text-xs font-bold text-white/65"
                                                         >
@@ -599,7 +606,7 @@ export function AiConcierge() {
                         <div className="relative w-full h-full rounded-full bg-black/80 backdrop-blur-xl flex items-center justify-center border border-white/10 overflow-hidden shadow-[0_0_25px_rgba(0,229,255,0.15)] group-hover:border-[#00E5FF]/45 transition-colors duration-500">
                             {/* Inner glow accent */}
                             <div className="absolute inset-0 bg-gradient-to-tr from-[#00E5FF]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            
+
                             <MessageCircle size={20} className="text-white relative z-10 group-hover:text-[#00E5FF] transition-colors duration-300" strokeWidth={2} />
                             <Sparkles size={8} className="text-[#C6FF00] absolute top-2 right-2 animate-pulse pointer-events-none" />
                         </div>

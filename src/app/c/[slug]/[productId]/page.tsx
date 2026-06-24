@@ -38,21 +38,49 @@ export default async function ResellerProductDetailPage({
         description: null // "la descripcion NO" as requested
     };
 
+    const resellerTheme = reseller.reseller_theme || 'original';
+
+    const themeMainClasses: Record<string, string> = {
+        original: 'min-h-screen bg-[#050505] text-white font-sans overflow-x-hidden relative',
+        minimal: 'min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans tracking-tight overflow-x-hidden relative',
+        cyber: 'min-h-screen bg-[#020408] text-emerald-400 font-mono overflow-x-hidden relative',
+        warm: 'min-h-screen bg-[#121110] text-[#F5F2EB] font-serif overflow-x-hidden relative',
+        swiss: 'min-h-screen bg-[#080808] text-white font-sans font-medium overflow-x-hidden relative',
+        kinetic: 'min-h-screen bg-[#030303] text-white font-sans tracking-wide overflow-x-hidden relative',
+    };
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white overflow-x-hidden">
-            <ResellerCartInitializer whatsappNumber={reseller.whatsapp_number} />
-            {/* Background Ambience & Grid */}
+        <div className={themeMainClasses[resellerTheme]}>
+            <ResellerCartInitializer
+                whatsappNumber={reseller.whatsapp_number}
+                resellerTheme={resellerTheme}
+            />
 
-            <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-[#00B8D9]/10 rounded-full blur-[150px] animate-pulse-slow" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#00B8D9]/5 rounded-full blur-[120px]" />
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(200,138,4,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,138,4,0.03)_1px,transparent_1px)] bg-[size:100px_100px] opacity-40" />
-            </div>
+            {resellerTheme === 'original' && (
+                <div className="fixed inset-0 z-0 pointer-events-none">
+                    <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-[#00B8D9]/10 rounded-full blur-[150px] animate-pulse-slow" />
+                    <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#00B8D9]/5 rounded-full blur-[120px]" />
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(200,138,4,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,138,4,0.03)_1px,transparent_1px)] bg-[size:100px_100px] opacity-40" />
+                </div>
+            )}
+
+            {resellerTheme === 'cyber' && (
+                <div className="fixed inset-0 z-0 pointer-events-none">
+                    <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-emerald-500/10 rounded-full blur-[150px]" />
+                    <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-emerald-500/5 rounded-full blur-[120px]" />
+                </div>
+            )}
+
+            {resellerTheme === 'kinetic' && (
+                <div className="fixed inset-0 z-0 pointer-events-none">
+                    <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-yellow-500/5 rounded-full blur-[150px]" />
+                </div>
+            )}
 
             <ResellerNavbar
                 resellerSlug={params.slug}
                 resellerName={reseller.full_name || ''}
+                resellerTheme={resellerTheme}
             />
 
             {/* Sticky Header with Breadcrumb */}

@@ -37,6 +37,8 @@ interface CartStore {
   removeCoupon: () => void;
   resellerWhatsApp: string | null;
   setResellerWhatsApp: (num: string | null) => void;
+  resellerTheme: string | null;
+  setResellerTheme: (theme: string | null) => void;
   cartStep: 'items' | 'checkout' | 'success' | 'transferencia';
   setCartStep: (step: 'items' | 'checkout' | 'success' | 'transferencia') => void;
   stockAlerts: Record<string, string>;
@@ -64,6 +66,7 @@ export const useCartStore = create<CartStore>()(
       isOpen: false,
       appliedCoupon: null,
       resellerWhatsApp: null,
+      resellerTheme: null,
       cartStep: 'items',
       stockAlerts: {},
       lastOrder: null,
@@ -89,6 +92,7 @@ export const useCartStore = create<CartStore>()(
       },
 
       setResellerWhatsApp: (num) => set({ resellerWhatsApp: num }),
+      setResellerTheme: (theme) => set({ resellerTheme: theme }),
       setCartStep: (step) => set({ cartStep: step }),
 
       addItem: (product, size, quantity = 1) => {
@@ -179,4 +183,3 @@ export const useCartStore = create<CartStore>()(
     }
   )
 );
-

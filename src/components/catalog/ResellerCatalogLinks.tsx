@@ -37,7 +37,7 @@ export function ResellerCatalogLinks({ links }: Props) {
           >
             <span className="min-w-0">
               <span className="block truncate text-sm font-black uppercase tracking-[0.08em] text-white">{link.name}</span>
-              <span className="mt-1 block truncate text-xs font-semibold text-[#00E0FF]">eter.store{link.href}</span>
+              <span className="mt-1 block truncate text-xs font-semibold text-[#00E0FF]">éter.store{link.href}</span>
             </span>
             <ArrowUpRight size={18} className="shrink-0 text-white/35 transition-colors group-hover:text-white" />
           </Link>

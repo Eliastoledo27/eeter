@@ -190,7 +190,7 @@ export async function POST(req: Request) {
 
     if (action === 'update_product') {
       const stock = body.stockBySize
-        ? Object.values(body.stockBySize as Record<string, unknown>).reduce((total, value) => total + Number(value), 0)
+        ? Object.values(body.stockBySize as Record<string, unknown>).reduce((total: number, value) => total + Number(value), 0)
         : 0;
       const { data, error } = await supabase
         .from('productos')

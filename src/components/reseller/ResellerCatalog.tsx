@@ -7,8 +7,11 @@ import { MinimalFooter } from '@/components/layout/MinimalFooter';
 import { ResellerFilters } from './ResellerFilters';
 import { ResellerProductGrid } from './ResellerProductGrid';
 import { MarginCalculator } from './MarginCalculator';
-import { AlertTriangle, Copy, Menu, PackageCheck, Share2, Sparkles, TrendingUp } from 'lucide-react';
+import { AlertTriangle, Copy, Menu, PackageCheck, Share2, Sparkles, TrendingUp, Globe, Settings, X, Crown, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
+import { ResellerCatalogBuilder } from './ResellerCatalogBuilder';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
     products: ProductType[];
@@ -16,6 +19,10 @@ interface Props {
 }
 
 export function ResellerCatalog({ products, categories }: Props) {
+    const { isAuthenticated, role } = useAuth();
+    const [isBuilderOpen, setIsBuilderOpen] = useState(false);
+    const [isMarketingOpen, setIsMarketingOpen] = useState(false);
+
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('Todos');
     const [stockFilter, setStockFilter] = useState<'all' | 'available' | 'low'>('all');
@@ -24,6 +31,16 @@ export function ResellerCatalog({ products, categories }: Props) {
     const [showCalc, setShowCalc] = useState(false);
     const [calcProduct, setCalcProduct] = useState<ProductType | null>(null);
     const [copiedAction, setCopiedAction] = useState<string | null>(null);
+
+    const isEligibleReseller = isAuthenticated && (role === 'reseller' || role === 'admin');
+
+    const handleOpenBuilder = () => {
+        if (isEligibleReseller) {
+            setIsBuilderOpen(true);
+        } else {
+            setIsMarketingOpen(true);
+        }
+    };
 
     const allSizes = useMemo(() => {
         const sizeSet = new Set<string>();
@@ -222,7 +239,7 @@ export function ResellerCatalog({ products, categories }: Props) {
                         </div>
                     </div>
 
-                    <div className="grid min-w-0 grid-cols-2 gap-2 md:flex">
+                    <div className="grid min-w-0 grid-cols-2 gap-2 md:flex md:items-center">
                         <button
                             onClick={shareCatalog}
                             className="inline-flex min-h-11 min-w-0 items-center justify-center gap-1.5 rounded-xl border border-[#00E5FF]/25 bg-[#00E5FF]/10 px-2 text-[9px] font-black uppercase tracking-[0.06em] text-[#00E5FF] transition-all hover:border-[#00E5FF]/50 hover:bg-[#00E5FF]/15 min-[380px]:gap-2 min-[380px]:px-3 min-[380px]:text-[10px] sm:px-4 sm:tracking-[0.14em]"
@@ -236,6 +253,13 @@ export function ResellerCatalog({ products, categories }: Props) {
                         >
                             <Copy size={14} />
                             {copiedAction === 'summary' ? 'Copiado' : 'Stock'}
+                        </button>
+                        <button
+                            onClick={handleOpenBuilder}
+                            className="col-span-2 md:col-span-1 inline-flex min-h-11 min-w-0 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#FF007A] via-[#8F00FF] to-[#00E5FF] px-3 text-[9px] font-black uppercase tracking-[0.06em] text-black hover:brightness-110 transition-all shadow-[0_0_15px_rgba(0,229,255,0.35)] hover:shadow-[0_0_20px_rgba(0,229,255,0.5)] min-[380px]:gap-2 min-[380px]:px-3.5 min-[380px]:text-[10px] sm:px-5 sm:tracking-[0.14em] animate-pulse"
+                        >
+                            <Sparkles size={14} className="animate-spin" style={{ animationDuration: '4s' }} />
+                            Mi Tienda
                         </button>
                     </div>
                 </section>
@@ -252,6 +276,120 @@ export function ResellerCatalog({ products, categories }: Props) {
             {showCalc && calcProduct && (
                 <MarginCalculator product={calcProduct} onClose={() => setShowCalc(false)} />
             )}
+
+            {/* Floating Action Button for Mobile */}
+            <div className="fixed bottom-6 right-6 z-40 sm:hidden">
+                <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={handleOpenBuilder}
+                    className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#FF007A] via-[#8F00FF] to-[#00E5FF] flex items-center justify-center text-black shadow-[0_0_20px_rgba(0,229,255,0.5)] border border-white/20 animate-bounce"
+                    style={{ animationDuration: '3s' }}
+                >
+                    <Settings className="animate-spin" style={{ animationDuration: '8s' }} size={24} />
+                </motion.button>
+            </div>
+
+            {/* Premium Overlay for Reseller Catalog Builder */}
+            <AnimatePresence>
+                {isBuilderOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.95, y: 20 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                            className="w-full max-w-[1100px] h-[90vh] rounded-3xl overflow-hidden shadow-2xl"
+                        >
+                            <ResellerCatalogBuilder onClose={() => setIsBuilderOpen(false)} />
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Marketing & Onboarding Modal for Guests */}
+            <AnimatePresence>
+                {isMarketingOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 30 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 30 }}
+                            className="bg-[#0A0A0A] border border-white/10 rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl shadow-cyan-500/5 p-8 relative text-white"
+                        >
+                            <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#00E5FF]/10 blur-[80px] rounded-full" />
+
+                            <button
+                                onClick={() => setIsMarketingOpen(false)}
+                                className="absolute top-6 right-6 text-slate-400 hover:text-white transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+
+                            <div className="space-y-6 text-center">
+                                <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#FF007A]/20 to-[#00E5FF]/20 border border-white/10 flex items-center justify-center shadow-lg">
+                                    <Crown className="text-[#00E5FF]" size={28} />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <h3 className="text-2xl font-black uppercase tracking-tight italic">
+                                        Tu Tienda Digital <span className="text-[#00E5FF]">ÉTER</span>
+                                    </h3>
+                                    <p className="text-xs text-slate-400 font-mono tracking-widest uppercase">Red de Revendedores Exclusivos</p>
+                                </div>
+
+                                <p className="text-xs text-slate-300 leading-relaxed max-w-sm mx-auto">
+                                    Multiplica tus ventas compartiendo tu propio catálogo con precios personalizados, stock en vivo y recepción de pedidos directamente en tu WhatsApp.
+                                </p>
+
+                                {/* Value Propositions */}
+                                <div className="space-y-3 text-left bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-xs">
+                                    <div className="flex items-start gap-3">
+                                        <span className="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">✓</span>
+                                        <p className="text-[11px] text-slate-300 font-semibold"><strong>Margen a tu Medida:</strong> Define tu propia ganancia por calzado vendido.</p>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <span className="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">✓</span>
+                                        <p className="text-[11px] text-slate-300 font-semibold"><strong>Stock 100% en Vivo:</strong> Tus clientes solo verán lo que está disponible en depósito.</p>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <span className="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">✓</span>
+                                        <p className="text-[11px] text-slate-300 font-semibold"><strong>Pedidos Directos:</strong> Los clientes te compran por la web y te llega por WhatsApp.</p>
+                                    </div>
+                                </div>
+
+                                {/* CTAs */}
+                                <div className="space-y-3 pt-2">
+                                    <a
+                                        href="/reseller/login"
+                                        className="w-full bg-gradient-to-r from-[#FF007A] to-[#00E5FF] text-black h-12 rounded-xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 hover:brightness-110 transition-all shadow-lg shadow-cyan-500/10"
+                                    >
+                                        Ingresar a Mi Tienda
+                                        <ArrowRight size={14} />
+                                    </a>
+                                    <a
+                                        href="/reseller/register"
+                                        className="w-full bg-slate-900 border border-white/10 text-slate-300 h-12 rounded-xl font-bold uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-slate-800 transition-all"
+                                    >
+                                        Quiero ser Revendedor
+                                    </a>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <MinimalFooter />
         </main>
     );

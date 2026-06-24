@@ -10,15 +10,17 @@ import { toast } from 'sonner';
 export function ResellerCatalogClient({
     initialProducts,
     resellerName,
-    resellerSlug
+    resellerSlug,
+    resellerTheme = 'original'
 }: {
     initialProducts: any[],
     resellerName: string,
-    resellerSlug: string
+    resellerSlug: string,
+    resellerTheme?: string
 }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState('Todos');
-    
+
     // --- CONTROLES DE MARGEN Y VISTA DEL REVENDEDOR ---
     const [isAdminView, setIsAdminView] = useState(false); // Toggle entre vista administrativa y de cliente
     const [customMarkup, setCustomMarkup] = useState<number>(0); // Incremento extra opcional sobre el precio
@@ -37,6 +39,52 @@ export function ResellerCatalogClient({
         });
     }, [initialProducts, searchQuery, activeCategory]);
 
+    // Theme-based style configurations
+    const activeBtnStyles: Record<string, string> = {
+        original: 'bg-[#00E5FF] text-black shadow-[0_0_20px_rgba(0,229,255,0.3)] rounded-full',
+        minimal: 'bg-white text-black border border-white rounded-none',
+        cyber: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.2)] rounded-none font-mono',
+        warm: 'bg-[#D39E82] text-[#121110] rounded-lg font-serif',
+        swiss: 'bg-[#FF3B30] text-white border-2 border-[#FF3B30] rounded-none font-black',
+        kinetic: 'bg-[#FFFF00] text-black border border-[#FFFF00] rounded-none font-extrabold italic'
+    };
+
+    const inactiveBtnStyles: Record<string, string> = {
+        original: 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white rounded-full',
+        minimal: 'bg-transparent text-zinc-500 border border-zinc-800 hover:text-white hover:border-zinc-500 rounded-none',
+        cyber: 'bg-transparent text-zinc-500 border border-zinc-900 hover:text-emerald-400 hover:border-emerald-500/30 rounded-none font-mono',
+        warm: 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-[#F5F2EB] rounded-lg font-serif',
+        swiss: 'bg-transparent text-white border-2 border-white hover:bg-white hover:text-black rounded-none font-black',
+        kinetic: 'bg-transparent text-white border border-white/20 hover:border-white/50 rounded-none font-extrabold italic'
+    };
+
+    const inputStyles: Record<string, string> = {
+        original: 'bg-white/5 border border-white/10 rounded-full focus:border-[#00E5FF]/50',
+        minimal: 'bg-transparent border border-zinc-800 rounded-none focus:border-zinc-400',
+        cyber: 'bg-transparent border border-zinc-900 rounded-none focus:border-emerald-500/50 text-emerald-400 font-mono',
+        warm: 'bg-white/5 border border-white/5 rounded-lg focus:border-[#D39E82]/50 text-[#F5F2EB] font-serif',
+        swiss: 'bg-transparent border-2 border-white rounded-none focus:border-[#FF3B30] text-white font-bold',
+        kinetic: 'bg-transparent border border-white/20 rounded-none focus:border-[#FFFF00] text-white font-black italic'
+    };
+
+    const searchIconStyles: Record<string, string> = {
+        original: 'text-gray-600',
+        minimal: 'text-zinc-600',
+        cyber: 'text-emerald-900',
+        warm: 'text-zinc-600',
+        swiss: 'text-white',
+        kinetic: 'text-zinc-500'
+    };
+
+    const containerCardStyles: Record<string, string> = {
+        original: 'bg-white/[0.02] border border-white/5 rounded-[2rem] p-6 backdrop-blur-xl',
+        minimal: 'bg-transparent border border-zinc-900 rounded-none p-6',
+        cyber: 'bg-black/40 border border-zinc-900/50 rounded-none p-6 font-mono',
+        warm: 'bg-white/[0.01] border border-white/5 rounded-2xl p-6 backdrop-blur-md',
+        swiss: 'bg-transparent border-4 border-white rounded-none p-6',
+        kinetic: 'bg-transparent border border-white/10 rounded-none p-6'
+    };
+
     // Generar y compartir plantilla formateada para clientes del revendedor
     const handleShareProduct = (e: React.MouseEvent, product: any) => {
         e.preventDefault();
@@ -44,7 +92,7 @@ export function ResellerCatalogClient({
 
         const basePrice = product.resellerPrice || product.basePrice;
         const finalPrice = basePrice + Number(customMarkup || 0);
-        
+
         // Extraer talles disponibles
         const sizes = Object.entries(product.stock_by_size || {})
             .filter(([_, qty]) => Number(qty) > 0)
@@ -53,8 +101,8 @@ export function ResellerCatalogClient({
             .join(', ');
 
         const catalogLink = `https://eter.store/c/${resellerSlug}/${product.id}`;
-        
-        const messageText = `⚡ *FÉTER - CALZADO PREMIUM* ⚡\n\n` +
+
+        const messageText = `⚡ *${resellerName.toUpperCase()} - CALZADO PREMIUM* ⚡\n\n` +
             `👟 *Modelo:* ${product.name.toUpperCase()}\n` +
             `💵 *Precio:* $${finalPrice.toLocaleString('es-AR')}\n` +
             `📏 *Talles disponibles:* ${sizes || 'Consultar'}\n` +
@@ -65,11 +113,11 @@ export function ResellerCatalogClient({
         // Copiar al portapapeles con toast de confirmación
         navigator.clipboard.writeText(messageText);
         setCopiedId(product.id);
-        
+
         toast.success('FICHA DE PRODUCTO COPIADA', {
             description: 'Mensaje formateado listo para enviar a tus clientes por WhatsApp.',
-            style: { 
-                background: '#050505', 
+            style: {
+                background: '#050505',
                 color: '#fff',
                 border: '1px solid rgba(0, 229, 255, 0.3)',
                 borderRadius: '1.25rem'
@@ -81,10 +129,10 @@ export function ResellerCatalogClient({
 
     return (
         <div className="space-y-12 relative pb-24">
-            
+
             {/* Cabecera / Controles */}
-            <div className="flex flex-col gap-6 bg-white/[0.02] border border-white/5 p-6 rounded-[2rem] backdrop-blur-xl">
-                
+            <div className={containerCardStyles[resellerTheme]}>
+
                 {/* Categorías y Búsqueda */}
                 <div className="flex flex-col lg:flex-row gap-6 justify-between items-center w-full">
                     <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 w-full lg:w-auto no-scrollbar">
@@ -92,10 +140,11 @@ export function ResellerCatalogClient({
                             <button
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
-                                className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeCategory === cat
-                                    ? 'bg-[#00E5FF] text-black shadow-[0_0_20px_rgba(0,229,255,0.3)]'
-                                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
-                                    }`}
+                                className={`px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                                    activeCategory === cat
+                                        ? activeBtnStyles[resellerTheme]
+                                        : inactiveBtnStyles[resellerTheme]
+                                }`}
                             >
                                 {cat}
                             </button>
@@ -103,13 +152,13 @@ export function ResellerCatalogClient({
                     </div>
 
                     <div className="relative w-full lg:w-80">
-                        <Search size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600" />
+                        <Search size={16} className={`absolute left-5 top-1/2 -translate-y-1/2 ${searchIconStyles[resellerTheme]}`} />
                         <input
                             type="text"
                             placeholder="BUSCAR PRODUCTO..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 text-[10px] font-bold tracking-widest uppercase focus:outline-none focus:border-[#00E5FF]/50 transition-all text-white"
+                            className={`w-full py-3 pl-12 pr-6 text-[10px] font-bold tracking-widest uppercase focus:outline-none transition-all text-white ${inputStyles[resellerTheme]}`}
                         />
                     </div>
                 </div>
@@ -120,18 +169,18 @@ export function ResellerCatalogClient({
                         <button
                             onClick={() => setIsAdminView(!isAdminView)}
                             className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${
-                                isAdminView 
-                                    ? 'bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/30' 
+                                isAdminView
+                                    ? 'bg-white/10 text-white border border-white/20'
                                     : 'bg-white/5 text-gray-400 border border-white/5 hover:text-white'
                             }`}
                         >
                             {isAdminView ? <Eye size={12} /> : <EyeOff size={12} />}
                             {isAdminView ? 'Vista Revendedor Activa' : 'Vista Cliente Activa'}
                         </button>
-                        
+
                         <p className="text-[10px] text-gray-500 font-mono hidden md:block">
-                            {isAdminView 
-                                ? 'Mostrando precios de costo y herramientas de margen.' 
+                            {isAdminView
+                                ? 'Mostrando precios de costo y herramientas de margen.'
                                 : 'Mostrando catálogo exactamente como lo ven tus clientes.'}
                         </p>
                     </div>
@@ -139,22 +188,22 @@ export function ResellerCatalogClient({
                     {/* Campo de Margen Extra */}
                     <AnimatePresence>
                         {isAdminView && (
-                            <motion.div 
+                            <motion.div
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 20 }}
                                 className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-full"
                             >
-                                <DollarSign size={12} className="text-[#00E5FF]" />
+                                <DollarSign size={12} className="text-white/60" />
                                 <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">Margen Sugerido:</span>
                                 <input
                                     type="number"
                                     placeholder="0"
                                     value={customMarkup || ''}
                                     onChange={(e) => setCustomMarkup(Number(e.target.value))}
-                                    className="bg-transparent text-white w-20 text-center font-black focus:outline-none text-[12px] border-b border-[#00E5FF]/30"
+                                    className="bg-transparent text-white w-20 text-center font-black focus:outline-none text-[12px] border-b border-white/30"
                                 />
-                                <span className="text-[9px] text-[#00E5FF] font-mono">ARS</span>
+                                <span className="text-[9px] text-white/80 font-mono">ARS</span>
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -179,28 +228,27 @@ export function ResellerCatalogClient({
                                 {/* Botón de Compartido Inteligente */}
                                 <button
                                     onClick={(e) => handleShareProduct(e, product)}
-                                    className="absolute top-6 right-6 z-40 h-10 w-10 flex items-center justify-center rounded-full bg-black/80 hover:bg-[#00E5FF] border border-white/10 text-white/70 hover:text-black hover:scale-110 shadow-lg backdrop-blur-md transition-all duration-300"
+                                    className="absolute top-6 right-6 z-40 h-10 w-10 flex items-center justify-center rounded-full bg-black/80 hover:bg-white border border-white/10 text-white/70 hover:text-black hover:scale-110 shadow-lg backdrop-blur-md transition-all duration-300"
                                     title="Copiar Ficha de WhatsApp"
                                 >
                                     {copiedId === product.id ? <Check size={16} /> : <Share2 size={16} />}
                                 </button>
 
-                                <Link href={`/c/${resellerSlug}/${product.id}`}>
-                                    <ProductCard
-                                        product={{
-                                            ...product,
-                                            basePrice: finalPrice,
-                                            stockBySize: product.stock_by_size
-                                        }}
-                                        href={`/c/${resellerSlug}/${product.id}`}
-                                        index={idx}
-                                    />
-                                </Link>
+                                <ProductCard
+                                    product={{
+                                        ...product,
+                                        basePrice: finalPrice,
+                                        stockBySize: product.stock_by_size
+                                    }}
+                                    href={`/c/${resellerSlug}/${product.id}`}
+                                    index={idx}
+                                    theme={resellerTheme}
+                                />
 
                                 {/* Bloque de Margen/Administrativo (solo en modo Admin) */}
                                 <AnimatePresence>
                                     {isAdminView && (
-                                        <motion.div 
+                                        <motion.div
                                             initial={{ opacity: 0, height: 0 }}
                                             animate={{ opacity: 1, height: 'auto' }}
                                             exit={{ opacity: 0, height: 0 }}
@@ -212,7 +260,7 @@ export function ResellerCatalogClient({
                                             </div>
                                             <div className="flex justify-between text-gray-500">
                                                 <span>Tu Margen Agregado:</span>
-                                                <span className="text-[#00E5FF]">+${Number(customMarkup || 0).toLocaleString('es-AR')}</span>
+                                                <span className="text-white/80">+${Number(customMarkup || 0).toLocaleString('es-AR')}</span>
                                             </div>
                                             <div className="h-px bg-white/5 my-1" />
                                             <div className="flex justify-between font-black text-[11px]">
