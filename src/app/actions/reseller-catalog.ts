@@ -57,6 +57,86 @@ export async function getResellerBySlug(slug: string) {
     return { data, error: null };
 }
 
+function normalizeResellerSlug(slug: string): string {
+    return slug
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .slice(0, 30);
+}
+
+export async function checkResellerSlugAvailability(slug: string) {
+    const cleanSlug = normalizeResellerSlug(slug);
+
+    if (cleanSlug.length < 3) {
+        return {
+            available: false,
+            slug: cleanSlug,
+            error: 'El link necesita al menos 3 caracteres',
+        };
+    }
+
+    const reserved = new Set([
+        'admin',
+        'api',
+        'auth',
+        'blog',
+        'cart',
+        'catalog',
+        'checkout',
+        'dashboard',
+        'login',
+        'register',
+        'reseller',
+        'shop',
+        'support',
+    ]);
+
+    if (reserved.has(cleanSlug)) {
+        return {
+            available: false,
+            slug: cleanSlug,
+            error: 'Ese link esta reservado',
+        };
+    }
+
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return {
+            available: false,
+            slug: cleanSlug,
+            error: 'No autorizado',
+        };
+    }
+
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('reseller_slug', cleanSlug)
+        .maybeSingle();
+
+    if (error) {
+        console.error('Error checking reseller slug availability:', error);
+        return {
+            available: false,
+            slug: cleanSlug,
+            error: 'No se pudo verificar el link',
+        };
+    }
+
+    return {
+        available: !data || data.id === user.id,
+        slug: cleanSlug,
+        error: data && data.id !== user.id ? 'Ese link ya esta en uso' : null,
+    };
+}
+
 /**
  * Get products with prices adjusted for a specific reseller
  */

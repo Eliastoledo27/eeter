@@ -1,14 +1,17 @@
 'use client';
 
+/* eslint-disable react/no-unescaped-entities */
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Store, TrendingUp, Phone, Palette, CreditCard,
     CheckCircle2, ChevronRight, ChevronLeft, X,
-    Sparkles, ArrowUpRight, Loader2
+    Sparkles, ArrowUpRight, Loader2, AlertCircle
 } from 'lucide-react';
-import { updateResellerMarkup } from '@/app/actions/reseller-catalog';
+import { checkResellerSlugAvailability, updateResellerMarkup } from '@/app/actions/reseller-catalog';
 import { updateProfile as updateProfileAction } from '@/app/actions/profiles';
+import type { Profile } from '@/types/profiles';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
@@ -98,42 +101,113 @@ function formatARS(value: number): string {
 // ─── Onboarding Wizard ────────────────────────────────────────────────────────
 interface ResellerOnboardingWizardProps {
     onComplete: (slug: string) => void;
+    initialProfile?: Partial<Profile> | null;
+    forceAllSteps?: boolean;
 }
 
-export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizardProps) {
-    const [step, setStep] = useState(1);
+type WizardStepId = 1 | 2 | 3 | 4 | 5;
+
+type SlugStatus =
+    | { state: 'idle'; message: string }
+    | { state: 'checking'; message: string }
+    | { state: 'available'; message: string }
+    | { state: 'taken'; message: string };
+
+function getMissingStepIds(profile?: Partial<Profile> | null): WizardStepId[] {
+    if (!profile) return [1, 2, 3, 4, 5];
+
+    const missing: WizardStepId[] = [];
+    const hasStoreName = Boolean(profile.full_name?.trim());
+    const hasSlug = Boolean(profile.reseller_slug?.trim());
+    const hasMarkup = typeof profile.reseller_markup === 'number' && profile.reseller_markup >= 0;
+    const hasTheme = Boolean(profile.reseller_theme?.trim());
+    const hasBankDestination = Boolean(profile.bank_cbu?.trim() || profile.bank_alias?.trim());
+    const hasBankOwner = Boolean(profile.bank_owner_name?.trim());
+
+    if (!hasStoreName || !hasSlug) missing.push(1);
+    if (!hasMarkup) missing.push(2);
+    if (!hasTheme) missing.push(4);
+    if (!hasBankDestination || !hasBankOwner) missing.push(5);
+
+    return missing;
+}
+
+export function ResellerOnboardingWizard({ onComplete, initialProfile, forceAllSteps = false }: ResellerOnboardingWizardProps) {
+    const activeSteps = forceAllSteps ? ([1, 2, 3, 4, 5] as WizardStepId[]) : getMissingStepIds(initialProfile);
+    const [stepIndex, setStepIndex] = useState(0);
     const [saving, setSaving] = useState(false);
     const [direction, setDirection] = useState<1 | -1>(1);
 
     // Form data
-    const [storeName, setStoreName] = useState('');
-    const [markup, setMarkup] = useState(12000);
-    const [whatsapp, setWhatsapp] = useState('');
-    const [theme, setTheme] = useState('original');
-    const [bankCbu, setBankCbu] = useState('');
-    const [bankAlias, setBankAlias] = useState('');
-    const [bankOwnerName, setBankOwnerName] = useState('');
-    const [savedSlug, setSavedSlug] = useState('');
+    const [storeName, setStoreName] = useState(initialProfile?.full_name || '');
+    const [customSlug, setCustomSlug] = useState(initialProfile?.reseller_slug || '');
+    const [markup, setMarkup] = useState(initialProfile?.reseller_markup ?? 12000);
+    const [whatsapp, setWhatsapp] = useState((initialProfile?.whatsapp_number || '').replace(/^549/, ''));
+    const [theme, setTheme] = useState(initialProfile?.reseller_theme || 'original');
+    const [bankCbu, setBankCbu] = useState(initialProfile?.bank_cbu || '');
+    const [bankAlias, setBankAlias] = useState(initialProfile?.bank_alias || '');
+    const [bankOwnerName, setBankOwnerName] = useState(initialProfile?.bank_owner_name || '');
+    const [savedSlug, setSavedSlug] = useState(initialProfile?.reseller_slug || '');
+    const [slugStatus, setSlugStatus] = useState<SlugStatus>({ state: 'idle', message: 'Elegi tu link publico' });
 
-    const slug = slugify(storeName);
+    const activeStep = activeSteps[stepIndex];
+    const isSuccessStep = stepIndex >= activeSteps.length;
+    const slug = slugify(customSlug || storeName);
+    const totalSteps = activeSteps.length || 1;
     const estimatedMonthly = markup * 15;
+
+    useEffect(() => {
+        setStepIndex(0);
+    }, [forceAllSteps, initialProfile?.id]);
+
+    useEffect(() => {
+        if (activeStep !== 1) return;
+        if (slug.length < 3) {
+            setSlugStatus({ state: 'idle', message: 'El link necesita al menos 3 caracteres' });
+            return;
+        }
+
+        let cancelled = false;
+        setSlugStatus({ state: 'checking', message: 'Verificando disponibilidad...' });
+
+        const timeout = window.setTimeout(async () => {
+            const result = await checkResellerSlugAvailability(slug);
+            if (cancelled) return;
+            setSlugStatus({
+                state: result.available ? 'available' : 'taken',
+                message: result.available ? 'Link disponible' : (result.error || 'Ese link ya esta en uso'),
+            });
+        }, 450);
+
+        return () => {
+            cancelled = true;
+            window.clearTimeout(timeout);
+        };
+    }, [activeStep, slug]);
 
     const goNext = () => {
         setDirection(1);
-        setStep(s => s + 1);
+        setStepIndex(s => Math.min(s + 1, activeSteps.length - 1));
     };
 
     const goPrev = () => {
         setDirection(-1);
-        setStep(s => s - 1);
+        setStepIndex(s => Math.max(s - 1, 0));
     };
 
     const handleDismiss = () => {
-        localStorage.setItem('eter-onboarding-complete', 'true');
-        onComplete('');
+        onComplete(initialProfile?.reseller_slug || '');
     };
 
     const handleFinish = async () => {
+        if (!storeName.trim()) {
+            toast.error('Necesitas indicar el nombre de tu tienda');
+            return;
+        }
+        if (slug.length < 3) {
+            toast.error('Elegi un link de al menos 3 caracteres');
+            return;
+        }
         if (!bankCbu.trim() && !bankAlias.trim()) {
             toast.error('Necesitás al menos un CBU o Alias para recibir pagos');
             return;
@@ -145,12 +219,19 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
 
         setSaving(true);
         try {
+            const availability = await checkResellerSlugAvailability(slug);
+            if (!availability.available) {
+                setSlugStatus({ state: 'taken', message: availability.error || 'Ese link ya esta en uso' });
+                toast.error(availability.error || 'Ese link ya esta en uso');
+                return;
+            }
+
             const finalWhatsApp = whatsapp ? `549${whatsapp.replace(/[^0-9]/g, '')}` : '';
 
             const [profileResult] = await Promise.all([
                 updateProfileAction({
                     full_name: storeName.trim(),
-                    reseller_slug: slug,
+                    reseller_slug: availability.slug,
                     whatsapp_number: finalWhatsApp,
                     reseller_theme: theme,
                     bank_cbu: bankCbu.trim(),
@@ -165,10 +246,9 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                 return;
             }
 
-            setSavedSlug(slug);
-            localStorage.setItem('eter-onboarding-complete', 'true');
+            setSavedSlug(availability.slug);
             setDirection(1);
-            setStep(6);
+            setStepIndex(activeSteps.length);
         } catch (err) {
             console.error(err);
             toast.error('Error de conexión. Intentá de nuevo.');
@@ -185,8 +265,14 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
     };
 
     const canProceedStep1 = storeName.trim().length >= 3;
+    const canProceedSlug = slug.length >= 3 && slugStatus.state === 'available';
     const canProceedStep3 = whatsapp.replace(/[^0-9]/g, '').length >= 10 || whatsapp === '';
     const canProceedStep5 = (bankCbu.trim() || bankAlias.trim()) && bankOwnerName.trim();
+    const canProceedCurrentStep =
+        activeStep === 1 ? canProceedStep1 && canProceedSlug :
+        activeStep === 3 ? canProceedStep3 :
+        activeStep === 5 ? Boolean(canProceedStep5) :
+        true;
 
     return (
         <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
@@ -212,11 +298,11 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                                 Configuración Inicial
                             </p>
                             <p className="text-[10px] text-white/30 font-mono">
-                                Paso {Math.min(step, 5)} de 5
+                                Paso {Math.min(stepIndex + 1, totalSteps)} de {totalSteps}
                             </p>
                         </div>
                     </div>
-                    {step < 6 && (
+                    {!isSuccessStep && (
                         <button
                             onClick={handleDismiss}
                             className="w-8 h-8 rounded-lg flex items-center justify-center text-white/30 hover:text-white hover:bg-white/5 transition-all"
@@ -228,33 +314,34 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                 </div>
 
                 {/* Progress bar */}
-                {step < 6 && (
+                {!isSuccessStep && (
                     <div className="h-0.5 bg-white/5">
                         <motion.div
                             className="h-full bg-gradient-to-r from-[#FF007A] to-[#00E5FF]"
-                            animate={{ width: `${((step - 1) / 5) * 100}%` }}
+                            animate={{ width: `${(stepIndex / totalSteps) * 100}%` }}
                             transition={{ duration: 0.4, ease: 'easeOut' }}
                         />
                     </div>
                 )}
 
                 {/* Step dots */}
-                {step < 6 && (
+                {!isSuccessStep && (
                     <div className="flex items-center justify-center gap-2 pt-4 pb-2">
-                        {STEPS.slice(0, 5).map((s) => {
+                        {activeSteps.map((stepId, index) => {
+                            const s = STEPS.find(item => item.id === stepId)!;
                             const Icon = s.icon;
                             return (
                                 <div
                                     key={s.id}
                                     className={`flex items-center justify-center w-7 h-7 rounded-full border transition-all duration-300 ${
-                                        step === s.id
+                                        activeStep === s.id
                                             ? 'border-[#00E5FF] bg-[#00E5FF]/10 text-[#00E5FF]'
-                                            : step > s.id
+                                            : stepIndex > index
                                             ? 'border-[#00E5FF]/40 bg-[#00E5FF]/5 text-[#00E5FF]/50'
                                             : 'border-white/10 bg-white/3 text-white/20'
                                     }`}
                                 >
-                                    {step > s.id
+                                    {stepIndex > index
                                         ? <CheckCircle2 size={12} />
                                         : <Icon size={12} />
                                     }
@@ -268,7 +355,7 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                 <div className="relative min-h-[320px] overflow-hidden px-6 py-4">
                     <AnimatePresence mode="wait" custom={direction}>
                         {/* ── STEP 1: Store name ── */}
-                        {step === 1 && (
+                        {activeStep === 1 && (
                             <motion.div
                                 key="step1"
                                 custom={direction}
@@ -297,13 +384,45 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                                         autoFocus
                                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#00E5FF]/60 focus:bg-[#00E5FF]/5 transition-all text-sm"
                                     />
-                                    {slug && (
-                                        <p className="text-[11px] text-white/30 font-mono px-1">
-                                            Tu link: <span className="text-[#00E5FF]/60">eter.store/c/<strong>{slug}</strong></span>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[11px] text-white/40 font-mono uppercase tracking-wider px-1">
+                                        Como queres que sea tu link
+                                    </label>
+                                    <div className={`flex items-center rounded-xl border bg-white/5 transition-all ${
+                                        slugStatus.state === 'available'
+                                            ? 'border-emerald-400/50'
+                                            : slugStatus.state === 'taken'
+                                            ? 'border-red-400/50'
+                                            : 'border-white/10 focus-within:border-[#00E5FF]/60'
+                                    }`}>
+                                        <span className="pl-4 pr-1 text-xs text-white/35 font-mono shrink-0">eter.store/c/</span>
+                                        <input
+                                            type="text"
+                                            value={customSlug}
+                                            onChange={e => setCustomSlug(slugify(e.target.value))}
+                                            placeholder={slugify(storeName) || 'mi-tienda'}
+                                            maxLength={30}
+                                            className="min-w-0 flex-1 bg-transparent px-1 py-3 text-sm text-white placeholder-white/25 focus:outline-none font-mono"
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2 px-1 min-h-5">
+                                        {slugStatus.state === 'checking' && <Loader2 size={12} className="animate-spin text-[#00E5FF]" />}
+                                        {slugStatus.state === 'available' && <CheckCircle2 size={12} className="text-emerald-400" />}
+                                        {slugStatus.state === 'taken' && <AlertCircle size={12} className="text-red-400" />}
+                                        <p className={`text-[11px] font-mono ${
+                                            slugStatus.state === 'available'
+                                                ? 'text-emerald-300'
+                                                : slugStatus.state === 'taken'
+                                                ? 'text-red-300'
+                                                : 'text-white/30'
+                                        }`}>
+                                            {slug ? `${slugStatus.message}: eter.store/c/${slug}` : slugStatus.message}
                                         </p>
-                                    )}
+                                    </div>
                                 </div>
                                 <div className="bg-white/3 rounded-2xl p-4 border border-white/5">
+                                    {/* eslint-disable-next-line react/no-unescaped-entities */}
                                     <p className="text-[11px] text-white/40 leading-relaxed">
                                         💡 <span className="text-white/60">Tip:</span> Usá un nombre que tus clientes puedan recordar fácil. Podés cambiarlo cuando quieras desde el panel.
                                     </p>
@@ -312,7 +431,7 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                         )}
 
                         {/* ── STEP 2: Margin ── */}
-                        {step === 2 && (
+                        {activeStep === 2 && (
                             <motion.div
                                 key="step2"
                                 custom={direction}
@@ -371,7 +490,7 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                         )}
 
                         {/* ── STEP 3: WhatsApp ── */}
-                        {step === 3 && (
+                        {activeStep === 3 && (
                             <motion.div
                                 key="step3"
                                 custom={direction}
@@ -411,7 +530,7 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                         )}
 
                         {/* ── STEP 4: Theme ── */}
-                        {step === 4 && (
+                        {activeStep === 4 && (
                             <motion.div
                                 key="step4"
                                 custom={direction}
@@ -459,7 +578,7 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                         )}
 
                         {/* ── STEP 5: Bank details ── */}
-                        {step === 5 && (
+                        {activeStep === 5 && (
                             <motion.div
                                 key="step5"
                                 custom={direction}
@@ -521,7 +640,7 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                         )}
 
                         {/* ── STEP 6: Success ── */}
-                        {step === 6 && (
+                        {isSuccessStep && (
                             <motion.div
                                 key="step6"
                                 custom={direction}
@@ -574,10 +693,10 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                 </div>
 
                 {/* Navigation footer */}
-                {step < 6 && (
+                {!isSuccessStep && (
                     <div className="px-6 pb-6 pt-2 border-t border-white/5 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
-                            {step > 1 && (
+                            {stepIndex > 0 && (
                                 <button
                                     onClick={goPrev}
                                     className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs text-white/40 hover:text-white hover:bg-white/5 border border-white/5 transition-all"
@@ -586,7 +705,7 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                                     Atrás
                                 </button>
                             )}
-                            {step === 1 && (
+                            {stepIndex === 0 && (
                                 <button
                                     onClick={handleDismiss}
                                     className="text-xs text-white/25 hover:text-white/50 transition-colors underline underline-offset-2"
@@ -596,12 +715,12 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                             )}
                         </div>
 
-                        {step < 5 && (
+                        {stepIndex < activeSteps.length - 1 && (
                             <button
                                 onClick={goNext}
-                                disabled={step === 1 && !canProceedStep1}
+                                disabled={!canProceedCurrentStep}
                                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-sm transition-all ${
-                                    (step === 1 && !canProceedStep1)
+                                    !canProceedCurrentStep
                                         ? 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5'
                                         : 'bg-gradient-to-r from-[#FF007A] to-[#00E5FF] text-black hover:opacity-90'
                                 }`}
@@ -611,12 +730,12 @@ export function ResellerOnboardingWizard({ onComplete }: ResellerOnboardingWizar
                             </button>
                         )}
 
-                        {step === 5 && (
+                        {stepIndex === activeSteps.length - 1 && (
                             <button
                                 onClick={handleFinish}
-                                disabled={saving || !canProceedStep5}
+                                disabled={saving || !canProceedCurrentStep}
                                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-sm transition-all ${
-                                    saving || !canProceedStep5
+                                    saving || !canProceedCurrentStep
                                         ? 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5'
                                         : 'bg-gradient-to-r from-[#FF007A] to-[#00E5FF] text-black hover:opacity-90'
                                 }`}

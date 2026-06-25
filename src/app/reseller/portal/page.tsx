@@ -2,21 +2,37 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
-import { Crown, LogOut, ExternalLink, Loader2, Copy } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Crown, ExternalLink, Loader2, LogOut, Copy, Settings, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/utils/supabase/client'
 import { useAuthStore } from '@/store/auth-store'
 import { ResellerCatalogBuilder } from '@/components/reseller/ResellerCatalogBuilder'
 import { ResellerOnboardingWizard } from '@/components/reseller/ResellerOnboardingWizard'
+import type { Profile } from '@/types/profiles'
+
+function getMissingConfigLabels(profile: Partial<Profile> | null) {
+  if (!profile) return ['datos de tienda', 'link publico', 'cobros']
+
+  const missing: string[] = []
+  if (!profile.full_name?.trim()) missing.push('nombre de tienda')
+  if (!profile.reseller_slug?.trim()) missing.push('link publico')
+  if (typeof profile.reseller_markup !== 'number' || profile.reseller_markup < 0) missing.push('margen')
+  if (!profile.reseller_theme?.trim()) missing.push('diseno')
+  if (!profile.bank_owner_name?.trim()) missing.push('titular de cobro')
+  if (!profile.bank_cbu?.trim() && !profile.bank_alias?.trim()) missing.push('CBU o alias')
+
+  return missing
+}
 
 function PortalContent() {
   const { isInitialized, isAuthenticated, isLoading, user, checkSession } = useAuthStore()
   const router = useRouter()
-  const [profile, setProfile] = useState<any>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
   const [loadingProfile, setLoadingProfile] = useState(true)
   const [showWizard, setShowWizard] = useState(false)
+  const [forceWizardAllSteps, setForceWizardAllSteps] = useState(false)
+  const [wizardDismissedThisSession, setWizardDismissedThisSession] = useState(false)
 
   // Auth Guard redirect
   useEffect(() => {
@@ -54,24 +70,35 @@ function PortalContent() {
     fetchProfile()
   }, [isAuthenticated, user])
 
-  // Show wizard if profile is incomplete and not already dismissed
+  const missingConfigLabels = getMissingConfigLabels(profile)
+  const profileComplete = missingConfigLabels.length === 0
+
+  // Show wizard if profile is incomplete according to saved data, not localStorage.
   useEffect(() => {
     if (!profile || loadingProfile) return
-    const alreadyCompleted = localStorage.getItem('eter-onboarding-complete') === 'true'
-    const profileComplete = profile.reseller_slug && (profile.bank_cbu || profile.bank_alias)
-    if (!alreadyCompleted && !profileComplete) {
+    const missingConfig = getMissingConfigLabels(profile)
+    if (!wizardDismissedThisSession && missingConfig.length > 0) {
+      setForceWizardAllSteps(false)
       setShowWizard(true)
     }
-  }, [profile, loadingProfile])
+  }, [profile, loadingProfile, wizardDismissedThisSession])
 
-  const handleWizardComplete = async (slug: string) => {
+  const handleWizardComplete = async () => {
     setShowWizard(false)
+    setForceWizardAllSteps(false)
+    setWizardDismissedThisSession(true)
     // Reload profile after wizard completes
     if (user) {
       const supabase = createClient()
       const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
       if (data) setProfile(data)
     }
+  }
+
+  const openQuickSetup = () => {
+    setWizardDismissedThisSession(false)
+    setForceWizardAllSteps(true)
+    setShowWizard(true)
   }
 
   const handleLogout = async () => {
@@ -183,6 +210,49 @@ function PortalContent() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-8 max-w-[1600px] w-full mx-auto">
+        <section className={`mb-5 overflow-hidden rounded-2xl border p-5 md:p-6 ${
+          profileComplete
+            ? 'border-[#00E5FF]/20 bg-[#00E5FF]/5'
+            : 'border-[#FF007A]/30 bg-gradient-to-r from-[#FF007A]/12 via-[#0A0A0A] to-[#00E5FF]/10'
+        }`}>
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-start gap-4">
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${
+                profileComplete
+                  ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300'
+                  : 'border-[#00E5FF]/30 bg-[#00E5FF]/10 text-[#00E5FF]'
+              }`}>
+                {profileComplete ? <CheckCircle2 size={22} /> : <Sparkles size={22} />}
+              </div>
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#00E5FF] font-mono">
+                  Configuracion rapida
+                </p>
+                <h2 className="mt-1 text-xl font-black tracking-tight text-white">
+                  {profileComplete ? 'Tu tienda esta configurada' : 'Terminemos tu tienda para que no falle el catalogo'}
+                </h2>
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/45">
+                  {profileComplete ? (
+                    <span>Podes revisar nombre, link, margen, estilo, WhatsApp y datos de cobro.</span>
+                  ) : (
+                    <>
+                      <AlertCircle size={14} className="text-[#FF007A]" />
+                      <span>Falta: {missingConfigLabels.join(', ')}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={openQuickSetup}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FF007A] to-[#00E5FF] px-5 py-3 text-sm font-black text-black shadow-lg shadow-cyan-500/10 transition-all hover:opacity-90"
+            >
+              <Settings size={16} />
+              Configuracion rapida
+            </button>
+          </div>
+        </section>
+
         <div className="bg-[#0A0A0A]/50 border border-[#181818] rounded-[2rem] p-6 md:p-8 backdrop-blur-xl shadow-3xl">
           <ResellerCatalogBuilder isDashboard={true} />
         </div>
@@ -190,7 +260,11 @@ function PortalContent() {
 
       {/* Onboarding Wizard — aparece si el perfil está incompleto */}
       {showWizard && (
-        <ResellerOnboardingWizard onComplete={handleWizardComplete} />
+        <ResellerOnboardingWizard
+          initialProfile={profile}
+          forceAllSteps={forceWizardAllSteps}
+          onComplete={handleWizardComplete}
+        />
       )}
     </div>
   )
