@@ -1,5 +1,5 @@
 import { headers } from 'next/headers';
-import CatalogClient from './CatalogClient';
+import CatalogClient from '@/app/catalog/CatalogClient';
 import { Metadata } from 'next';
 import { getProducts } from '@/app/actions/products';
 import { getActiveResellerCatalogLinks } from '@/app/actions/reseller-catalog';
