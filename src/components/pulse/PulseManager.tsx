@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Bike, Box, X } from 'lucide-react';
+import { ShoppingBag, Truck, Package, X, CheckCircle2 } from 'lucide-react';
 import { useEterPulse } from '@/hooks/useEterPulse';
 import { PulseEvent } from '@/types/pulse';
 import Link from 'next/link';
@@ -14,26 +14,27 @@ export function PulseManager() {
 
     const handleNewEvent = useCallback((event: PulseEvent) => {
         setActiveNotification(event);
-        // Auto-dismiss after 8 seconds
+        // Auto-dismiss after 6.5 seconds
         setTimeout(() => {
-            setActiveNotification(prev => prev?.id === event.id ? null : prev);
-        }, 8000);
+            setActiveNotification(prev => (prev?.id === event.id ? null : prev));
+        }, 6500);
     }, []);
 
     useEterPulse(handleNewEvent);
 
-    // No mostrar en el portal del revendedor
-    if (pathname?.startsWith('/reseller')) return null;
+    // No mostrar en el portal del revendedor ni en checkout
+    if (pathname?.startsWith('/reseller') || pathname?.startsWith('/checkout')) return null;
 
     return (
-        <div className="pointer-events-none fixed bottom-6 right-5 z-[95] sm:right-6">
+        <div className="pointer-events-none fixed bottom-6 left-4 sm:left-6 z-[95] max-w-[360px] sm:max-w-md">
             <AnimatePresence mode="wait">
                 {activeNotification && (
                     <motion.div
                         key={activeNotification.id}
-                        initial={{ x: 100, opacity: 0, scale: 0.9 }}
+                        initial={{ x: -80, opacity: 0, scale: 0.95 }}
                         animate={{ x: 0, opacity: 1, scale: 1 }}
-                        exit={{ x: 20, opacity: 0, scale: 0.95 }}
+                        exit={{ x: -60, opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                         className="pointer-events-auto"
                     >
                         <PulseToast
@@ -47,12 +48,26 @@ export function PulseManager() {
     );
 }
 
-function PulseToast({ event, onClose }: { event: PulseEvent, onClose: () => void }) {
+function PulseToast({ event, onClose }: { event: PulseEvent; onClose: () => void }) {
     const getIcon = () => {
         switch (event.channel) {
-            case 'SALES': return <ShoppingCart className="text-[#00E5FF]" size={20} />;
-            case 'LOCAL_DELIVERY': return <Bike className="text-[#8B5CF6]" size={20} />;
-            case 'NATIONAL_SHIPMENT': return <Box className="text-[#00E5FF]" size={20} />;
+            case 'SALES':
+                return <ShoppingBag className="text-[#39FF14]" size={18} />;
+            case 'LOCAL_DELIVERY':
+                return <Truck className="text-[#00E5FF]" size={18} />;
+            case 'NATIONAL_SHIPMENT':
+                return <Package className="text-[#39FF14]" size={18} />;
+        }
+    };
+
+    const getTag = () => {
+        switch (event.channel) {
+            case 'SALES':
+                return 'VENTA CONFIRMADA';
+            case 'LOCAL_DELIVERY':
+                return 'ENTREGA LOCAL MDQ';
+            case 'NATIONAL_SHIPMENT':
+                return 'DESPACHO ANDREANI 24HS';
         }
     };
 
@@ -60,69 +75,72 @@ function PulseToast({ event, onClose }: { event: PulseEvent, onClose: () => void
         switch (event.channel) {
             case 'SALES':
                 return (
-                    <>
-                        <span className="text-white/60">🔥 ¡Venta confirmada! Alguien en </span>
-                        <span className="text-white font-bold">{event.city}</span>
-                        <span className="text-white/60"> acaba de llevarse unas </span>
-                        <span className="text-[#00E5FF] font-black">{event.model}</span>
-                        <span className="text-white/60">.</span>
-                    </>
+                    <p className="text-xs text-white/80 leading-snug">
+                        Alguien en <span className="font-bold text-white">{event.city}</span> acaba de pedir unas{' '}
+                        <span className="font-black text-[#39FF14]">{event.model}</span>.
+                    </p>
                 );
             case 'LOCAL_DELIVERY':
                 return (
-                    <>
-                        <span className="text-white/60">🛵 ¡Reparto en camino! Uno de nuestros 8 repartidores está entregando unas </span>
-                        <span className="text-[#8B5CF6] font-black">{event.model}</span>
-                        <span className="text-white/60"> en </span>
-                        <span className="text-white font-bold">Mar del Plata</span>
-                        <span className="text-white/60">.</span>
-                    </>
+                    <p className="text-xs text-white/80 leading-snug">
+                        Reparto en camino en <span className="font-bold text-white">Mar del Plata</span>: entregando unas{' '}
+                        <span className="font-black text-[#00E5FF]">{event.model}</span>.
+                    </p>
                 );
             case 'NATIONAL_SHIPMENT':
                 return (
-                    <>
-                        <span className="text-white/60">📦 ¡Envío despachado! Un par de </span>
-                        <span className="text-[#00E5FF] font-black">{event.model}</span>
-                        <span className="text-white/60"> va en camino a </span>
-                        <span className="text-white font-bold">{event.city}</span>
-                        <span className="text-white/60"> vía correo prioritario.</span>
-                    </>
+                    <p className="text-xs text-white/80 leading-snug">
+                        Despacho prioritario de <span className="font-black text-[#39FF14]">{event.model}</span> con destino a{' '}
+                        <span className="font-bold text-white">{event.city}</span>.
+                    </p>
                 );
         }
     };
 
-    // Para ventas → lleva al catálogo filtrado por el modelo; para otros → /pulse
     const linkHref = event.channel === 'SALES' && event.model
         ? `/catalog?q=${encodeURIComponent(event.model)}`
-        : '/pulse';
+        : '/catalog';
 
     return (
-        <div className="relative group pointer-events-auto">
-            {/* Glow Effect */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#8B5CF6] to-[#00E5FF] rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+        <div className="relative group select-none">
+            
+            {/* Subtle glow border effect */}
+            <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-[#39FF14]/20 via-[#00E5FF]/20 to-transparent blur-sm opacity-50 group-hover:opacity-100 transition duration-500 pointer-events-none" />
 
             <Link
                 href={linkHref}
-                className="flex items-center gap-4 bg-[#0A0A0A]/80 backdrop-blur-2xl border border-white/10 p-4 rounded-2xl shadow-2xl max-w-sm hover:bg-[#0A0A0A]/90 transition-all cursor-pointer"
+                className="relative flex items-center gap-3.5 bg-[#0a0a0a]/95 backdrop-blur-2xl border border-white/10 p-3.5 sm:p-4 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.9),0_0_20px_rgba(57,255,20,0.06)] hover:border-[#39FF14]/40 hover:bg-[#0f0f0f] transition-all"
             >
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner">
+                {/* Icon Box */}
+                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner">
                     {getIcon()}
                 </div>
 
-                <div className="flex-grow text-xs leading-relaxed">
+                {/* Content Box */}
+                <div className="flex-grow min-w-0 space-y-1">
+                    <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold uppercase tracking-widest text-[#39FF14]">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#39FF14] animate-pulse" />
+                        <span>{getTag()}</span>
+                        <span className="text-white/20">·</span>
+                        <span className="text-white/40">AHORA</span>
+                    </div>
+
                     {getMessage()}
                 </div>
 
-                <div
+                {/* Close Button */}
+                <button
+                    type="button"
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         onClose();
                     }}
-                    className="flex-shrink-0 p-1 hover:bg-white/5 rounded-md transition-colors text-white/20 hover:text-white pointer-events-auto cursor-pointer"
+                    className="flex-shrink-0 p-1.5 rounded-lg text-white/30 hover:text-white hover:bg-white/10 transition-colors"
+                    aria-label="Cerrar notificación"
                 >
-                    <X size={14} />
-                </div>
+                    <X size={13} />
+                </button>
             </Link>
         </div>
     );

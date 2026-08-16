@@ -7,14 +7,13 @@ import { Toaster } from "sonner";
 import { AuthInitializer } from '@/components/auth/AuthInitializer';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { CartSidebar } from '@/components/cart/CartSidebar';
-import { AiConcierge } from '@/components/ai/AiConcierge';
+import { WhatsAppFloatingButton } from '@/components/layout/WhatsAppFloatingButton';
 import { AudioProvider } from '@/providers/AudioProvider';
 import { PulseManager } from '@/components/pulse/PulseManager';
 import { FloatingNavMenu } from '@/components/layout/FloatingNavMenu';
 import { CartNotificationContainer } from '@/components/cart/CartNotificationSystem';
 import { FloatingCartButton } from '@/components/cart/FloatingCartButton';
 import { FloatingAnnouncements } from '@/components/announcements/FloatingAnnouncements';
-
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -65,14 +64,16 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/logo.png', type: 'image/png' },
+      { url: '/icon.png', sizes: 'any' },
+      { url: '/images/eter-icon-circle.png', sizes: '512x512', type: 'image/png' },
     ],
+    shortcut: '/icon.png',
     apple: [
-      { url: '/logo.png', type: 'image/png' },
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
     ],
   },
   verification: {
-    google: 'your-google-verification-code', // Recommended to add
+    google: 'your-google-verification-code',
     other: {
       'nave-verification': 'P-69AF-88A4-X',
       'nave-domain-verification': 'P-69AF-88A4-X',
@@ -124,10 +125,9 @@ export default async function RootLayout({
               {children}
               <AuthModal />
               <CartSidebar />
-              <AiConcierge />
+              <WhatsAppFloatingButton />
               <PulseManager />
               <FloatingAnnouncements />
-              {/* Global floating UI — always on top */}
               <FloatingNavMenu />
               <CartNotificationContainer />
               <FloatingCartButton />

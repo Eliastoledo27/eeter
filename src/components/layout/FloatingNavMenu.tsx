@@ -69,11 +69,13 @@ export function FloatingNavMenu() {
   const pathname = usePathname();
 
   // Hide the menu on dashboard and reseller pages to prevent visual clutter
+  // Also hide on /preview which has its own navigation in the Hero header
   if (
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/c/') ||
     pathname.startsWith('/resellers') ||
-    pathname.startsWith('/reseller')
+    pathname.startsWith('/reseller') ||
+    pathname.startsWith('/preview')
   ) {
     return null;
   }
