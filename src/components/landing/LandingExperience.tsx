@@ -4,6 +4,7 @@ import * as React from 'react';
 import { PreviewHeader } from '@/components/landing/primitives/PreviewHeader';
 import { Scene01_Hero } from '@/components/landing/scenes/Scene01_Hero';
 import { SceneTheBest } from '@/components/landing/scenes/SceneTheBest';
+import { SceneCustomerReferences } from '@/components/landing/scenes/SceneCustomerReferences';
 import { SceneEcosystem } from '@/components/landing/scenes/SceneEcosystem';
 import { SceneCommunityReferences } from '@/components/landing/scenes/SceneCommunityReferences';
 import { Scene04_WhyEter } from '@/components/landing/scenes/Scene04_WhyEter';
@@ -27,11 +28,12 @@ export interface LandingExperienceProps {
  * - HERO MONUMENTAL
  * - CINTAS VERDES NEÓN 01
  * - THE BEST (Showcase de Calzado y Productos)
+ * - REFERENCIAS DE CLIENTES SATISFECHOS (Fotos Reales & Prueba Social Psicológica)
  * - ECOSISTEMA ÉTER: LO QUE HACEMOS
  * - CINTAS VERDES NEÓN 02
- * - COMUNIDAD & REFERENCIAS (Prueba Social y Casos de Éxito)
+ * - COMUNIDAD & REFERENCIAS
  * - POR QUÉ ÉTER
- * - BANNER ATMOSFÉRICO DE MARCA (Laboratorio / Brand Banner)
+ * - BANNER ATMOSFÉRICO DE MARCA (Laboratorio)
  * - FOOTER MINIMALISTA & PROFESIONAL
  */
 export function LandingExperience({ products, className }: LandingExperienceProps) {
@@ -63,7 +65,10 @@ export function LandingExperience({ products, className }: LandingExperienceProp
             {/* 4. ESCENA — THE BEST: PRODUCT SHOWCASE */}
             <SceneTheBest products={products} />
 
-            {/* 5. ESCENA — ECOSISTEMA ÉTER: LO QUE HACEMOS */}
+            {/* 5. ESCENA — REFERENCIAS DE CLIENTES SATISFECHOS (PRUEBA SOCIAL DE VENTA PSICOLÓGICA) */}
+            <SceneCustomerReferences />
+
+            {/* 6. ESCENA — ECOSISTEMA ÉTER: LO QUE HACEMOS */}
             <SceneEcosystem />
 
             {/* 6. CINTAS CINÉTICAS CRUZADAS 02 (VERDE NEÓN) */}

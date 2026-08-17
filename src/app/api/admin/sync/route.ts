@@ -90,17 +90,25 @@ function normalizeAnnouncementPages(value: unknown) {
 function announcementPayload(announcement: Record<string, unknown>) {
   const targetPages = Array.isArray(announcement.target_pages)
     ? announcement.target_pages
-    : announcement.targetPages;
+    : Array.isArray(announcement.targetPages)
+      ? announcement.targetPages
+      : typeof announcement.target_pages === 'string'
+        ? [announcement.target_pages]
+        : typeof announcement.targetPages === 'string'
+          ? [announcement.targetPages]
+          : ['all'];
 
   return {
     title: String(announcement.title || '').trim(),
-    content: announcement.content ?? null,
-    category: announcement.category ?? null,
+    content: announcement.content ? String(announcement.content).trim() : null,
+    category: announcement.category ? String(announcement.category).trim() : null,
     image_url: announcement.image_url ?? announcement.imageUrl ?? null,
     is_active: announcement.is_active ?? announcement.isActive ?? true,
     target_pages: normalizeAnnouncementPages(targetPages),
-    template_key: announcement.template_key ?? announcement.templateKey ?? 'minimal',
-    display_mode: announcement.display_mode ?? announcement.displayMode ?? 'floating',
+    template_key: String(announcement.template_key ?? announcement.templateKey ?? 'drop').trim(),
+    display_mode: ['floating', 'banner', 'modal'].includes(String(announcement.display_mode ?? announcement.displayMode))
+      ? String(announcement.display_mode ?? announcement.displayMode)
+      : 'floating',
     cta_label: announcement.cta_label ?? announcement.ctaLabel ?? null,
     cta_url: announcement.cta_url ?? announcement.ctaUrl ?? null,
     priority: Number(announcement.priority || 0),
@@ -253,8 +261,13 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: false, error: 'Título requerido' }, { status: 400 });
       }
 
-      const query = body.announcement?.id
-        ? supabase.from('announcements').update(payload).eq('id', body.announcement.id)
+      const rawId = body.announcement?.id;
+      const announcementId = rawId && typeof rawId === 'string' && rawId.trim().length > 0 && rawId !== 'null' && rawId !== 'undefined'
+        ? rawId.trim()
+        : null;
+
+      const query = announcementId
+        ? supabase.from('announcements').update(payload).eq('id', announcementId)
         : supabase.from('announcements').insert({ ...payload, published_at: new Date().toISOString() });
       const { data, error } = await query.select().single();
       if (error) throw error;
@@ -263,7 +276,11 @@ export async function POST(req: Request) {
     }
 
     if (action === 'delete_announcement') {
-      const { error } = await supabase.from('announcements').delete().eq('id', body.id);
+      const rawId = body.id || body.announcementId;
+      if (!rawId) {
+        return NextResponse.json({ success: false, error: 'ID requerido' }, { status: 400 });
+      }
+      const { error } = await supabase.from('announcements').delete().eq('id', String(rawId).trim());
       if (error) throw error;
       revalidateStore();
       return NextResponse.json({ success: true });

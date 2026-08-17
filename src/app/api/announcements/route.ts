@@ -22,11 +22,15 @@ function normalizeTargetPage(value: string) {
 }
 
 export async function GET(request: Request) {
+  const page = normalizeTargetPage(new URL(request.url).searchParams.get('page') || '');
+
   if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.json({ success: false, announcements: [], error: 'Supabase no configurado' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, announcements: [], error: 'Supabase no configurado' },
+      { status: 500 }
+    );
   }
 
-  const page = normalizeTargetPage(new URL(request.url).searchParams.get('page') || '');
   const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
@@ -34,7 +38,7 @@ export async function GET(request: Request) {
   try {
     const { data, error } = await supabase
       .from('announcements')
-      .select('id,title,content,category,image_url,is_active,published_at,created_at,target_pages,template_key,display_mode,cta_label,cta_url,priority')
+      .select('*')
       .eq('is_active', true)
       .order('priority', { ascending: false })
       .order('published_at', { ascending: false })
@@ -44,7 +48,7 @@ export async function GET(request: Request) {
 
     const announcements = (data || []).filter((announcement) => {
       if (!page) return true;
-      const pages = ((announcement.target_pages?.length ? announcement.target_pages : ['home']) as string[]).map(normalizeTargetPage);
+      const pages = ((announcement.target_pages?.length ? announcement.target_pages : ['all']) as string[]).map(normalizeTargetPage);
       return pages.includes('all') || pages.includes(page);
     });
 

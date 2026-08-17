@@ -1,24 +1,32 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Megaphone, MousePointerClick, X } from 'lucide-react';
+import { Megaphone, MousePointerClick, Sparkles, X, ChevronRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { createClient } from '@/utils/supabase/client';
 import type { Announcement } from '@/hooks/useAnnouncements';
 
-const AUTO_DISMISS_MS = 7000;
-const DISPLAY_MODES = ['floating', 'modal', 'banner'] as const;
-const STYLE_MAP: Record<string, { accent: string; glow: string; cta: string; border: string }> = {
-  drop: { accent: 'text-[#00E5FF]', glow: 'bg-[#00E5FF]/15', cta: 'hover:bg-[#00E5FF]', border: 'border-[#00E5FF]/20' },
-  stock: { accent: 'text-[#00E5FF]', glow: 'bg-[#00E5FF]/12', cta: 'hover:bg-[#00E5FF]', border: 'border-[#00E5FF]/25' },
-  rose: { accent: 'text-[#FF007A]', glow: 'bg-[#FF007A]/18', cta: 'hover:bg-[#FF007A]', border: 'border-[#FF007A]/25' },
-  gold: { accent: 'text-[#FFC857]', glow: 'bg-[#FFC857]/16', cta: 'hover:bg-[#FFC857]', border: 'border-[#FFC857]/25' },
-  mono: { accent: 'text-white', glow: 'bg-white/10', cta: 'hover:bg-white', border: 'border-white/20' },
-  flash: { accent: 'text-[#B7FF00]', glow: 'bg-[#B7FF00]/16', cta: 'hover:bg-[#B7FF00]', border: 'border-[#B7FF00]/25' },
-  community: { accent: 'text-[#8B5CF6]', glow: 'bg-[#8B5CF6]/18', cta: 'hover:bg-[#8B5CF6]', border: 'border-[#8B5CF6]/25' },
-};
+const AUTO_DISMISS_MS = 9000;
+
+function getVisualConfig(templateKey?: string, category?: string) {
+  const key = `${templateKey || ''} ${category || ''}`.toLowerCase();
+  if (key.includes('rose') || key.includes('pink') || key.includes('mujer') || key.includes('femme')) {
+    return { accent: 'text-[#FF007A]', glow: 'bg-[#FF007A]/25', border: 'border-[#FF007A]/35', hex: '#FF007A' };
+  }
+  if (key.includes('gold') || key.includes('luxury') || key.includes('oro') || key.includes('signature') || key.includes('minimal')) {
+    return { accent: 'text-[#FFC857]', glow: 'bg-[#FFC857]/20', border: 'border-[#FFC857]/30', hex: '#FFC857' };
+  }
+  if (key.includes('flash') || key.includes('sale') || key.includes('oferta') || key.includes('verde') || key.includes('green') || key.includes('bold')) {
+    return { accent: 'text-[#39FF14]', glow: 'bg-[#39FF14]/25', border: 'border-[#39FF14]/35', hex: '#39FF14' };
+  }
+  if (key.includes('community') || key.includes('comunidad') || key.includes('vip') || key.includes('purple') || key.includes('morado') || key.includes('club')) {
+    return { accent: 'text-[#A855F7]', glow: 'bg-[#A855F7]/25', border: 'border-[#A855F7]/35', hex: '#A855F7' };
+  }
+  return { accent: 'text-[#00E5FF]', glow: 'bg-[#00E5FF]/20', border: 'border-[#00E5FF]/30', hex: '#00E5FF' };
+}
 
 function normalizeTargetPage(value: string) {
   const normalized = value
@@ -27,7 +35,7 @@ function normalizeTargetPage(value: string) {
     .trim()
     .toLowerCase();
 
-  if (['all', 'todos', 'todo', '*'].includes(normalized)) return 'all';
+  if (['all', 'todos', 'todo', '*', 'toda la web'].includes(normalized)) return 'all';
   if (['home', 'inicio', 'index', '/'].includes(normalized)) return 'home';
   if (['catalog', 'catalogo', 'catalogue', 'c'].includes(normalized)) return 'catalog';
   if (['community', 'comunidad'].includes(normalized)) return 'community';
@@ -48,201 +56,390 @@ function getPageKey(pathname: string) {
 export function FloatingAnnouncements() {
   const pathname = usePathname();
 
-  // No mostrar en el portal del revendedor
-  if (pathname?.startsWith('/reseller')) return null;
+  // No mostrar en el panel de control ni portal de revendedor
+  if (pathname?.startsWith('/reseller') || pathname?.startsWith('/dashboard')) return null;
 
   const routeKey = pathname || '/';
   const pageKey = getPageKey(routeKey);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [dismissedKeys, setDismissedKeys] = useState<Set<string>>(new Set());
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Consulta de anuncios sincronizada con FETER Stock y el Dashboard
   useEffect(() => {
-    const controller = new AbortController();
+    let isMounted = true;
+    const supabase = createClient();
 
-    async function fetchPublicAnnouncements() {
+    async function loadAnnouncements() {
       try {
-        const response = await fetch(`/api/announcements?page=${encodeURIComponent(pageKey)}`, {
-          signal: controller.signal,
+        // 1. Intentar cargar vía API del servidor (ignora bloqueos RLS y optimiza cache)
+        const res = await fetch(`/api/announcements?page=${encodeURIComponent(pageKey)}`, {
           cache: 'no-store',
         });
-        const payload = await response.json();
-        if (!response.ok || !payload.success) {
-          throw new Error(payload.error || 'No se pudieron cargar los anuncios');
+        if (res.ok) {
+          const payload = await res.json();
+          if (payload.success && Array.isArray(payload.announcements) && isMounted) {
+            setAnnouncements(payload.announcements);
+            return;
+          }
         }
-        setAnnouncements(payload.announcements || []);
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error('Error loading public announcements:', error);
-          setAnnouncements([]);
+      } catch (e) {
+        // Fallback a consulta directa Supabase
+      }
+
+      try {
+        // 2. Consulta directa a Supabase
+        const { data, error } = await supabase
+          .from('announcements')
+          .select('*')
+          .eq('is_active', true)
+          .order('priority', { ascending: false })
+          .order('published_at', { ascending: false });
+
+        if (!error && data && isMounted) {
+          setAnnouncements(data);
         }
+      } catch (err) {
+        console.error('Error fetching announcements from supabase:', err);
       }
     }
 
-    fetchPublicAnnouncements();
+    loadAnnouncements();
 
-    return () => controller.abort();
+    // Polling cada 12 segundos para detectar cambios de FETER Stock inmediatamente
+    const interval = setInterval(loadAnnouncements, 12000);
+
+    // Suscribirse a cambios en tiempo real desde Supabase / FETER Stock
+    const channel = supabase
+      .channel('announcements_realtime_sync')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'announcements' },
+        () => {
+          loadAnnouncements();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+      supabase.removeChannel(channel);
+    };
   }, [pageKey]);
 
-  const active = useMemo(() => {
-    const floating = announcements
-      .filter((announcement) => {
-        const mode = announcement.display_mode || 'floating';
-        return announcement.is_active && DISPLAY_MODES.includes(mode);
-      })
+  // Filtrar anuncios activos y asignados a esta página
+  const eligibleAnnouncements = useMemo(() => {
+    const activeList = announcements
+      .filter((a) => a.is_active)
       .sort((a, b) => {
         const priorityDelta = (b.priority || 0) - (a.priority || 0);
         if (priorityDelta !== 0) return priorityDelta;
         return new Date(b.published_at || b.created_at || 0).getTime() - new Date(a.published_at || a.created_at || 0).getTime();
       });
 
-    const eligible = floating.filter((announcement) => {
-        const pages = (announcement.target_pages?.length ? announcement.target_pages : ['home']).map(normalizeTargetPage);
-        const dismissedKey = `${routeKey}:${announcement.id}`;
+    const filtered = activeList.filter((a) => {
+      const targetPages = a.target_pages && a.target_pages.length > 0 ? a.target_pages : ['all'];
+      const normalizedTargets = targetPages.map(normalizeTargetPage);
+      const isTarget = normalizedTargets.includes('all') || normalizedTargets.includes(pageKey);
+      return isTarget && !dismissedIds.has(a.id);
+    });
 
-        return (
-          (pages.includes('all') || pages.includes(pageKey)) &&
-          !dismissedKeys.has(dismissedKey)
-        );
-      });
+    return filtered;
+  }, [announcements, dismissedIds, pageKey]);
 
-    if (eligible[0]) return eligible[0];
+  const active = eligibleAnnouncements[currentIndex % Math.max(1, eligibleAnnouncements.length)] || null;
 
-    return null;
-  }, [announcements, dismissedKeys, pageKey, routeKey]);
-
+  // Rotación y temporizador
   useEffect(() => {
-    if (!active) return;
+    if (!active || isHovered) return;
 
-    const dismissedKey = `${routeKey}:${active.id}`;
-    const timer = window.setTimeout(() => {
-      setDismissedKeys((current) => {
-        const next = new Set(current);
-        next.add(dismissedKey);
-        return next;
-      });
+    timerRef.current = setTimeout(() => {
+      if (eligibleAnnouncements.length > 1) {
+        setCurrentIndex((prev) => (prev + 1) % eligibleAnnouncements.length);
+      }
     }, AUTO_DISMISS_MS);
 
-    return () => window.clearTimeout(timer);
-  }, [active, routeKey]);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [active, isHovered, eligibleAnnouncements.length, currentIndex]);
 
-  const dismissActive = () => {
+  const dismissCurrent = () => {
     if (!active) return;
-    setDismissedKeys((current) => {
-      const next = new Set(current);
-      next.add(`${routeKey}:${active.id}`);
+    setDismissedIds((prev) => {
+      const next = new Set(prev);
+      next.add(active.id);
       return next;
     });
+    setTimeout(() => {
+      setCurrentIndex((prev) => prev + 1);
+    }, 250);
   };
 
-  const badge = active?.category || active?.template_key || 'ETER';
-  const mode = active?.display_mode || 'floating';
-  const visualKey = active?.template_key || 'drop';
-  const visual = STYLE_MAP[visualKey] || STYLE_MAP.drop;
-  const isBanner = mode === 'banner';
-  const shellClass = isBanner
-    ? 'fixed inset-x-0 bottom-5 z-[94] grid place-items-center px-3 sm:bottom-6'
-    : 'fixed inset-0 z-[94] grid place-items-center px-3 py-4';
-  const panelClass = isBanner
-    ? 'w-[min(46rem,100%)]'
-    : 'w-[min(40rem,100%)] max-h-[calc(100dvh-2rem)] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden';
-  const cardClass = isBanner
-    ? 'rounded-2xl p-3 pr-12 sm:p-4 sm:pr-14'
-    : 'rounded-[1.35rem] p-4 sm:p-5 md:p-6';
-  const imageClass = isBanner
-    ? 'h-14 w-14 rounded-xl sm:h-16 sm:w-16'
-    : 'h-[4.75rem] w-[4.75rem] rounded-2xl sm:h-24 sm:w-24 md:h-28 md:w-28';
-  const titleClass = isBanner
-    ? 'line-clamp-2 text-sm sm:text-base'
-    : 'line-clamp-3 text-xl sm:text-2xl md:text-3xl';
+  if (!active) return null;
 
-  return (
-    <AnimatePresence mode="wait">
-      {active && (
-        <>
-          {!isBanner && (
-            <motion.button
-              type="button"
-              aria-label="Cerrar anuncio"
-              className="fixed inset-0 z-[93] bg-black/55 backdrop-blur-[3px]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={dismissActive}
-            />
-          )}
+  const mode = active.display_mode || 'floating';
+  const visual = getVisualConfig(active.template_key, active.category || undefined);
+  const badgeText = active.category || 'ÉTER // ANUNCIO';
+
+  // ── 1. Modo MODAL ─────────────────────────────────────────────────────────────
+  if (mode === 'modal') {
+    return (
+      <AnimatePresence>
+        <div className="fixed inset-0 z-[9990] grid place-items-center px-4 py-6">
           <motion.div
-            key={`${routeKey}:${active.id}`}
-            initial={{ opacity: 0, y: isBanner ? 28 : 16, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: isBanner ? 28 : 16, scale: 0.98 }}
-            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            role="status"
-            aria-live="polite"
-            className={shellClass}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={dismissCurrent}
+            className="fixed inset-0 bg-black/75 backdrop-blur-md"
+          />
+          <motion.div
+            key={`modal-${active.id}`}
+            initial={{ opacity: 0, scale: 0.92, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: 20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            className="relative z-10 w-full max-w-lg overflow-hidden rounded-3xl border bg-gradient-to-b from-[#111113] via-[#09090b] to-[#040405] p-6 text-white shadow-[0_25px_80px_rgba(0,0,0,0.95)] backdrop-blur-2xl"
+            style={{ borderColor: `${visual.hex}44` }}
           >
-          <div className={`${panelClass}`}>
-          <div className={`relative overflow-hidden border-t border-r border-b bg-gradient-to-br from-[#0a0a0c] to-[#030303] text-white shadow-[0_28px_90px_rgba(0,0,0,0.85),0_0_40px_rgba(0,229,255,0.1)] backdrop-blur-20 ${visual.border} ${cardClass} border-l-[5px]`} style={{ borderLeftColor: visualKey === 'rose' ? '#FF007A' : visualKey === 'gold' ? '#FFC857' : visualKey === 'flash' ? '#B7FF00' : visualKey === 'community' ? '#8B5CF6' : '#00E5FF' }}>
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00E5FF] to-transparent opacity-60" />
-            <div className={`pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full blur-3xl ${visual.glow} animate-pulse`} />
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.04),transparent_40%,rgba(255,255,255,0.02)_70%,transparent)]" />
-            <motion.div
-              className="absolute inset-x-0 bottom-0 h-[2.5px] origin-left"
-              style={{ backgroundColor: visualKey === 'rose' ? '#FF007A' : visualKey === 'gold' ? '#FFC857' : visualKey === 'flash' ? '#B7FF00' : visualKey === 'community' ? '#8B5CF6' : '#00E5FF' }}
-              initial={{ scaleX: 1 }}
-              animate={{ scaleX: 0 }}
-              transition={{ duration: AUTO_DISMISS_MS / 1000, ease: 'linear' }}
-            />
+            <div className={`pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full blur-3xl ${visual.glow}`} />
 
             <button
               type="button"
-              onClick={dismissActive}
-              className="absolute right-2.5 top-2.5 grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-black/40 text-white/50 transition hover:bg-white/10 hover:text-white hover:border-white/25"
-              aria-label="Cerrar anuncio"
+              onClick={dismissCurrent}
+              className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/5 text-white/60 transition hover:bg-white/15 hover:text-white"
+              aria-label="Cerrar"
             >
               <X size={15} />
             </button>
 
-            <div className={`relative z-10 flex gap-3 ${isBanner ? 'items-center pr-3' : 'items-start pr-7 sm:gap-4 md:gap-5'}`}>
-              {active.image_url ? (
-                <div className={`relative shrink-0 overflow-hidden border border-white/10 bg-black/60 shadow-[0_8px_25px_rgba(0,0,0,0.5)] ${imageClass}`}>
-                  <Image src={active.image_url} alt="" fill sizes="(max-width: 640px) 64px, 96px" className="object-cover transition-transform duration-700 hover:scale-105" />
-                </div>
-              ) : (
-                <div className={`flex shrink-0 items-center justify-center border bg-black/40 shadow-[0_8px_25px_rgba(0,0,0,0.5)] ${visual.border} ${visual.accent} ${imageClass}`}>
-                  <Megaphone size={24} className="animate-bounce duration-1000" />
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              {active.image_url && (
+                <div className="relative h-44 w-full shrink-0 overflow-hidden rounded-2xl border border-white/10 sm:h-32 sm:w-32">
+                  <Image src={active.image_url} alt="" fill sizes="128px" className="object-cover" />
                 </div>
               )}
-
-              <div className="min-w-0 flex-1">
-                <span className={`inline-block px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-[0.2em] sm:text-[9px] bg-white/5 border border-white/10 ${visual.accent}`}>
-                  {badge}
+              <div className="flex-1 min-w-0">
+                <span
+                  className="inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[9px] font-mono font-black uppercase tracking-wider"
+                  style={{ borderColor: `${visual.hex}55`, color: visual.hex, backgroundColor: `${visual.hex}15` }}
+                >
+                  <Sparkles size={10} />
+                  {badgeText}
                 </span>
-                <h3 className={`mt-2 font-black uppercase leading-tight tracking-normal text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/70 ${titleClass}`}>
+                <h3 className="mt-2 text-lg font-black uppercase tracking-tight text-white sm:text-xl">
                   {active.title}
                 </h3>
-                {active.content && <p className={`mt-2.5 text-[12px] leading-relaxed text-white/75 sm:text-sm md:text-[15px] ${isBanner ? 'line-clamp-1 max-sm:hidden' : 'line-clamp-4 sm:line-clamp-3'}`}>{active.content}</p>}
-                {active.cta_label && active.cta_url && (
-                  <Link
-                    href={active.cta_url}
-                    onClick={dismissActive}
-                    className={`mt-4 inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.16em] transition-all sm:w-auto sm:min-h-0 sm:rounded-lg sm:text-[10px] hover:scale-[1.03] duration-300 bg-white text-black hover:shadow-[0_0_20px_rgba(255,255,255,0.4)]`}
-                    style={{
-                      backgroundColor: visualKey === 'rose' ? '#FF007A' : visualKey === 'gold' ? '#FFC857' : visualKey === 'flash' ? '#B7FF00' : visualKey === 'community' ? '#8B5CF6' : '#00E5FF',
-                      color: visualKey === 'gold' || visualKey === 'flash' ? '#000000' : '#ffffff',
-                      boxShadow: `0 0 15px ${(visualKey === 'rose' ? '#FF007A' : visualKey === 'gold' ? '#FFC857' : visualKey === 'flash' ? '#B7FF00' : visualKey === 'community' ? '#8B5CF6' : '#00E5FF')}33`
-                    }}
-                  >
-                    <MousePointerClick size={14} />
-                    {active.cta_label}
-                  </Link>
+                {active.content && (
+                  <p className="mt-1.5 text-xs text-white/70 leading-relaxed sm:text-sm">
+                    {active.content}
+                  </p>
                 )}
               </div>
             </div>
-          </div>
-          </div>
+
+            {active.cta_label && active.cta_url && (
+              <div className="mt-5 pt-3 border-t border-white/10 flex justify-end">
+                <Link
+                  href={active.cta_url}
+                  onClick={dismissCurrent}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-wider text-black transition-all hover:scale-[1.02] active:scale-95 shadow-lg"
+                  style={{ backgroundColor: visual.hex }}
+                >
+                  <MousePointerClick size={14} />
+                  {active.cta_label}
+                </Link>
+              </div>
+            )}
           </motion.div>
-        </>
-      )}
+        </div>
+      </AnimatePresence>
+    );
+  }
+
+  // ── 2. Modo BANNER ────────────────────────────────────────────────────────────
+  if (mode === 'banner') {
+    return (
+      <aside aria-label="Anuncios Éter">
+      <AnimatePresence>
+        <motion.div
+          key={`banner-${active.id}`}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 30 }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="fixed inset-x-0 bottom-4 z-[9990] mx-auto w-[min(48rem,calc(100vw-1.5rem))] px-2"
+        >
+          <div
+            className="relative flex items-center justify-between gap-3 overflow-hidden rounded-2xl border bg-[#0a0a0c]/95 p-3 text-white shadow-[0_15px_50px_rgba(0,0,0,0.9)] backdrop-blur-2xl sm:px-5 sm:py-3.5"
+            style={{ borderColor: `${visual.hex}44` }}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <span
+                className="hidden shrink-0 items-center justify-center rounded-lg p-2 sm:flex"
+                style={{ backgroundColor: `${visual.hex}20`, color: visual.hex }}
+              >
+                <Megaphone size={16} />
+              </span>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-white/50">{badgeText}</span>
+                </div>
+                <h4 className="truncate text-xs font-bold uppercase tracking-tight text-white sm:text-sm">{active.title}</h4>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              {active.cta_label && active.cta_url && (
+                <Link
+                  href={active.cta_url}
+                  onClick={dismissCurrent}
+                  className="rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-black transition hover:scale-105"
+                  style={{ backgroundColor: visual.hex }}
+                >
+                  {active.cta_label}
+                </Link>
+              )}
+              <button
+                type="button"
+                onClick={dismissCurrent}
+                className="grid h-7 w-7 place-items-center rounded-full text-white/40 hover:bg-white/10 hover:text-white"
+                aria-label="Cerrar"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+      </aside>
+    );
+  }
+
+  // ── 3. Modo FLOATING (Predeterminado — Card en esquina inferior izquierda) ──
+  return (
+    <aside aria-label="Anuncios Éter">
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={`floating-${active.id}`}
+        initial={{ opacity: 0, scale: 0.9, y: 25, x: -10 }}
+        animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20, transition: { duration: 0.2 } }}
+        transition={{ type: 'spring', damping: 24, stiffness: 280 }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="fixed bottom-5 left-4 z-[9990] w-[min(24rem,calc(100vw-2rem))] sm:bottom-6 sm:left-6"
+        role="region"
+        aria-live="polite"
+      >
+        <div
+          className="group relative overflow-hidden rounded-2xl border bg-gradient-to-br from-[#0c0c0e]/95 via-[#08080a]/98 to-[#030304] p-3.5 text-white shadow-[0_20px_60px_rgba(0,0,0,0.92),0_0_30px_rgba(0,0,0,0.6)] backdrop-blur-2xl transition-all duration-300 sm:p-4"
+          style={{
+            borderColor: `${visual.hex}35`,
+            boxShadow: `0 20px 60px rgba(0,0,0,0.9), 0 0 25px ${visual.hex}18`,
+          }}
+        >
+          {/* Sombra de glow */}
+          <div
+            className={`pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full blur-2xl ${visual.glow} opacity-60`}
+          />
+
+          {/* Barra de progreso de auto-cierre */}
+          {!isHovered && (
+            <motion.div
+              key={`progress-${active.id}-${currentIndex}`}
+              className="absolute inset-x-0 bottom-0 h-[2px] origin-left"
+              style={{ backgroundColor: visual.hex }}
+              initial={{ scaleX: 1 }}
+              animate={{ scaleX: 0 }}
+              transition={{ duration: AUTO_DISMISS_MS / 1000, ease: 'linear' }}
+            />
+          )}
+
+          {/* Botón cerrar */}
+          <button
+            type="button"
+            onClick={dismissCurrent}
+            className="absolute right-2.5 top-2.5 z-20 grid h-6 w-6 place-items-center rounded-full border border-white/10 bg-white/5 text-white/40 transition-all hover:bg-white/20 hover:text-white"
+            aria-label="Cerrar anuncio"
+          >
+            <X size={12} />
+          </button>
+
+          <div className="relative z-10 flex items-start gap-3">
+            {/* Imagen o icono del anuncio del dashboard */}
+            {active.image_url ? (
+              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black/60 shadow-md sm:h-16 sm:w-16">
+                <Image
+                  src={active.image_url}
+                  alt=""
+                  fill
+                  sizes="64px"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+            ) : (
+              <div
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border sm:h-16 sm:w-16"
+                style={{ backgroundColor: `${visual.hex}15`, borderColor: `${visual.hex}40`, color: visual.hex }}
+              >
+                <Megaphone size={20} className="animate-pulse" />
+              </div>
+            )}
+
+            {/* Contenido configurado en el Dashboard */}
+            <div className="min-w-0 flex-1 pr-4">
+              <div className="flex items-center gap-1.5">
+                <span
+                  className="inline-block rounded px-1.5 py-0.5 text-[8px] font-mono font-black uppercase tracking-wider"
+                  style={{
+                    backgroundColor: `${visual.hex}20`,
+                    color: visual.hex,
+                    border: `1px solid ${visual.hex}40`,
+                  }}
+                >
+                  {badgeText}
+                </span>
+              </div>
+
+              <h4 className="mt-1 text-xs font-black uppercase leading-tight tracking-tight text-white sm:text-sm line-clamp-2">
+                {active.title}
+              </h4>
+
+              {active.content && (
+                <p className="mt-1 text-[11px] leading-snug text-white/65 line-clamp-2">
+                  {active.content}
+                </p>
+              )}
+
+              {/* Botón CTA del Dashboard */}
+              {active.cta_label && active.cta_url && (
+                <div className="mt-2.5">
+                  <Link
+                    href={active.cta_url}
+                    onClick={dismissCurrent}
+                    className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-black transition-all hover:scale-105 active:scale-95 shadow"
+                    style={{ backgroundColor: visual.hex }}
+                  >
+                    <span>{active.cta_label}</span>
+                    <ChevronRight size={11} strokeWidth={3} />
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </motion.div>
     </AnimatePresence>
+    </aside>
   );
 }
+
+
