@@ -7,8 +7,16 @@ import { WhatsAppFloatingButton } from '@/components/layout/WhatsAppFloatingButt
 import { SceneBrandBanner } from '@/components/landing/scenes/SceneBrandBanner';
 
 export const metadata: Metadata = {
-    title: 'Sobre ÉTER | El Estándar del Calzado Urbano',
-    description: 'Conocé la visión, el origen en Mar del Plata y el proceso de curaduría directa en Brasil detrás de ÉTER Store.',
+    title: 'Origen & Calidad en Calzado Brasil | ÉTER Store Zapatillas',
+    description: 'Conocé el estándar de calidad detrás de nuestro calzado: selección directa en fábricas de Brasil, control par por par y logística integral de zapatillas desde Mar del Plata a todo el país.',
+    keywords: [
+        'calzado brasilero calidad', 'importación de zapatillas brasil', 'zapas importadas mar del plata',
+        'calidad zapatillas', 'distribuidores de zapatillas argentina', 'fábrica de calzado brasil',
+        'eter calzados origen', 'sobre eter store'
+    ],
+    alternates: {
+        canonical: 'https://www.eter.store/about',
+    },
 };
 
 export default function AboutPage() {

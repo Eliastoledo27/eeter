@@ -7,7 +7,7 @@ import {
   ShieldCheck, RefreshCw, User, MapPin,
   CheckCircle2, Building2, Tag, Percent, Loader2, Wallet,
   CreditCard, Banknote, Copy, MessageCircle,
-  Target, Shield, Zap, ChevronDown, Truck
+  Target, Shield, Zap, ChevronDown, Truck, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
@@ -21,7 +21,7 @@ import { cartNotify } from '@/components/cart/CartNotificationSystem';
 import { usePathname } from 'next/navigation';
 import { getResellerBySlug } from '@/app/actions/reseller-catalog';
 
-// Datos bancarios de Éter
+// Datos bancarios oficiales de Éter
 const BANK_DATA = {
   titular: 'Elias Francesco Calderon Toledo',
   alias: 'eterstore / etershop',
@@ -29,33 +29,7 @@ const BANK_DATA = {
 };
 
 const WHATSAPP_NUMBER = '5492236204002';
-
-const PROVINCIAS = [
-  'Buenos Aires',
-  'Capital Federal (CABA)',
-  'Catamarca',
-  'Chaco',
-  'Chubut',
-  'Córdoba',
-  'Corrientes',
-  'Entre Ríos',
-  'Formosa',
-  'Jujuy',
-  'La Pampa',
-  'La Rioja',
-  'Mendoza',
-  'Misiones',
-  'Neuquén',
-  'Río Negro',
-  'Salta',
-  'San Juan',
-  'San Luis',
-  'Santa Cruz',
-  'Santa Fe',
-  'Santiago del Estero',
-  'Tierra del Fuego',
-  'Tucumán'
-];
+const FREE_SHIPPING_THRESHOLD = 250000;
 
 export function CartSidebar() {
   const {
@@ -72,10 +46,17 @@ export function CartSidebar() {
   const [referenceCode, setReferenceCode] = useState<string | null>(null);
   const [orderedItems, setOrderedItems] = useState<any[]>([]);
   const [orderedTotal, setOrderedTotal] = useState(0);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
   // Per-item loading state (key: `${id}-${size}`)
   const [itemLoading, setItemLoading] = useState<Record<string, 'remove' | 'qty-up' | 'qty-down'>>({});
 
-  // Reseller-specific path detection and state
+  // Coupon state
+  const [couponCode, setCouponCode] = useState('');
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+  const [showCouponInput, setShowCouponInput] = useState(false);
+
+  // Reseller path detection
   const pathname = usePathname();
   const isResellerCatalog = pathname ? pathname.startsWith('/c/') : false;
   const resellerSlug = isResellerCatalog && pathname ? pathname.split('/')[2] : null;
@@ -108,195 +89,16 @@ export function CartSidebar() {
     fetchReseller();
   }, [resellerSlug]);
 
-  const activeTheme = isResellerCatalog ? (resellerProfile?.reseller_theme || 'original') : 'original';
-
-  // Dynamic visual styling configurations for the 6 reseller themes
-  const themeStyles: Record<string, {
-    font: string;
-    container: string;
-    progressBar: string;
-    header: string;
-    card: string;
-    buttonPrimary: string;
-    buttonSecondary: string;
-    input: string;
-    accentText: string;
-    textMuted: string;
-    transferBg: string;
-    transferItem: string;
-    whatsappBtn: string;
-    bgEffects: React.ReactNode;
-  }> = {
-    original: {
-      font: 'font-sans',
-      container: 'bg-[#070707] border-l border-white/5 text-white',
-      progressBar: 'bg-[#00E5FF] shadow-[0_0_8px_rgba(0,229,255,0.8)]',
-      header: 'bg-black/40 border-b border-white/5 backdrop-blur-2xl',
-      card: 'bg-white/[0.01] hover:bg-white/[0.02] border border-white/5 hover:border-white/10 rounded-2xl',
-      buttonPrimary: 'bg-white hover:bg-[#00E5FF] text-black rounded-xl font-semibold',
-      buttonSecondary: 'bg-white/5 text-white/40 hover:text-white border border-white/5 rounded-lg',
-      input: 'bg-[#0c0c0c] border border-white/5 focus:border-[#00E5FF]/30 text-white rounded-xl focus:bg-[#0c0c0c]',
-      accentText: 'text-[#00E5FF]',
-      textMuted: 'text-white/40',
-      transferBg: 'bg-[#0b0b0b] border border-emerald-500/10 rounded-2xl',
-      transferItem: 'bg-white/[0.02] border border-white/5 hover:border-emerald-500/20 rounded-xl',
-      whatsappBtn: 'bg-[#25D366] hover:bg-[#20ba5a] text-white shadow-md rounded-xl',
-      bgEffects: (
-        <div className="absolute inset-0 z-0 opacity-15 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[#00E5FF]/10 blur-[90px] rounded-full" />
-          <div className="absolute bottom-0 left-0 w-[250px] h-[250px] bg-[#7A00FF]/5 blur-[80px] rounded-full" />
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-[0.2] contrast-100 mix-blend-overlay opacity-30" />
-        </div>
-      )
-    },
-    minimal: {
-      font: 'font-sans tracking-tight',
-      container: 'bg-black border-l border-zinc-800 text-zinc-100',
-      progressBar: 'bg-zinc-300',
-      header: 'bg-black border-b border-zinc-900',
-      card: 'bg-transparent border border-zinc-900 hover:border-zinc-700 rounded-none',
-      buttonPrimary: 'bg-white hover:bg-zinc-200 text-black rounded-none font-bold tracking-widest uppercase',
-      buttonSecondary: 'bg-transparent text-zinc-400 hover:text-white border border-zinc-800 rounded-none',
-      input: 'bg-black border border-zinc-800 focus:border-zinc-400 text-white rounded-none placeholder:text-zinc-600 focus:bg-black',
-      accentText: 'text-white font-bold',
-      textMuted: 'text-zinc-500',
-      transferBg: 'bg-black border border-zinc-800 rounded-none',
-      transferItem: 'bg-transparent border border-zinc-900 hover:border-zinc-700 rounded-none',
-      whatsappBtn: 'bg-white hover:bg-zinc-200 text-black border border-zinc-800 rounded-none font-bold uppercase tracking-widest',
-      bgEffects: null
-    },
-    cyber: {
-      font: 'font-mono',
-      container: 'bg-[#020408] border-l-2 border-emerald-500/80 text-emerald-400',
-      progressBar: 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]',
-      header: 'bg-black border-b border-emerald-950/50',
-      card: 'bg-black border border-emerald-950 hover:border-emerald-500/40 rounded-none',
-      buttonPrimary: 'bg-emerald-500 hover:bg-emerald-400 text-black rounded-none font-bold uppercase border border-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]',
-      buttonSecondary: 'bg-transparent text-emerald-600 hover:text-emerald-400 border border-emerald-950 rounded-none',
-      input: 'bg-black border border-emerald-950 focus:border-emerald-500 text-emerald-400 rounded-none placeholder:text-emerald-900 focus:bg-black',
-      accentText: 'text-emerald-400',
-      textMuted: 'text-emerald-700',
-      transferBg: 'bg-[#020408] border border-emerald-500/30 rounded-none',
-      transferItem: 'bg-black border border-emerald-950/80 hover:border-emerald-500/50 rounded-none',
-      whatsappBtn: 'bg-transparent hover:bg-emerald-500/10 text-emerald-400 border border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.2)] rounded-none font-bold uppercase tracking-wider',
-      bgEffects: (
-        <div className="absolute inset-0 z-0 opacity-5 pointer-events-none">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b981_1px,transparent_1px),linear-gradient(to_bottom,#10b981_1px,transparent_1px)] bg-[size:24px_24px]" />
-        </div>
-      )
-    },
-    warm: {
-      font: 'font-serif',
-      container: 'bg-[#1a1816] border-l border-[#2c2824] text-[#F5F2EB]',
-      progressBar: 'bg-[#D39E82]',
-      header: 'bg-[#121110] border-b border-[#2c2824]',
-      card: 'bg-[#22201d] border border-[#2c2824] hover:border-[#D39E82]/30 rounded-xl',
-      buttonPrimary: 'bg-[#D39E82] hover:bg-[#c58d70] text-[#1a1816] rounded-xl font-serif font-medium',
-      buttonSecondary: 'bg-[#22201d] text-[#8F9E8B] hover:text-[#F5F2EB] border border-[#2c2824] rounded-xl',
-      input: 'bg-[#121110] border border-[#2c2824] focus:border-[#D39E82]/40 text-[#F5F2EB] rounded-xl placeholder:text-[#8F9E8B]/40 focus:bg-[#121110]',
-      accentText: 'text-[#D39E82]',
-      textMuted: 'text-[#8F9E8B]',
-      transferBg: 'bg-[#121110] border border-[#2c2824] rounded-xl',
-      transferItem: 'bg-[#22201d] border border-[#2c2824] hover:border-[#D39E82]/20 rounded-xl',
-      whatsappBtn: 'bg-[#8F9E8B] hover:bg-[#7a8b76] text-[#1a1816] rounded-xl font-medium',
-      bgEffects: (
-        <div className="absolute inset-0 z-0 opacity-[0.08] pointer-events-none">
-          <div className="absolute top-10 left-10 w-[250px] h-[250px] bg-[#D39E82] rounded-full blur-[100px]" />
-        </div>
-      )
-    },
-    swiss: {
-      font: 'font-sans font-medium',
-      container: 'bg-neutral-950 border-l-4 border-white text-white',
-      progressBar: 'bg-[#FF3B30]',
-      header: 'bg-black border-b-2 border-neutral-800',
-      card: 'bg-black border-2 border-neutral-900 hover:border-white rounded-none',
-      buttonPrimary: 'bg-white hover:bg-[#FF3B30] hover:text-white text-black rounded-none font-black uppercase border-2 border-white',
-      buttonSecondary: 'bg-neutral-900 border border-neutral-800 text-white hover:bg-neutral-800 rounded-none',
-      input: 'bg-black border-2 border-neutral-800 focus:border-white text-white rounded-none placeholder:text-neutral-700 focus:bg-black',
-      accentText: 'text-[#FF3B30] font-black',
-      textMuted: 'text-neutral-400',
-      transferBg: 'bg-black border-2 border-white rounded-none',
-      transferItem: 'bg-neutral-950 border border-neutral-900 hover:border-white rounded-none',
-      whatsappBtn: 'bg-[#FF3B30] hover:bg-[#d92e24] text-white rounded-none font-black uppercase border-2 border-[#FF3B30]',
-      bgEffects: null
-    },
-    kinetic: {
-      font: 'font-sans tracking-wide',
-      container: 'bg-[#030303] border-l border-yellow-500/20 text-white',
-      progressBar: 'bg-[#FFFF00] shadow-[0_0_10px_rgba(255,255,0,0.6)]',
-      header: 'bg-[#090909] border-b border-zinc-900',
-      card: 'bg-zinc-950 border border-zinc-900 hover:border-zinc-800 rounded-xl',
-      buttonPrimary: 'bg-[#FFFF00] hover:bg-yellow-400 text-black rounded-lg font-black uppercase italic tracking-wider shadow-[0_4px_12px_rgba(255,255,0,0.15)]',
-      buttonSecondary: 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 rounded-lg',
-      input: 'bg-[#0d0d0d] border border-zinc-800 focus:border-[#FFFF00] text-white rounded-lg placeholder:text-zinc-700 focus:bg-[#0d0d0d]',
-      accentText: 'text-[#FFFF00] font-bold italic',
-      textMuted: 'text-zinc-500',
-      transferBg: 'bg-[#050505] border border-zinc-800 rounded-lg',
-      transferItem: 'bg-zinc-950 border border-zinc-900 hover:border-zinc-800 rounded-lg',
-      whatsappBtn: 'bg-[#FFFF00] hover:bg-yellow-400 text-black rounded-lg shadow-lg font-black uppercase tracking-wider',
-      bgEffects: (
-        <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-yellow-500/20 blur-[80px] rounded-full" />
-        </div>
-      )
-    }
-  };
-
-  const currentStyles = themeStyles[activeTheme] || themeStyles.original;
-
-  const setItemOp = (key: string, op: 'remove' | 'qty-up' | 'qty-down' | null) => {
-    setItemLoading(prev => {
-      if (op === null) { const n = { ...prev }; delete n[key]; return n; }
-      return { ...prev, [key]: op };
-    });
-  };
-
-  const handleRemoveItem = useCallback(async (itemId: string, size: string, name: string, image?: string) => {
-    const key = `${itemId}-${size}`;
-    setItemOp(key, 'remove');
-    await new Promise(r => setTimeout(r, 250));
-    removeItem(itemId, size);
-    setItemOp(key, null);
-    cartNotify({ type: 'removed', title: 'Producto eliminado', productName: name, productImage: image });
-  }, [removeItem]);
-
-  const handleUpdateQuantity = useCallback(async (
-    itemId: string, size: string, newQty: number, dir: 'up' | 'down', name: string, image?: string
-  ) => {
-    if (newQty < 1) return;
-    const key = `${itemId}-${size}`;
-    setItemOp(key, dir === 'up' ? 'qty-up' : 'qty-down');
-    await new Promise(r => setTimeout(r, 180));
-    updateQuantity(itemId, size, newQty);
-    setItemOp(key, null);
-    cartNotify({ type: 'updated', title: 'Cantidad actualizada', productName: name, productImage: image });
-  }, [updateQuantity]);
-
   // Form State
   const [formData, setFormData] = useState({
     customerName: '',
     customerPhone: '',
-    resellerName: user?.name || '',
+    resellerName: '',
     deliveryAddress: '',
-    paymentMethod: 'mercadopago' as 'stripe' | 'mercadopago' | 'transferencia',
+    paymentMethod: 'mercadopago' as 'mercadopago' | 'transferencia' | 'stripe',
     notes: ''
   });
 
-  // Force direct bank transfer payment option for resellers
-  useEffect(() => {
-    if (isResellerCatalog) {
-      setFormData(prev => ({ ...prev, paymentMethod: 'transferencia' }));
-    }
-  }, [isResellerCatalog]);
-
-  // Coupon State
-  const [couponCode, setCouponCode] = useState('');
-  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
-  const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [showCouponInput, setShowCouponInput] = useState(false);
-
-  // Redesign: sub-step navigation for checkout Form vs Payment
   const [checkoutSubStep, setCheckoutSubStep] = useState<'shipping' | 'payment'>('shipping');
   const [shippingForm, setShippingForm] = useState({
     nombre: '',
@@ -311,12 +113,85 @@ export function CartSidebar() {
     notas: ''
   });
 
+  // Calculate totals
+  const subtotal = getSubtotal();
+  const discount = getDiscountAmount();
+  const total = getFinalTotal();
+  const totalItemsCount = items.reduce((acc, item) => acc + item.quantity, 0);
+
+  // Shipping progress calculation
+  const freeShippingProgress = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
+  const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+
+  // Coupon handling
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setIsValidatingCoupon(true);
+    try {
+      const res = await validateCoupon(couponCode.trim(), subtotal);
+      if (res.valid && res.coupon) {
+        applyCoupon(res.coupon);
+        toast.success(`Cupón ${res.coupon.code} aplicado con éxito`);
+        setCouponCode('');
+        setShowCouponInput(false);
+      } else {
+        toast.error(res.message || 'Cupón inválido o expirado');
+      }
+    } catch (err) {
+      toast.error('Error al validar el cupón');
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    removeCoupon();
+    toast.info('Cupón eliminado');
+  };
+
+  const handleUpdateQuantity = async (
+    id: string,
+    size: string,
+    newQuantity: number,
+    direction: 'up' | 'down',
+    name: string,
+    image?: string
+  ) => {
+    const key = `${id}-${size}`;
+    setItemLoading((prev) => ({ ...prev, [key]: direction === 'up' ? 'qty-up' : 'qty-down' }));
+    updateQuantity(id, size, newQuantity);
+    setTimeout(() => {
+      setItemLoading((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    }, 200);
+  };
+
+  const handleRemoveItem = (id: string, size: string, name: string, image?: string) => {
+    const key = `${id}-${size}`;
+    setItemLoading((prev) => ({ ...prev, [key]: 'remove' }));
+    removeItem(id, size);
+    cartNotify({
+      type: 'removed',
+      title: 'Producto eliminado',
+      message: `${name} (Talle AR ${size})`,
+      productImage: image || '/hero.webp'
+    });
+    setTimeout(() => {
+      setItemLoading((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    }, 200);
+  };
+
   const handleGoToPayment = () => {
     if (!shippingForm.nombre.trim()) { toast.error('Completá tu nombre'); return; }
     if (!shippingForm.apellido.trim()) { toast.error('Completá tu apellido'); return; }
     if (!shippingForm.whatsapp.trim()) { toast.error('Completá tu WhatsApp'); return; }
-    if (!shippingForm.provincia) { toast.error('Seleccioná tu provincia'); return; }
-    if (!shippingForm.localidad.trim()) { toast.error('Completá tu localidad'); return; }
     if (!shippingForm.direccion.trim()) { toast.error('Completá tu dirección'); return; }
     if (!shippingForm.altura.trim()) { toast.error('Completá la altura / número de calle'); return; }
 
@@ -324,17 +199,13 @@ export function CartSidebar() {
       ...formData,
       customerName: `${shippingForm.nombre.trim()} ${shippingForm.apellido.trim()}`,
       customerPhone: shippingForm.whatsapp.trim(),
-      deliveryAddress: `${shippingForm.direccion.trim()} ${shippingForm.altura.trim()}${shippingForm.depto ? `, Depto/Piso: ${shippingForm.depto.trim()}` : ''}, ${shippingForm.localidad.trim()}, ${shippingForm.provincia.trim()} (CP ${shippingForm.codigoPostal.trim()})`,
+      deliveryAddress: `${shippingForm.direccion.trim()} ${shippingForm.altura.trim()}${shippingForm.depto ? `, Depto/Piso: ${shippingForm.depto.trim()}` : ''}, ${shippingForm.localidad.trim()}, ${shippingForm.provincia.trim()}${shippingForm.codigoPostal ? ` (CP ${shippingForm.codigoPostal.trim()})` : ''}`,
       notes: shippingForm.notas.trim(),
       resellerName: isResellerCatalog && resellerProfile ? (resellerProfile.full_name || 'Mi Showroom') : (user?.name || 'Éter Oficial')
     });
 
     setCheckoutSubStep('payment');
   };
-
-  const subtotal = getSubtotal();
-  const discount = getDiscountAmount();
-  const total = getFinalTotal();
 
   const handleNextStep = () => {
     if (cartStep === 'items') {
@@ -356,7 +227,6 @@ export function CartSidebar() {
       `▪️ ${item.quantity}x ${item.name} (${item.selectedSize}) — $${(item.basePrice * item.quantity).toLocaleString('es-AR')}`
     ).join('\n');
 
-    // Customize ticket title and thanks message if reseller catalog
     const headerTitle = isResellerCatalog ? formData.resellerName.toUpperCase() : 'ÉTER STORE';
     const footerThanks = isResellerCatalog ? `Gracias por elegir ${formData.resellerName}` : 'Gracias por elegir ÉTER';
 
@@ -383,7 +253,7 @@ ${itemsList}
 
 ━━━━━━━━━━━━━━━━━━━━
 ✅ *Pedido registrado exitosamente*
-🚚 Te contactaremos para coordinar el envío.
+🚚 Te contactaremos para coordinar el despacho en 24/48hs.
 
 _${footerThanks}_ 🖤`;
 
@@ -392,15 +262,14 @@ _${footerThanks}_ 🖤`;
 
   const openWhatsApp = (refCode: string, orderItems: any[], orderTotal: number) => {
     const ticket = generateWhatsAppTicket(refCode, orderItems, orderTotal);
-    // Dynamic WhatsApp destination number (with backup to fetched profile and fallback to Éter)
     const number = (isResellerCatalog && (resellerWhatsApp || resellerProfile?.whatsapp_number)) || WHATSAPP_NUMBER;
     window.open(`https://wa.me/${number}?text=${ticket}`, '_blank');
   };
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.customerName || !formData.customerPhone || !formData.deliveryAddress || !formData.resellerName) {
-      toast.error('Por favor completa todos los campos obligatorios');
+    if (!formData.customerName || !formData.customerPhone || !formData.deliveryAddress) {
+      toast.error('Por favor completa los datos de entrega');
       return;
     }
 
@@ -418,7 +287,7 @@ _${footerThanks}_ 🖤`;
         })),
         customerName: formData.customerName,
         customerPhone: fullCustomerPhone,
-        resellerName: formData.resellerName,
+        resellerName: formData.resellerName || 'Éter Oficial',
         deliveryAddress: formData.deliveryAddress,
         paymentMethod: formData.paymentMethod,
         notes: formData.notes,
@@ -433,7 +302,6 @@ _${footerThanks}_ 🖤`;
         setOrderId(result.orderId!);
         setReferenceCode(result.referenceCode!);
 
-        // Persist order data for the success page
         setLastOrder({
           orderId: result.orderId!,
           referenceCode: result.referenceCode!,
@@ -449,278 +317,259 @@ _${footerThanks}_ 🖤`;
           customerName: formData.customerName,
           customerPhone: formData.customerPhone,
           deliveryAddress: formData.deliveryAddress,
-          resellerName: formData.resellerName,
-          paymentMethod: formData.paymentMethod
+          paymentMethod: formData.paymentMethod,
+          createdAt: new Date().toISOString()
         });
 
-        // Handle payment flow based on method
         if (formData.paymentMethod === 'transferencia') {
           setCartStep('transferencia');
+        } else if (result.initPoint) {
+          clearCart();
+          window.location.href = result.initPoint;
         } else {
-          // Mercado Pago or Stripe
           setCartStep('success');
-
-          const paymentEndpoint = formData.paymentMethod === 'mercadopago' ? '/api/checkout/mercadopago' : '/api/checkout/stripe';
-          try {
-            const response = await fetch(paymentEndpoint, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                items: currentItems.map(i => ({
-                  id: i.id,
-                  name: i.name,
-                  price: i.basePrice,
-                  size: i.selectedSize,
-                  quantity: i.quantity,
-                  images: i.images
-                })),
-                payer: {
-                  firstName: formData.customerName,
-                  lastName: '',
-                  email: '',
-                  phone: fullCustomerPhone,
-                  address: formData.deliveryAddress,
-                  city: '',
-                  postalCode: '',
-                  province: ''
-                }
-              })
-            });
-            const resultPayment = await response.json();
-            if (resultPayment.success && resultPayment.init_point) {
-              clearCart();
-              window.location.href = resultPayment.init_point;
-              return;
-            } else {
-              toast.error(`Error al iniciar el pago: ${resultPayment.error || "Intente nuevamente"}`);
-            }
-          } catch (error) {
-            console.error("Network Error:", error);
-            toast.error("Error de red al conectar pasarela de pago");
-          }
         }
       } else {
         toast.error(result.message || 'Error al procesar el pedido');
       }
-    } catch (error) {
-      console.error(error);
-      toast.error('Ocurrió un error inesperado');
+    } catch (err: any) {
+      toast.error(err.message || 'Ocurrió un error inesperado');
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) return;
-    setIsValidatingCoupon(true);
-    try {
-      const result = await validateCoupon(couponCode, subtotal);
-      if (result.success && result.coupon) {
-        applyCoupon(result.coupon);
-        setCouponCode('');
-        toast.success(`Cupón ${result.coupon.code} aplicado con éxito`);
-      } else {
-        toast.error(result.error || 'Error al validar el cupón');
-      }
-    } catch (error) {
-      toast.error('Error de conexión al validar el cupón');
-    } finally {
-      setIsValidatingCoupon(false);
-    }
-  };
-
-  // ─── RENDER ─────────────────────────────────────────────
   return (
     <AnimatePresence>
       {isOpen && (
         <>
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={toggleCart}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200]"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] transition-opacity duration-300"
           />
 
+          {/* Drawer Container */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 32, stiffness: 300 }}
-            className={cn(
-              "fixed right-0 top-0 bottom-0 w-full sm:w-[460px] z-[210] shadow-[0_0_80px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden",
-              currentStyles.container,
-              currentStyles.font
-            )}
+            transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+            className="fixed right-0 top-0 bottom-0 w-full sm:w-[460px] z-[210] bg-[#070707] border-l border-white/10 text-white shadow-[0_0_80px_rgba(0,0,0,0.9)] flex flex-col overflow-hidden font-sans"
           >
-            {/* Minimal Horizontal Progress Bar at the top of the cart */}
+            {/* Minimal Progress Bar */}
             {cartStep !== 'success' && (
               <div className="absolute top-0 inset-x-0 h-[2px] bg-white/5 z-[220] overflow-hidden">
                 <motion.div
                   initial={{ width: '0%' }}
                   animate={{
-                    width: cartStep === 'items' ? '33.33%' :
-                           cartStep === 'checkout' ? '66.66%' :
-                           cartStep === 'transferencia' ? '90%' : '100%'
+                    width:
+                      cartStep === 'items'
+                        ? '33.33%'
+                        : cartStep === 'checkout'
+                        ? checkoutSubStep === 'shipping'
+                          ? '66.66%'
+                          : '85%'
+                        : '100%'
                   }}
                   transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                  className={cn("h-full transition-all duration-300", currentStyles.progressBar)}
+                  className="h-full bg-[#39FF14] shadow-[0_0_8px_rgba(57,255,20,0.8)]"
                 />
               </div>
             )}
 
-            {/* Background Effects */}
-            {currentStyles.bgEffects}
-
-            {/* ── Header ── */}
-            <header className={cn("relative flex items-center justify-between px-6 py-5 z-50 shrink-0 border-b", currentStyles.header)}>
+            {/* ── 1. HEADER ── */}
+            <header className="relative flex items-center justify-between px-6 py-5 z-50 shrink-0 border-b border-white/[0.08] bg-black/60 backdrop-blur-2xl">
               <div className="flex items-center gap-3">
-                {(cartStep === 'checkout' || cartStep === 'transferencia') && (
+                {cartStep === 'checkout' && (
                   <button
                     onClick={() => {
-                      if (cartStep === 'checkout' && checkoutSubStep === 'payment') {
+                      if (checkoutSubStep === 'payment') {
                         setCheckoutSubStep('shipping');
                       } else {
-                        setCartStep(cartStep === 'transferencia' ? 'checkout' : 'items');
-                        if (cartStep === 'transferencia') setCheckoutSubStep('payment');
+                        setCartStep('items');
                       }
                     }}
-                    className={cn("w-8 h-8 flex items-center justify-center transition-all group", currentStyles.buttonSecondary)}
+                    className="w-8 h-8 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all"
                   >
-                    <ArrowLeft size={14} className="text-white/60 group-hover:text-white" />
+                    <ArrowLeft size={14} />
                   </button>
                 )}
-                <div>
-                  <h2 className="text-base font-semibold tracking-tight text-white flex items-center gap-2">
-                    {cartStep === 'items' ? 'Mi Carrito' :
-                     cartStep === 'checkout' ? (checkoutSubStep === 'shipping' ? `CARRITO (${items.reduce((acc, item) => acc + item.quantity, 0)})` : 'Pago') :
-                     cartStep === 'transferencia' ? 'Pago' :
-                     'Completado'}
-                  </h2>
-                </div>
+
+                <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-white flex items-center gap-2">
+                  {cartStep === 'items'
+                    ? 'Mi Carrito'
+                    : cartStep === 'checkout'
+                    ? checkoutSubStep === 'shipping'
+                      ? `CARRITO (${totalItemsCount})`
+                      : 'Método de Pago'
+                    : cartStep === 'transferencia'
+                    ? 'Transferencia'
+                    : 'Completado'}
+                </h2>
               </div>
-              <div className="flex items-center gap-3">
+
+              <div className="flex items-center gap-2.5">
                 {cartStep === 'items' && items.length > 0 && (
                   <button
                     onClick={() => {
                       clearCart();
-                      cartNotify({ type: 'removed', title: 'Carrito vaciado', productName: 'Todos los productos eliminados' });
+                      cartNotify({
+                        type: 'removed',
+                        title: 'Carrito vaciado',
+                        message: 'Se han eliminado todos los productos'
+                      });
                     }}
-                    className="text-[10px] font-semibold text-white/30 hover:text-[#FF3A5C] uppercase tracking-wider px-2.5 py-1 rounded transition-colors"
+                    className="text-[10px] font-mono font-bold uppercase tracking-wider text-white/40 hover:text-[#FF3A5C] px-2.5 py-1 rounded-lg transition-colors"
                   >
                     Vaciar
                   </button>
                 )}
+
                 <button
-                  onClick={() => { toggleCart(); if (cartStep === 'success' || cartStep === 'transferencia') setCartStep('items'); }}
-                  className={cn("w-8 h-8 flex items-center justify-center group transition-all", currentStyles.buttonSecondary)}
+                  onClick={() => {
+                    toggleCart();
+                    if (cartStep === 'success' || cartStep === 'transferencia') setCartStep('items');
+                  }}
+                  className="w-8 h-8 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
                 >
-                  <X className="text-white/60 group-hover:text-[#FF0055]" size={15} />
+                  <X size={15} />
                 </button>
               </div>
             </header>
 
-            {/* Alert Banner for free shipping (shown on items and checkout steps) */}
+            {/* ── 2. FREE SHIPPING THRESHOLD NOTIFICATION ── */}
             {(cartStep === 'items' || cartStep === 'checkout') && (
-              <div className={cn("flex items-center gap-2 px-6 py-3 shrink-0 z-40 border-b", currentStyles.header)}>
-                <Truck size={14} className="opacity-50" />
-                <span className={cn("text-[11px] font-medium", currentStyles.textMuted)}>
-                  Tenés envío gratis en compras superiores a <span className={cn("font-semibold", currentStyles.accentText)}>$250.000</span>
-                </span>
+              <div className="px-6 py-3 shrink-0 z-40 border-b border-white/[0.06] bg-[#0c0c0c]/80 backdrop-blur-md">
+                <div className="flex items-center justify-between text-[11px] font-mono mb-1.5">
+                  <span className="flex items-center gap-1.5 text-white/70">
+                    <Truck size={13} className="text-[#39FF14]" />
+                    {remainingForFreeShipping === 0 ? (
+                      <span className="text-[#39FF14] font-bold">¡Tenés ENVÍO GRATIS a todo el país!</span>
+                    ) : (
+                      <span>
+                        Envío gratis superando <strong className="text-white">$250.000</strong>
+                      </span>
+                    )}
+                  </span>
+                  {remainingForFreeShipping > 0 && (
+                    <span className="text-[10px] text-white/40">
+                      Faltan ${remainingForFreeShipping.toLocaleString('es-AR')}
+                    </span>
+                  )}
+                </div>
+
+                {/* Progress bar container */}
+                <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full bg-[#39FF14] transition-all duration-500 rounded-full shadow-[0_0_8px_rgba(57,255,20,0.6)]"
+                    style={{ width: `${freeShippingProgress}%` }}
+                  />
+                </div>
               </div>
             )}
 
-            {/* ── Scrollable Body ── */}
-            <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth relative z-10 px-6 py-6">
-              {/* ════════════════════ STEP: ITEMS ════════════════════ */}
+            {/* ── 3. SCROLLABLE BODY ── */}
+            <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth relative z-10 px-5 sm:px-6 py-5 space-y-4">
+              {/* ════════════════════ STEP 1: ITEMS LIST ════════════════════ */}
               {cartStep === 'items' && (
                 <div className="animate-in fade-in duration-300 space-y-4">
                   {items.length === 0 ? (
-                    <div className="py-20 flex flex-col items-center justify-center text-center">
-                      <div className="w-20 h-20 bg-white/[0.01] border border-white/5 rounded-full flex items-center justify-center mb-6">
-                        <ShoppingBag className="text-white/20" size={32} />
+                    <div className="py-24 flex flex-col items-center justify-center text-center">
+                      <div className="w-20 h-20 bg-white/[0.02] border border-white/10 rounded-full flex items-center justify-center mb-5 shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+                        <ShoppingBag className="text-white/30" size={32} />
                       </div>
-                      <h3 className="text-base font-semibold text-white mb-2">Tu carrito está vacío</h3>
-                      <p className="text-white/40 text-xs max-w-[240px] leading-relaxed mb-8">Agrega productos del catálogo para comenzar tu pedido.</p>
-                      <Button
+                      <h3 className="text-base font-black uppercase text-white mb-1.5">Tu carrito está vacío</h3>
+                      <p className="text-white/40 text-xs max-w-[240px] leading-relaxed mb-6 font-mono">
+                        Agregá calzados del catálogo para comenzar tu compra.
+                      </p>
+                      <button
                         onClick={toggleCart}
-                        className={cn("font-semibold text-xs tracking-wider uppercase py-5 px-8 transition-all", currentStyles.buttonPrimary)}
+                        className="px-6 py-3 rounded-xl bg-[#39FF14] text-black font-mono text-xs font-black uppercase tracking-widest hover:bg-white transition-all shadow-[0_0_20px_rgba(57,255,20,0.3)]"
                       >
                         Explorar Catálogo
-                      </Button>
+                      </button>
                     </div>
                   ) : (
                     <>
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {items.map((item) => {
                           const key = `${item.id}-${item.selectedSize}`;
                           const op = itemLoading[key];
                           const isRemoving = op === 'remove';
+
                           return (
                             <motion.div
                               layout
-                              initial={{ opacity: 0, y: 12 }}
+                              initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: isRemoving ? 0.3 : 1, y: 0 }}
-                              exit={{ opacity: 0, x: -20 }}
+                              exit={{ opacity: 0, scale: 0.95 }}
                               key={key}
-                              className={cn("group flex gap-4 p-4 transition-all relative overflow-hidden", currentStyles.card)}
+                              className="group flex gap-3.5 p-3.5 rounded-2xl bg-[#0c0c0c] border border-white/[0.08] hover:border-white/20 transition-all relative overflow-hidden"
                             >
-                              {/* Remove loading overlay */}
-                              {isRemoving && (
-                                <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
-                                  <Loader2 size={16} className="animate-spin text-[#FF3A5C]" />
-                                </div>
-                              )}
-                              <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden border border-white/5 bg-black relative">
+                              {/* Shoe Image */}
+                              <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden border border-white/5 bg-[#121212] relative flex items-center justify-center p-1.5">
                                 <Image
-                                  src={item.images?.[0] || '/placeholder.png'}
+                                  src={item.images?.[0] || '/hero.webp'}
                                   alt={item.name}
                                   fill
-                                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                  unoptimized
+                                  className="object-contain p-1 transition-transform duration-500 group-hover:scale-105"
                                 />
                               </div>
+
+                              {/* Info */}
                               <div className="flex-1 flex flex-col justify-between py-0.5">
                                 <div>
                                   <div className="flex justify-between items-start gap-2">
-                                    <h3 className="font-semibold text-white text-sm tracking-tight leading-tight group-hover:text-[#00E5FF] transition-colors line-clamp-1">{item.name}</h3>
+                                    <h3 className="font-bold text-white text-xs sm:text-sm tracking-tight leading-snug line-clamp-1 group-hover:text-[#39FF14] transition-colors">
+                                      {item.name}
+                                    </h3>
                                     <button
                                       onClick={() => handleRemoveItem(item.id, item.selectedSize, item.name, item.images?.[0])}
                                       disabled={!!op}
                                       aria-label={`Eliminar ${item.name}`}
-                                      className="text-white/20 hover:text-[#FF3A5C] transition-colors p-1"
+                                      className="text-white/30 hover:text-[#FF3A5C] transition-colors p-1"
                                     >
                                       {isRemoving ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={13} />}
                                     </button>
                                   </div>
-                                  <p className={cn("text-[10px] font-medium mt-1", currentStyles.textMuted)}>Talle: {item.selectedSize}</p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-[10px] font-mono font-bold text-white/50 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
+                                      Talle: AR {item.selectedSize}
+                                    </span>
+                                  </div>
                                 </div>
 
-                                <div className="flex justify-between items-center mt-2">
-                                  {/* Quantity Selector */}
-                                  <div className={cn("flex items-center p-0.5", currentStyles.buttonSecondary)}>
+                                {/* Price & Quantity Controls */}
+                                <div className="flex justify-between items-center mt-2.5 pt-2 border-t border-white/5">
+                                  {/* Quantity pill */}
+                                  <div className="flex items-center rounded-lg bg-white/5 border border-white/10 p-0.5">
                                     <button
                                       onClick={() => handleUpdateQuantity(item.id, item.selectedSize, item.quantity - 1, 'down', item.name, item.images?.[0])}
                                       disabled={!!op || item.quantity <= 1}
-                                      aria-label={`Reducir cantidad de ${item.name}`}
-                                      className="w-6 h-6 flex items-center justify-center text-white/40 hover:text-white rounded transition-colors disabled:opacity-20"
+                                      className="w-6 h-6 flex items-center justify-center text-white/50 hover:text-white rounded transition-colors disabled:opacity-20"
                                     >
-                                      {op === 'qty-down' ? <Loader2 size={10} className="animate-spin" /> : <Minus size={10} />}
+                                      <Minus size={11} />
                                     </button>
-                                    <span className="w-8 text-center text-xs font-semibold text-white">
+                                    <span className="w-7 text-center text-xs font-mono font-bold text-white">
                                       {item.quantity}
                                     </span>
                                     <button
                                       onClick={() => handleUpdateQuantity(item.id, item.selectedSize, item.quantity + 1, 'up', item.name, item.images?.[0])}
                                       disabled={!!op}
-                                      aria-label={`Aumentar cantidad de ${item.name}`}
-                                      className="w-6 h-6 flex items-center justify-center text-white/40 hover:text-white rounded transition-colors disabled:opacity-20"
+                                      className="w-6 h-6 flex items-center justify-center text-white/50 hover:text-white rounded transition-colors disabled:opacity-20"
                                     >
-                                      {op === 'qty-up' ? <Loader2 size={10} className="animate-spin" /> : <Plus size={10} />}
+                                      <Plus size={11} />
                                     </button>
                                   </div>
 
-                                  <span className="font-semibold text-sm text-white">
-                                    $${(item.basePrice * item.quantity).toLocaleString('es-AR')}
+                                  {/* Price */}
+                                  <span className="font-mono font-black text-sm text-white">
+                                    ${(item.basePrice * item.quantity).toLocaleString('es-AR')}
                                   </span>
                                 </div>
                               </div>
@@ -729,44 +578,47 @@ _${footerThanks}_ 🖤`;
                         })}
                       </div>
 
-                      {/* Collapsible Coupon Input */}
-                      <div className="border-t border-white/5 pt-5 mt-6">
+                      {/* Coupon Accordion */}
+                      <div className="border-t border-white/[0.08] pt-4 mt-5">
                         {appliedCoupon ? (
-                          <div className={cn("flex justify-between items-center p-3 rounded-xl border", currentStyles.card)}>
+                          <div className="flex justify-between items-center p-3 rounded-xl bg-[#39FF14]/5 border border-[#39FF14]/20">
                             <div className="flex items-center gap-2">
-                              <Percent size={12} className={cn(currentStyles.accentText)} />
-                              <span className={cn("text-xs font-bold tracking-wider", currentStyles.accentText)}>{appliedCoupon.code}</span>
+                              <Percent size={13} className="text-[#39FF14]" />
+                              <span className="text-xs font-mono font-bold text-[#39FF14]">{appliedCoupon.code}</span>
                             </div>
-                            <button onClick={removeCoupon} className="text-[10px] font-semibold text-[#FF3A5C] hover:underline uppercase tracking-wider">
+                            <button
+                              onClick={handleRemoveCoupon}
+                              className="text-[10px] font-mono font-bold text-[#FF3A5C] hover:underline uppercase tracking-wider"
+                            >
                               Eliminar
                             </button>
                           </div>
                         ) : (
-                          <div className="space-y-3">
+                          <div className="space-y-2.5">
                             <button
                               type="button"
                               onClick={() => setShowCouponInput(!showCouponInput)}
-                              className={cn("text-xs font-medium flex items-center gap-1.5 transition-colors", currentStyles.textMuted, "hover:text-white")}
+                              className="text-xs font-mono text-white/50 hover:text-white flex items-center gap-1.5 transition-colors"
                             >
-                              <Tag size={12} />
-                              ¿Tenés un código alpha?
+                              <Tag size={13} />
+                              ¿Tenés un código alpha o cupón?
                             </button>
 
                             {showCouponInput && (
-                              <div className="flex gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                              <div className="flex gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
                                 <input
                                   type="text"
-                                  placeholder="Escribe el código aquí"
+                                  placeholder="CÓDIGO DE DESCUENTO"
                                   value={couponCode}
                                   onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                                  className={cn("flex-1 px-4 py-2 text-xs border focus:outline-none transition-all uppercase", currentStyles.input)}
+                                  className="flex-1 px-3.5 py-2.5 text-xs font-mono bg-[#121212] border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-[#39FF14] focus:outline-none transition-all uppercase"
                                 />
                                 <button
                                   onClick={handleApplyCoupon}
                                   disabled={isValidatingCoupon || !couponCode.trim()}
-                                  className={cn("px-4 text-xs font-bold transition-all flex items-center justify-center min-w-[70px]", currentStyles.buttonPrimary)}
+                                  className="px-4 py-2.5 text-xs font-mono font-black uppercase tracking-wider bg-[#39FF14] text-black rounded-xl hover:bg-white transition-all disabled:opacity-40"
                                 >
-                                  {isValidatingCoupon ? <Loader2 className="animate-spin" size={14} /> : 'Aplicar'}
+                                  {isValidatingCoupon ? <Loader2 className="animate-spin" size={13} /> : 'Aplicar'}
                                 </button>
                               </div>
                             )}
@@ -778,35 +630,39 @@ _${footerThanks}_ 🖤`;
                 </div>
               )}
 
-              {/* ════════════════════ STEP: CHECKOUT ════════════════════ */}
+              {/* ════════════════════ STEP 2: CHECKOUT (SHIPPING & PAYMENT) ════════════════════ */}
               {cartStep === 'checkout' && (
-                <div className="animate-in slide-in-from-right-5 duration-300">
+                <div className="animate-in slide-in-from-right-4 duration-300">
                   {checkoutSubStep === 'shipping' ? (
-                    /* Sub-step 1: Shipping Form (Matching the new image) */
-                    <div className="space-y-5">
+                    /* ── Sub-step 2A: Shipping Information Form ── */
+                    <div className="space-y-4">
                       <div>
-                        <h3 className="text-xs font-bold text-white uppercase tracking-wider">DATOS DE ENTREGA</h3>
-                        <p className={cn("text-[11px] mt-1", currentStyles.textMuted)}>Completá los datos del cliente final para coordinar la entrega.</p>
+                        <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                          DATOS DE ENTREGA
+                        </h3>
+                        <p className="text-[11px] text-white/50 mt-0.5">
+                          Completá los datos para coordinar el despacho seguro en 24/48hs.
+                        </p>
                       </div>
 
-                      <div className="space-y-3.5">
+                      <div className="space-y-3">
                         {/* Nombre & Apellido */}
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-2.5">
                           <input
                             required
                             type="text"
                             placeholder="Nombre"
                             value={shippingForm.nombre}
-                            onChange={e => setShippingForm({ ...shippingForm, nombre: e.target.value })}
-                            className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all", currentStyles.input)}
+                            onChange={(e) => setShippingForm({ ...shippingForm, nombre: e.target.value })}
+                            className="w-full py-3 px-3.5 text-xs font-mono bg-[#121212] border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-[#39FF14] focus:outline-none transition-all"
                           />
                           <input
                             required
                             type="text"
                             placeholder="Apellido"
                             value={shippingForm.apellido}
-                            onChange={e => setShippingForm({ ...shippingForm, apellido: e.target.value })}
-                            className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all", currentStyles.input)}
+                            onChange={(e) => setShippingForm({ ...shippingForm, apellido: e.target.value })}
+                            className="w-full py-3 px-3.5 text-xs font-mono bg-[#121212] border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-[#39FF14] focus:outline-none transition-all"
                           />
                         </div>
 
@@ -815,37 +671,36 @@ _${footerThanks}_ 🖤`;
                           <input
                             required
                             type="tel"
-                            placeholder="WhatsApp"
+                            placeholder="WhatsApp (ej. 223 620 4002)"
                             value={shippingForm.whatsapp}
-                            onChange={e => setShippingForm({ ...shippingForm, whatsapp: e.target.value.replace(/[^0-9]/g, '') })}
-                            className={cn("w-full py-3 pl-3.5 pr-10 text-xs focus:outline-none transition-all", currentStyles.input)}
+                            onChange={(e) =>
+                              setShippingForm({ ...shippingForm, whatsapp: e.target.value.replace(/[^0-9]/g, '') })
+                            }
+                            className="w-full py-3 pl-3.5 pr-10 text-xs font-mono bg-[#121212] border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-[#39FF14] focus:outline-none transition-all"
                           />
-                          {/* WhatsApp SVG Logo Icon */}
-                          <svg className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.464L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.725 1.45 5.556 0 10.074-4.522 10.077-10.077a9.98 9.98 0 0 0-2.954-7.118A9.975 9.975 0 0 0 12.008 2.04c-5.562 0-10.08 4.526-10.084 10.082-.001 1.83.479 3.626 1.39 5.222l-.992 3.616 3.725-.976zM17.07 14.39c-.274-.136-1.62-.8-1.87-.892-.25-.091-.433-.136-.615.136-.182.273-.705.89-.865 1.072-.16.182-.32.205-.594.069-.273-.136-1.157-.426-2.203-1.36-1.127-1.006-1.205-1.157-1.353-1.43-.148-.273-.016-.421.12-.557.123-.122.274-.32.41-.478.137-.159.182-.273.274-.455.092-.182.046-.341-.023-.478-.069-.136-.615-1.48-.842-2.025-.221-.532-.444-.46-.615-.468-.16-.008-.342-.01-.524-.01-.182 0-.479.068-.73.342-.25.273-.956.934-.956 2.278 0 1.343.978 2.637 1.115 2.82.137.182 1.925 2.938 4.664 4.12 1.637.705 2.585.836 3.195.746.68-.101 2.086-.851 2.378-1.674.292-.823.292-1.528.205-1.674-.087-.146-.27-.23-.54-.366z"/>
-                          </svg>
+                          <MessageCircle
+                            size={16}
+                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#39FF14] pointer-events-none"
+                          />
                         </div>
 
-
-
-                        {/* Código postal */}
+                        {/* Código Postal */}
                         <input
-                          required
                           type="text"
                           placeholder="Código postal"
                           value={shippingForm.codigoPostal}
-                          onChange={e => setShippingForm({ ...shippingForm, codigoPostal: e.target.value })}
-                          className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all", currentStyles.input)}
+                          onChange={(e) => setShippingForm({ ...shippingForm, codigoPostal: e.target.value })}
+                          className="w-full py-3 px-3.5 text-xs font-mono bg-[#121212] border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-[#39FF14] focus:outline-none transition-all"
                         />
 
                         {/* Dirección */}
                         <input
                           required
                           type="text"
-                          placeholder="Dirección"
+                          placeholder="Dirección / Calle"
                           value={shippingForm.direccion}
-                          onChange={e => setShippingForm({ ...shippingForm, direccion: e.target.value })}
-                          className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all", currentStyles.input)}
+                          onChange={(e) => setShippingForm({ ...shippingForm, direccion: e.target.value })}
+                          className="w-full py-3 px-3.5 text-xs font-mono bg-[#121212] border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-[#39FF14] focus:outline-none transition-all"
                         />
 
                         {/* Altura / Calle y número */}
@@ -854,8 +709,8 @@ _${footerThanks}_ 🖤`;
                           type="text"
                           placeholder="Altura / Calle y número"
                           value={shippingForm.altura}
-                          onChange={e => setShippingForm({ ...shippingForm, altura: e.target.value })}
-                          className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all", currentStyles.input)}
+                          onChange={(e) => setShippingForm({ ...shippingForm, altura: e.target.value })}
+                          className="w-full py-3 px-3.5 text-xs font-mono bg-[#121212] border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-[#39FF14] focus:outline-none transition-all"
                         />
 
                         {/* Departamento / Piso (opcional) */}
@@ -863,16 +718,16 @@ _${footerThanks}_ 🖤`;
                           type="text"
                           placeholder="Departamento / Piso (opcional)"
                           value={shippingForm.depto}
-                          onChange={e => setShippingForm({ ...shippingForm, depto: e.target.value })}
-                          className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all", currentStyles.input)}
+                          onChange={(e) => setShippingForm({ ...shippingForm, depto: e.target.value })}
+                          className="w-full py-3 px-3.5 text-xs font-mono bg-[#121212] border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-[#39FF14] focus:outline-none transition-all"
                         />
 
                         {/* Referencias o notas (opcional) */}
                         <textarea
-                          placeholder="Referencias o notas (opcional)"
+                          placeholder="Referencias de entrega o notas (opcional)"
                           value={shippingForm.notas}
-                          onChange={e => setShippingForm({ ...shippingForm, notas: e.target.value })}
-                          className={cn("w-full py-3 px-3.5 text-xs focus:outline-none transition-all min-h-[80px] resize-none", currentStyles.input)}
+                          onChange={(e) => setShippingForm({ ...shippingForm, notas: e.target.value })}
+                          className="w-full py-3 px-3.5 text-xs font-mono bg-[#121212] border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-[#39FF14] focus:outline-none transition-all min-h-[75px] resize-none"
                         />
                       </div>
 
@@ -880,53 +735,55 @@ _${footerThanks}_ 🖤`;
                       <button
                         type="button"
                         onClick={handleGoToPayment}
-                        className={cn("w-full h-11 font-semibold text-xs tracking-wider uppercase flex items-center justify-between px-4 transition-all mt-6 group", currentStyles.buttonPrimary)}
+                        className="w-full h-12 mt-4 rounded-2xl bg-white text-black font-mono font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#39FF14] hover:shadow-[0_0_20px_rgba(57,255,20,0.3)] transition-all group"
                       >
-                        <span className="mx-auto">CONTINUAR</span>
-                        <ArrowRight size={14} className="shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                        <span>CONTINUAR</span>
+                        <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                       </button>
                     </div>
                   ) : (
-                    /* Sub-step 2: Payment Selector (Previous styling but cleaned up) */
-                    <form onSubmit={handleCheckout} className="space-y-6">
-                      {/* Payment Methods */}
+                    /* ── Sub-step 2B: Payment Method Selection ── */
+                    <form onSubmit={handleCheckout} className="space-y-5">
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                          <CreditCard size={14} className={cn(currentStyles.accentText)} />
-                          <h3 className="text-xs font-semibold text-white uppercase tracking-wider">Método de Pago</h3>
+                          <CreditCard size={14} className="text-[#39FF14]" />
+                          <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                            Seleccioná Método de Pago
+                          </h3>
                         </div>
 
                         {isResellerCatalog ? (
-                          <div className={cn("p-5 border space-y-3", currentStyles.transferBg)}>
-                            <div className="flex items-center gap-2">
-                              <Banknote size={16} className={currentStyles.accentText} />
-                              <h3 className={cn("text-xs font-bold uppercase tracking-wider", currentStyles.accentText)}>Transferencia Directa</h3>
+                          <div className="p-4 rounded-2xl bg-[#0c0c0c] border border-emerald-500/20 space-y-2">
+                            <div className="flex items-center gap-2 text-[#39FF14] font-bold text-xs uppercase">
+                              <Banknote size={16} />
+                              <span>Transferencia Bancaria Directa</span>
                             </div>
-                            <p className={cn("text-[11px] leading-relaxed", currentStyles.textMuted)}>
-                              Esta tienda procesa los pagos exclusivamente por transferencia bancaria directa al revendedor. Al presionar "Solicitar Transferencia", obtendrás los datos bancarios del showroom para completar tu pago de inmediato.
+                            <p className="text-xs text-white/60 leading-relaxed font-mono">
+                              Esta tienda procesa pagos por transferencia bancaria directa al showroom. Al continuar obtendrás los datos bancarios y el comprobante por WhatsApp.
                             </p>
                           </div>
                         ) : (
-                          <div className="grid grid-cols-3 gap-3">
+                          <div className="grid grid-cols-3 gap-2.5">
                             {[
-                              { id: 'mercadopago', icon: CreditCard, label: 'MP' },
-                              { id: 'transferencia', icon: Banknote, label: 'Transfer' },
-                              { id: 'stripe', icon: Wallet, label: 'Global' }
+                              { id: 'mercadopago', icon: CreditCard, label: 'Mercado Pago' },
+                              { id: 'transferencia', icon: Banknote, label: 'Transferencia' },
+                              { id: 'stripe', icon: Wallet, label: 'Tarjeta' }
                             ].map((method) => {
                               const isSelected = formData.paymentMethod === method.id;
                               return (
                                 <div
                                   key={method.id}
                                   onClick={() => setFormData({ ...formData, paymentMethod: method.id as any })}
-                                  className={cn(
-                                    "p-3 rounded-xl border cursor-pointer transition-all flex flex-col items-center justify-center gap-1.5 min-h-[70px]",
+                                  className={`p-3 rounded-2xl border cursor-pointer transition-all flex flex-col items-center justify-center gap-1.5 min-h-[75px] ${
                                     isSelected
-                                      ? "bg-white/[0.04] border-[#00E5FF] shadow-[0_0_15px_rgba(0,229,255,0.15)]"
-                                      : "bg-white/[0.01] border-white/5 text-white/40 hover:border-white/10 hover:text-white/60"
-                                  )}
+                                      ? 'bg-[#39FF14]/10 border-[#39FF14] text-white shadow-[0_0_15px_rgba(57,255,20,0.2)]'
+                                      : 'bg-[#121212] border-white/10 text-white/50 hover:border-white/20 hover:text-white'
+                                  }`}
                                 >
-                                  <method.icon size={18} className={cn(isSelected ? "text-[#00E5FF]" : "text-white/30")} />
-                                  <span className="text-[10px] font-semibold tracking-wider uppercase">{method.label}</span>
+                                  <method.icon size={18} className={isSelected ? 'text-[#39FF14]' : 'text-white/40'} />
+                                  <span className="text-[10px] font-mono font-bold tracking-wider uppercase text-center leading-tight">
+                                    {method.label}
+                                  </span>
                                 </div>
                               );
                             })}
@@ -934,51 +791,47 @@ _${footerThanks}_ 🖤`;
                         )}
                       </div>
 
-                      {/* Totals Box */}
-                      <div className={cn("border p-4 space-y-2 mt-4", currentStyles.card)}>
-                        <div className={cn("flex justify-between text-xs", currentStyles.textMuted)}>
-                          <span>Carga Parcial</span>
-                          <span className="text-white">$${subtotal.toLocaleString('es-AR')}</span>
+                      {/* Totals Breakdown */}
+                      <div className="rounded-2xl bg-[#0c0c0c] border border-white/[0.08] p-4 space-y-2 font-mono">
+                        <div className="flex justify-between text-xs text-white/60">
+                          <span>Subtotal</span>
+                          <span className="text-white">${subtotal.toLocaleString('es-AR')}</span>
                         </div>
                         {appliedCoupon && (
-                          <div className={cn("flex justify-between text-xs", currentStyles.accentText)}>
+                          <div className="flex justify-between text-xs text-[#39FF14]">
                             <span>Descuento ({appliedCoupon.code})</span>
-                            <span>-$${discount.toLocaleString('es-AR')}</span>
+                            <span>-${discount.toLocaleString('es-AR')}</span>
                           </div>
                         )}
                         <div className="h-px bg-white/5 my-2" />
                         <div className="flex justify-between items-center">
-                          <span className="text-xs font-semibold text-white">Total a Liquidar</span>
-                          <span className={cn("text-base font-bold", currentStyles.accentText)}>
-                            $${total.toLocaleString('es-AR')}
+                          <span className="text-xs font-bold text-white uppercase">Total Final</span>
+                          <span className="text-base font-black text-[#39FF14]">
+                            ${total.toLocaleString('es-AR')}
                           </span>
                         </div>
                       </div>
 
-                      {/* Final Payment Trigger Button */}
-                      <div className="space-y-3 pt-2">
+                      {/* Final Submit CTA */}
+                      <div className="space-y-2.5 pt-2">
                         <button
                           type="submit"
                           disabled={isProcessing}
-                          className={cn(
-                            "w-full h-11 rounded-xl flex items-center justify-center gap-2 font-semibold text-xs tracking-wider uppercase transition-all duration-300 relative overflow-hidden group",
-                            isResellerCatalog ? currentStyles.buttonPrimary : (
-                              formData.paymentMethod === 'mercadopago' ? "bg-[#00E5FF] hover:bg-[#00B3FF] text-black" :
-                              formData.paymentMethod === 'transferencia' ? "bg-[#10B981] text-white hover:bg-[#0E9F6E]" :
-                              "bg-white hover:bg-neutral-200 text-black"
-                            )
-                          )}
+                          className="w-full h-12 rounded-2xl bg-[#39FF14] text-black font-mono font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all group disabled:opacity-50"
                         >
                           {isProcessing ? (
-                            <><Loader2 className="animate-spin" size={16} /> <span>Procesando...</span></>
+                            <>
+                              <Loader2 className="animate-spin" size={16} />
+                              <span>Procesando...</span>
+                            </>
                           ) : (
                             <span className="flex items-center gap-2">
-                              {isResellerCatalog ? 'Solicitar Transferencia' : (
-                                formData.paymentMethod === 'mercadopago' ? 'Pagar con Mercado Pago' :
-                                formData.paymentMethod === 'transferencia' ? 'Solicitar Transferencia' :
-                                'Pagar con Stripe'
-                              )}
-                              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                              {formData.paymentMethod === 'mercadopago'
+                                ? 'PAGAR CON MERCADO PAGO'
+                                : formData.paymentMethod === 'transferencia'
+                                ? 'SOLICITAR TRANSFERENCIA'
+                                : 'PAGAR CON TARJETA'}
+                              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                             </span>
                           )}
                         </button>
@@ -986,9 +839,9 @@ _${footerThanks}_ 🖤`;
                         <button
                           type="button"
                           onClick={() => setCheckoutSubStep('shipping')}
-                          className={cn("w-full text-center text-[10px] font-semibold uppercase tracking-wider py-1.5 transition-colors", currentStyles.textMuted, "hover:text-white")}
+                          className="w-full text-center text-[10px] font-mono font-bold uppercase tracking-wider py-1.5 text-white/40 hover:text-white transition-colors"
                         >
-                          Volver a los datos de envío
+                          ← Volver a datos de entrega
                         </button>
                       </div>
                     </form>
@@ -996,19 +849,19 @@ _${footerThanks}_ 🖤`;
                 </div>
               )}
 
-              {/* ════════════════════ STEP: TRANSFERENCIA ════════════════════ */}
+              {/* ════════════════════ STEP 3: TRANSFERENCIA BANCARIA ════════════════════ */}
               {cartStep === 'transferencia' && (
-                <div className="px-1 py-1 animate-in slide-in-from-right-5 duration-300 space-y-6">
-                  <div className={cn("border p-5 relative overflow-hidden shadow-lg", currentStyles.transferBg)}>
-                    <div className="text-center mb-6">
-                      <div className="w-14 h-14 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Banknote className="text-emerald-400" size={24} />
+                <div className="px-1 py-1 animate-in slide-in-from-right-4 duration-300 space-y-5 font-mono">
+                  <div className="rounded-3xl border border-emerald-500/20 bg-[#0c0c0c] p-5 relative overflow-hidden shadow-xl">
+                    <div className="text-center mb-5">
+                      <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                        <Banknote className="text-[#39FF14]" size={22} />
                       </div>
-                      <h3 className="text-base font-semibold text-white">Orden de Transferencia</h3>
-                      <p className={cn("text-[10px] uppercase tracking-wider mt-1 font-mono", currentStyles.accentText)}>Sincronización Showroom Activada</p>
+                      <h3 className="text-base font-black uppercase text-white">Datos de Transferencia</h3>
+                      <p className="text-[10px] text-[#39FF14] tracking-wider mt-0.5">ORDEN REGISTRADA EXITOSAMENTE</p>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-2.5">
                       {(() => {
                         const getBankDetails = () => {
                           if (isResellerCatalog && resellerProfile) {
@@ -1028,28 +881,29 @@ _${footerThanks}_ 🖤`;
                         };
 
                         const bankDetails = getBankDetails();
-
                         const transferItems = [
-                          { label: 'Titular de la cuenta', value: bankDetails.titular, key: 'titular', icon: Shield },
-                          ...(bankDetails.alias ? [{ label: 'Alias de cuenta', value: bankDetails.alias, key: 'alias', icon: Target }] : []),
-                          ...(bankDetails.cbu ? [{ label: 'CBU / CVU', value: bankDetails.cbu, key: 'cbu', icon: CreditCard }] : []),
-                          ...(!isResellerCatalog ? [{ label: 'Banco', value: BANK_DATA.banco, key: 'banco', icon: Zap }] : [])
+                          { label: 'Titular de la cuenta', value: bankDetails.titular, key: 'titular' },
+                          ...(bankDetails.alias ? [{ label: 'Alias de cuenta', value: bankDetails.alias, key: 'alias' }] : []),
+                          ...(bankDetails.cbu ? [{ label: 'CBU / CVU', value: bankDetails.cbu, key: 'cbu' }] : []),
+                          ...(!isResellerCatalog ? [{ label: 'Banco', value: BANK_DATA.banco, key: 'banco' }] : [])
                         ];
 
-                        return transferItems.map(({ label, value, key, icon: Icon }) => (
-                          <div key={key} className={cn("flex items-center justify-between px-4 py-3 transition-all", currentStyles.transferItem)}>
+                        return transferItems.map(({ label, value, key }) => (
+                          <div
+                            key={key}
+                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/5 hover:border-emerald-500/30 transition-all"
+                          >
                             <div>
-                              <span className={cn("text-[9px] font-semibold uppercase tracking-wider block mb-0.5", currentStyles.textMuted)}>{label}</span>
-                              <span className="text-xs font-medium text-white">{value}</span>
+                              <span className="text-[9px] font-bold uppercase text-white/40 block">{label}</span>
+                              <span className="text-xs font-bold text-white">{value}</span>
                             </div>
                             <button
                               onClick={() => copyToClipboard(value, key)}
-                              className={cn(
-                                "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+                              className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
                                 copiedField === key
-                                  ? "bg-emerald-500 text-black shadow-md"
-                                  : "bg-white/5 text-white/40 hover:text-white"
-                              )}
+                                  ? 'bg-[#39FF14] text-black shadow-md'
+                                  : 'bg-white/5 text-white/50 hover:text-white'
+                              }`}
                             >
                               {copiedField === key ? <CheckCircle2 size={12} /> : <Copy size={12} />}
                             </button>
@@ -1058,28 +912,28 @@ _${footerThanks}_ 🖤`;
                       })()}
                     </div>
 
-                    <div className={cn("mt-5 border p-4 flex justify-between items-center bg-white/[0.01]", currentStyles.card)}>
+                    <div className="mt-4 pt-3 border-t border-white/5 flex justify-between items-center">
                       <div>
-                        <span className={cn("text-[9px] font-semibold uppercase tracking-wider block", currentStyles.textMuted)}>Monto Total</span>
-                        <span className={cn("text-xl font-bold", currentStyles.accentText)}>$${orderedTotal.toLocaleString('es-AR')}</span>
+                        <span className="text-[9px] font-bold uppercase text-white/40 block">Monto a Transferir</span>
+                        <span className="text-lg font-black text-[#39FF14]">${orderedTotal.toLocaleString('es-AR')}</span>
                       </div>
                       <div className="text-right">
-                        <span className={cn("text-[9px] font-semibold uppercase block", currentStyles.textMuted)}>Referencia</span>
-                        <span className="text-xs font-mono font-bold text-white">{referenceCode}</span>
+                        <span className="text-[9px] font-bold uppercase text-white/40 block">N° Referencia</span>
+                        <span className="text-xs font-bold text-white">{referenceCode}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     <button
                       onClick={() => {
                         clearCart();
                         openWhatsApp(referenceCode!, orderedItems, orderedTotal);
                       }}
-                      className={cn("w-full h-12 flex items-center justify-center gap-2 font-semibold text-xs tracking-wider uppercase transition-all shadow-md", currentStyles.whatsappBtn)}
+                      className="w-full h-12 flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] text-white font-mono font-black text-xs uppercase tracking-widest hover:bg-[#20ba5a] transition-all shadow-[0_0_20px_rgba(37,211,102,0.3)]"
                     >
                       <MessageCircle size={16} />
-                      Enviar comprobante por WhatsApp
+                      <span>Enviar Comprobante por WhatsApp</span>
                     </button>
 
                     <button
@@ -1088,69 +942,69 @@ _${footerThanks}_ 🖤`;
                         setCartStep('items');
                         toggleCart();
                       }}
-                      className={cn("w-full text-center text-[10px] font-semibold uppercase tracking-wider py-1.5 transition-colors", currentStyles.textMuted, "hover:text-white")}
+                      className="w-full text-center text-[10px] font-mono font-bold uppercase tracking-wider py-1.5 text-white/40 hover:text-white transition-colors"
                     >
-                      Finalizar Proceso
+                      Cerrar y volver a la tienda
                     </button>
                   </div>
                 </div>
               )}
 
-              {/* ════════════════════ STEP: SUCCESS (MP/Stripe redirect fallback) ════════════════════ */}
+              {/* ════════════════════ STEP 4: SUCCESS / REDIRECT ════════════════════ */}
               {cartStep === 'success' && (
-                <div className="px-6 py-12 flex flex-col items-center justify-center animate-in zoom-in-95 duration-500">
-                  <div className="w-16 h-16 rounded-full bg-black border border-[#00E5FF]/20 flex items-center justify-center relative shadow-[0_0_30px_rgba(0,229,255,0.15)] mb-6">
-                    <CheckCircle2 className="text-[#00E5FF]" size={32} />
+                <div className="px-6 py-16 flex flex-col items-center justify-center text-center font-mono">
+                  <div className="w-16 h-16 rounded-full bg-[#39FF14]/10 border border-[#39FF14]/30 flex items-center justify-center mb-5 shadow-[0_0_30px_rgba(57,255,20,0.2)]">
+                    <CheckCircle2 className="text-[#39FF14]" size={32} />
                   </div>
-                  <h2 className="text-base font-semibold text-white mb-1">Pedido Registrado</h2>
-                  <p className="text-white/40 text-xs mb-8 text-center">Conectando con la pasarela de pago...</p>
+                  <h2 className="text-base font-black uppercase text-white mb-1">Pedido Registrado</h2>
+                  <p className="text-white/40 text-xs mb-8">Conectando con la pasarela de pago segura...</p>
 
-                  <Loader2 className="animate-spin text-[#00E5FF]" size={24} />
+                  <Loader2 className="animate-spin text-[#39FF14]" size={24} />
 
                   <button
                     onClick={() => {
                       setCartStep('items');
                       toggleCart();
                     }}
-                    className="mt-12 text-[10px] font-semibold text-white/30 hover:text-white uppercase tracking-wider transition-colors"
+                    className="mt-10 text-[10px] font-bold text-white/40 hover:text-white uppercase tracking-wider transition-colors"
                   >
-                    Salir del Proceso
+                    Cerrar
                   </button>
                 </div>
               )}
             </div>
 
-            {/* ── Footer (Items Step Only) ── */}
+            {/* ── 4. STICKY FOOTER (ITEMS STEP ONLY) ── */}
             {cartStep === 'items' && items.length > 0 && (
-              <div className={cn("border-t px-6 py-5 shadow-[0_-15px_40px_rgba(0,0,0,0.8)] backdrop-blur-md relative z-50 shrink-0 bg-black/95", currentStyles.header)}>
-                {/* Totals */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className={currentStyles.textMuted}>Subtotal</span>
-                    <span className="font-medium text-white">$${subtotal.toLocaleString('es-AR')}</span>
+              <div className="border-t border-white/[0.08] px-6 py-5 bg-[#080808]/95 backdrop-blur-2xl relative z-50 shrink-0 shadow-[0_-15px_40px_rgba(0,0,0,0.9)]">
+                {/* Summary Rows */}
+                <div className="space-y-2 mb-4 font-mono">
+                  <div className="flex justify-between items-center text-xs text-white/60">
+                    <span>Subtotal</span>
+                    <span className="font-bold text-white">${subtotal.toLocaleString('es-AR')}</span>
                   </div>
                   {appliedCoupon && (
-                    <div className="flex justify-between items-center text-xs">
-                      <span className={currentStyles.accentText}>Descuento ({appliedCoupon.code})</span>
-                      <span className={cn("font-medium", currentStyles.accentText)}>-$${discount.toLocaleString('es-AR')}</span>
+                    <div className="flex justify-between items-center text-xs text-[#39FF14]">
+                      <span>Descuento ({appliedCoupon.code})</span>
+                      <span className="font-bold">-${discount.toLocaleString('es-AR')}</span>
                     </div>
                   )}
                   <div className="h-px bg-white/5 my-2" />
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-semibold text-white">Total</span>
-                    <span className={cn("text-base font-bold tracking-tight", currentStyles.accentText)}>
-                      $${total.toLocaleString('es-AR')}
+                    <span className="text-xs font-black uppercase text-white">Total</span>
+                    <span className="text-lg font-black text-[#39FF14]">
+                      ${total.toLocaleString('es-AR')}
                     </span>
                   </div>
                 </div>
 
-                {/* CTA */}
+                {/* Primary Action Button */}
                 <button
                   onClick={handleNextStep}
-                  className={cn("w-full h-11 rounded-xl flex items-center justify-center gap-2 font-semibold text-xs tracking-wider uppercase transition-all duration-300 shadow-[0_5px_15px_rgba(255,255,255,0.02)] active:scale-98 group", currentStyles.buttonPrimary)}
+                  className="w-full h-12 rounded-2xl bg-white text-black font-mono font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#39FF14] hover:shadow-[0_0_20px_rgba(57,255,20,0.3)] transition-all group"
                 >
                   <span>Continuar al Pago</span>
-                  <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             )}

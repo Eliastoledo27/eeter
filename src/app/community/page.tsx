@@ -4,8 +4,16 @@ import { PreviewCommunityClient } from '@/components/preview/PreviewCommunityCli
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-    title: 'Comunidad & Academia | ÉTER Store',
-    description: 'Sumate a la red federal de revendedores de calzado urbano. Stock asegurado, margen 100% libre y despachos en 24/48hs por Andreani.',
+    title: 'Revendedores de Zapatillas & Calzado Mayorista | ÉTER Store',
+    description: 'Comenzá a vender zapatillas y calzado urbano con listas mayoristas directas de Brasil. Stock físico garantizado en Mar del Plata, fotos profesionales y margen 100% libre.',
+    keywords: [
+        'revendedores de zapatillas', 'calzado por mayor argentina', 'venta mayorista zapatillas',
+        'comprar zapatillas por mayor', 'dropshipping calzado argentina', 'vender zapas online',
+        'distribuidor zapatillas brasil', 'comunidad eter revendedores'
+    ],
+    alternates: {
+        canonical: 'https://www.eter.store/comunidad',
+    },
 };
 
 export default function CommunityPage() {

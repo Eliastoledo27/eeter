@@ -5,8 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/admin/'],
+      disallow: ['/api/', '/admin/', '/dashboard/', '/checkout/'],
     },
-    sitemap: 'https://eter-store.com/sitemap.xml',
+    sitemap: 'https://www.eter.store/sitemap.xml',
   }
 }
